@@ -8,7 +8,7 @@ Git Prompt Tool is a CLI tool helps you write commit messages & pull request des
 npm install -g gitpt
 ```
 
-## Set up
+## Set up
 
 To initiate the setup or reset the previous configuration, use the setup command:
 
