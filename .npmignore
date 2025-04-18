@@ -1,0 +1,14 @@
+# Source files
+src/
+tsconfig.json
+
+# Development files
+.git/
+.github/
+.vscode/
+
+# Build artifacts
+node_modules/
+
+# Other files
+.gitignore

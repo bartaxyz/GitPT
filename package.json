@@ -7,6 +7,11 @@
   "bin": {
     "gitpt": "dist/index.js"
   },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "ts-node --esm src/index.ts",
