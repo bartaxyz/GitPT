@@ -62,7 +62,27 @@ The tool will:
 4. Let you edit the message before committing
 5. Create the commit with your approved message
 
-### Options
+### Changing Models
+
+You can change the AI model at any time without re-entering your API key:
+
+```bash
+# Select model interactively (fetches available models from OpenRouter)
+gitpt model
+
+# Specify model directly
+gitpt model openai/gpt-4o
+
+# Switch to a different Claude model
+gitpt model anthropic/claude-3-haiku
+```
+
+The tool will:
+1. Keep your existing API key
+2. Update your configuration with the new model
+3. Use the new model for future commit message generations
+
+### Commit Options
 
 You can use any standard git commit options with the `gitpt commit` command:
 

@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import { setupCommand } from './commands/setup.js';
 import { commitCommand } from './commands/commit.js';
 import { addCommand } from './commands/add.js';
+import { modelCommand } from './commands/model.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -42,6 +43,12 @@ program
   .option('--no-edit', 'do not edit the message after generation')
   .allowUnknownOption(true) // Pass through other git commit options
   .action(commitCommand);
+
+// Model command
+program
+  .command('model [model-id]')
+  .description('Change the AI model used for generating commit messages')
+  .action(modelCommand);
 
 // Main logic
 async function main() {
