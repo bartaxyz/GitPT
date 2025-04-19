@@ -33,51 +33,164 @@ function getCurrentBranch(): string {
 
 function getDefaultBaseBranch(): string {
   try {
-    // Try to find default branch - first check for main, then master
-    const branches = execSync('git branch -r').toString().trim().split('\n');
-    
-    // Look for main branch patterns in remote branches
-    const mainPattern = /origin\/(main|master|develop|dev)/;
-    const defaultBranch = branches.find(b => mainPattern.test(b.trim()));
-    
-    if (defaultBranch) {
-      return defaultBranch.trim().replace(/^origin\//, '');
+    // First check for a default branch set in git config
+    try {
+      const defaultBranch = execSync('git config init.defaultBranch').toString().trim();
+      if (defaultBranch) {
+        return defaultBranch;
+      }
+    } catch (error) {
+      // Continue if git config doesn't have default branch
     }
     
-    // Fallback to 'main'
+    // Next, check if GitHub CLI can tell us the default branch
+    try {
+      const repoInfo = execSync('gh repo view --json defaultBranchRef --jq .defaultBranchRef.name').toString().trim();
+      if (repoInfo) {
+        return repoInfo;
+      }
+    } catch (error) {
+      // Continue if gh command fails
+    }
+    
+    // Try to find default branch in remote branches list
+    const branches = execSync('git branch -r').toString().trim().split('\n');
+    
+    // Common default branch names, in order of likelihood
+    const mainPatterns = [
+      /origin\/main$/,
+      /origin\/master$/,
+      /origin\/develop$/,
+      /origin\/dev$/,
+      /origin\/trunk$/
+    ];
+    
+    // Try each pattern in order
+    for (const pattern of mainPatterns) {
+      const defaultBranch = branches.find(b => pattern.test(b.trim()));
+      if (defaultBranch) {
+        return defaultBranch.trim().replace(/^origin\//, '');
+      }
+    }
+    
+    // Check for a branch that has 'HEAD -> origin/' in it, indicating the default branch
+    const headBranch = branches.find(b => b.includes('HEAD -> origin/'));
+    if (headBranch) {
+      const match = headBranch.match(/HEAD -> origin\/([^,\s]+)/);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    // Fallback to 'main' as most GitHub repos use this now
+    console.log(chalk.yellow('Could not determine default branch, using "main"'));
     return 'main';
   } catch (error) {
     // If we can't determine, default to main
+    console.log(chalk.yellow('Error detecting default branch, using "main"'));
     return 'main';
   }
 }
 
 function getCommitsSinceBaseBranch(baseBranch: string): string[] {
   try {
-    // Get commit messages since branching from base
-    const mergeBase = execSync(`git merge-base HEAD origin/${baseBranch}`).toString().trim();
-    const commitMessages = execSync(`git log --pretty=format:"%s" ${mergeBase}..HEAD`).toString().trim();
+    // Try first with origin/baseBranch
+    try {
+      const mergeBase = execSync(`git merge-base HEAD origin/${baseBranch}`).toString().trim();
+      const commitMessages = execSync(`git log --pretty=format:"%s" ${mergeBase}..HEAD`).toString().trim();
+      
+      if (commitMessages) {
+        return commitMessages.split('\n').filter(Boolean);
+      }
+    } catch (error) {
+      // If origin/baseBranch doesn't exist, try with just baseBranch
+      console.log(chalk.yellow(`No origin/${baseBranch} found, trying with local ${baseBranch} branch...`));
+    }
     
+    // Try with local branch
+    try {
+      const mergeBase = execSync(`git merge-base HEAD ${baseBranch}`).toString().trim();
+      const commitMessages = execSync(`git log --pretty=format:"%s" ${mergeBase}..HEAD`).toString().trim();
+      
+      if (commitMessages) {
+        return commitMessages.split('\n').filter(Boolean);
+      }
+    } catch (error) {
+      // If that fails too, fallback to simple branch comparison
+      console.log(chalk.yellow(`Merge base with ${baseBranch} not found, comparing branches directly...`));
+    }
+    
+    // Direct branch comparison
+    try {
+      const commitMessages = execSync(`git log --pretty=format:"%s" ${baseBranch}..HEAD`).toString().trim();
+      
+      if (commitMessages) {
+        return commitMessages.split('\n').filter(Boolean);
+      }
+    } catch (error) {
+      console.log(chalk.yellow(`Could not compare with ${baseBranch}, using recent commits...`));
+    }
+    
+    // Last resort: get most recent commits
+    const commitMessages = execSync('git log --pretty=format:"%s" -n 10').toString().trim();
     return commitMessages.split('\n').filter(Boolean);
   } catch (error) {
-    console.error(chalk.yellow('Could not get commits since base branch. Using all commits in the current branch.'));
-    // Fallback: just get commits on this branch
-    try {
-      const commitMessages = execSync('git log --pretty=format:"%s" HEAD~10..HEAD').toString().trim();
-      return commitMessages.split('\n').filter(Boolean);
-    } catch (e) {
-      return [];
-    }
+    console.error(chalk.yellow('Could not get commits. Using empty list.'));
+    return [];
   }
 }
 
 function getChangedFiles(baseBranch: string): string[] {
+  // Try several methods to get changed files
+  
+  // Method 1: Compare with origin/baseBranch using three dots
   try {
-    // Get files changed since branching from base
     const changedFiles = execSync(`git diff --name-only origin/${baseBranch}...HEAD`).toString().trim();
-    return changedFiles.split('\n').filter(Boolean);
+    if (changedFiles) {
+      return changedFiles.split('\n').filter(Boolean);
+    }
   } catch (error) {
-    console.error(chalk.yellow('Could not get changed files since base branch.'));
+    // Continue to next method
+  }
+  
+  // Method 2: Compare with local baseBranch using three dots
+  try {
+    const changedFiles = execSync(`git diff --name-only ${baseBranch}...HEAD`).toString().trim();
+    if (changedFiles) {
+      return changedFiles.split('\n').filter(Boolean);
+    }
+  } catch (error) {
+    // Continue to next method
+  }
+  
+  // Method 3: Direct comparison with two dots
+  try {
+    const changedFiles = execSync(`git diff --name-only ${baseBranch}..HEAD`).toString().trim();
+    if (changedFiles) {
+      return changedFiles.split('\n').filter(Boolean);
+    }
+  } catch (error) {
+    // Continue to next method
+  }
+  
+  // Method 4: Get recently modified files
+  try {
+    console.log(chalk.yellow(`Could not determine changed files relative to ${baseBranch}, using recently modified files...`));
+    const changedFiles = execSync('git ls-files --modified --others --exclude-standard').toString().trim();
+    if (changedFiles) {
+      return changedFiles.split('\n').filter(Boolean);
+    }
+  } catch (error) {
+    // Last resort
+  }
+  
+  // Method 5: List all files in the repo as a last resort
+  try {
+    console.log(chalk.yellow('Using all tracked files as fallback...'));
+    const allFiles = execSync('git ls-files').toString().trim();
+    return allFiles.split('\n').filter(Boolean).slice(0, 50); // Limit to first 50 files
+  } catch (error) {
+    console.error(chalk.red('Could not determine changed files.'));
     return [];
   }
 }
@@ -95,19 +208,77 @@ async function generatePRDetails(baseBranch: string, currentBranch: string): Pro
   const commitMessages = getCommitsSinceBaseBranch(baseBranch);
   const changedFiles = getChangedFiles(baseBranch);
   
+  // Check if we have any content to work with
+  if (commitMessages.length === 0 && changedFiles.length === 0) {
+    console.log(chalk.yellow('No commits or changed files detected.'));
+    console.log(chalk.yellow('Will attempt to generate PR details using branch name and repository context.'));
+  }
+  
+  // Get additional context from repository
+  let repoName = "";
+  let repoDescription = "";
+  
+  try {
+    // Try to get repo information from GitHub CLI
+    const repoInfo = JSON.parse(execSync('gh repo view --json name,description').toString().trim());
+    repoName = repoInfo.name || "";
+    repoDescription = repoInfo.description || "";
+  } catch (error) {
+    // Continue without this info
+  }
+  
   console.log(chalk.blue('Generating PR title and description...'));
   
-  // Create context for the AI
-  const context = `
-Branch: ${currentBranch}
-Base branch: ${baseBranch}
-
-Commit messages in this branch:
-${commitMessages.map(msg => `- ${msg}`).join('\n')}
-
-Files changed in this branch:
-${changedFiles.map(file => `- ${file}`).join('\n')}
-  `.trim();
+  // Build a rich context for the AI
+  let contextSections = [
+    `Branch: ${currentBranch}`,
+    `Base branch: ${baseBranch}`
+  ];
+  
+  // Add repository info if available
+  if (repoName) {
+    contextSections.push(`Repository: ${repoName}`);
+  }
+  
+  if (repoDescription) {
+    contextSections.push(`Repository description: ${repoDescription}`);
+  }
+  
+  // Add commit messages if available
+  if (commitMessages.length > 0) {
+    contextSections.push(
+      'Commit messages in this branch:',
+      commitMessages.map(msg => `- ${msg}`).join('\n')
+    );
+  } else {
+    contextSections.push('No commit messages available.');
+    
+    // Try to extract intent from branch name if no commits
+    if (currentBranch.includes('/')) {
+      const branchParts = currentBranch.split('/');
+      const branchType = branchParts[0]; // e.g., "feature", "fix", "chore"
+      const branchDescription = branchParts.slice(1).join('/').replace(/-/g, ' ');
+      
+      contextSections.push(
+        'Branch name analysis:',
+        `Type: ${branchType}`,
+        `Description: ${branchDescription}`
+      );
+    }
+  }
+  
+  // Add changed files if available
+  if (changedFiles.length > 0) {
+    contextSections.push(
+      'Files changed in this branch:',
+      changedFiles.map(file => `- ${file}`).join('\n')
+    );
+  } else {
+    contextSections.push('No file changes detected.');
+  }
+  
+  // Create the final context
+  const context = contextSections.join('\n\n');
   
   const systemPrompt = `You are a helpful assistant that generates clear, informative GitHub pull request titles and descriptions.
 For the title:
@@ -201,14 +372,59 @@ function createPullRequest(title: string, body: string, baseBranch: string, draf
   try {
     console.log(chalk.blue(`Creating pull request to ${baseBranch}...`));
     
-    // Use template literal to preserve line breaks in the body
-    const command = `gh pr create --title "${title}" --body "${body.replace(/"/g, '\\"')}" --base "${baseBranch}" ${draftFlag}`;
-    
-    execSync(command, { stdio: 'inherit' });
-    
-    console.log(chalk.green('✓ Pull request created successfully'));
+    // Create a temporary file for the PR body to avoid issues with escaping
+    const tempFilePath = `/tmp/gitpt-pr-body-${Date.now()}.md`;
+    try {
+      // Write the body to a temporary file
+      execSync(`cat > "${tempFilePath}" << 'GITPT_EOF'
+${body}
+GITPT_EOF`);
+      
+      // Try to get the remote repo URL if available
+      let repoUrlArg = '';
+      try {
+        const repoUrl = execSync('git config --get remote.origin.url').toString().trim();
+        if (repoUrl) {
+          repoUrlArg = `--repo "${repoUrl}"`;
+        }
+      } catch (e) {
+        // Proceed without repo URL
+      }
+      
+      // Use the file for the body
+      const command = `gh pr create --title "${title.replace(/"/g, '\\"')}" --body-file "${tempFilePath}" --base "${baseBranch}" ${draftFlag} ${repoUrlArg}`;
+      
+      // Set a timeout to avoid hanging indefinitely
+      console.log(chalk.gray('Running GitHub PR creation command...'));
+      console.log(chalk.gray(`Using base branch: ${baseBranch}`));
+      
+      // Add debugging output
+      console.log(chalk.gray('Executing command with 60s timeout:'));
+      
+      // Execute the command with a timeout
+      const result = execSync(command, { 
+        stdio: 'pipe', 
+        timeout: 60000 // 60-second timeout 
+      }).toString();
+      
+      console.log(result);
+      console.log(chalk.green('✓ Pull request created successfully'));
+    } finally {
+      // Clean up temporary file
+      try {
+        execSync(`rm -f "${tempFilePath}"`);
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+    }
   } catch (error) {
-    console.error(chalk.red('Error creating pull request:'), error);
+    if (error instanceof Error && error.message.includes('timeout')) {
+      console.error(chalk.red('Error: GitHub CLI command timed out after 60 seconds.'));
+      console.log(chalk.yellow('You may need to create the PR manually using:'));
+      console.log(chalk.yellow(`gh pr create --title "${title}" --base "${baseBranch}" ${draftFlag}`));
+    } else {
+      console.error(chalk.red('Error creating pull request:'), error);
+    }
     throw new Error('Failed to create pull request');
   }
 }
@@ -228,11 +444,15 @@ export async function prCreateCommand(options: PullRequestOptions = {}): Promise
   
   // Check if user is authenticated with GitHub CLI
   try {
-    execSync('gh auth status', { stdio: 'ignore' });
+    const authStatus = execSync('gh auth status -h github.com 2>&1 || true').toString();
+    if (authStatus.includes('not logged')) {
+      console.error(chalk.red('Error: You are not authenticated with GitHub CLI.'));
+      console.log(chalk.yellow('Please run `gh auth login` to authenticate.'));
+      process.exit(1);
+    }
   } catch (error) {
-    console.error(chalk.red('Error: You are not authenticated with GitHub CLI.'));
-    console.log(chalk.yellow('Please run `gh auth login` to authenticate.'));
-    process.exit(1);
+    console.log(chalk.yellow('Warning: Could not verify GitHub CLI authentication.'));
+    console.log(chalk.yellow('If PR creation fails, please run `gh auth login` first.'));
   }
 
   // Get configuration
