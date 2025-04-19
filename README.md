@@ -77,11 +77,6 @@ gitpt model openai/gpt-4o
 gitpt model anthropic/claude-3-haiku
 ```
 
-The tool will:
-1. Keep your existing API key
-2. Update your configuration with the new model
-3. Use the new model for future commit message generations
-
 ### Commit Options
 
 You can use any standard git commit options with the `gitpt commit` command:
