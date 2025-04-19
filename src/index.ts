@@ -6,6 +6,7 @@ import { setupCommand } from './commands/setup.js';
 import { commitCommand } from './commands/commit.js';
 import { addCommand } from './commands/add.js';
 import { modelCommand } from './commands/model.js';
+import { prCreateCommand } from './commands/pr.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -49,6 +50,18 @@ program
   .command('model [model-id]')
   .description('Change the AI model used for generating commit messages')
   .action(modelCommand);
+
+// Pull request command
+program
+  .command('pr create')
+  .description('Create a pull request with AI-generated title and description')
+  .option('-t, --title <title>', 'Custom pull request title')
+  .option('-b, --body <body>', 'Custom pull request description')
+  .option('-d, --draft', 'Create as draft pull request')
+  .option('-B, --base <branch>', 'Base branch to create PR against')
+  .option('-e, --edit', 'Edit PR details before submission', true)
+  .option('--no-edit', 'Skip editing PR details')
+  .action(prCreateCommand);
 
 // Main logic
 async function main() {
