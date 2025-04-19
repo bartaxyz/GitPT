@@ -5,6 +5,7 @@ Git Prompt Tool is a CLI tool that helps you write commit messages using AI thro
 ## Features
 
 - Generate commit messages with AI based on your code changes
+- Create pull requests with AI-generated titles and descriptions
 - Compatible with all regular git commit options (you can treat it as an alias)
 - Edit suggested messages before committing
 - Works with various AI models via OpenRouter
@@ -92,9 +93,46 @@ gitpt commit -m "Your message here"
 gitpt commit --amend
 ```
 
+### Creating Pull Requests
+
+Generate AI-powered pull request titles and descriptions based on your changes:
+
+```bash
+gitpt pr create
+```
+
+The tool will:
+1. Analyze the commits and files changed since branching from the base branch
+2. Generate a suitable PR title and detailed description
+3. Show you the suggested content
+4. Let you edit the title and description before submission
+5. Create the pull request with your approved content
+
+#### Pull Request Options
+
+```bash
+# Create a draft PR
+gitpt pr create --draft
+
+# Specify a custom base branch
+gitpt pr create --base develop
+
+# Skip editing the PR details
+gitpt pr create --no-edit
+
+# Provide your own title instead of generating one
+gitpt pr create --title "Your PR title here"
+```
+
+> **Note:** This command requires GitHub CLI (`gh`) to be installed and authenticated.
+
 ## How It Works
 
-GitPT sends a diff of your staged changes to the configured AI model via OpenRouter, which generates a contextual commit message following best practices.
+GitPT leverages AI via OpenRouter to enhance your Git workflow:
+
+- **For commits:** Sends a diff of your staged changes to the AI, which generates a contextual commit message following best practices.
+
+- **For pull requests:** Analyzes the commits and file changes between your branch and the base branch, then generates a suitable title and detailed description for your PR.
 
 ## Development
 
