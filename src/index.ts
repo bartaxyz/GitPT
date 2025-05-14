@@ -2,6 +2,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { execSync } from 'child_process';
 import { setupCommand } from './commands/setup.js';
 import { commitCommand } from './commands/commit.js';
 import { addCommand } from './commands/add.js';
@@ -10,6 +11,7 @@ import { prCreateCommand } from './commands/pr.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { isGitRepository } from './utils/git.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,19 +25,24 @@ program
   .description('Git Prompt Tool helps you write commit messages using AI')
   .version(version);
 
-// Setup command
+// GitPT-specific commands
 program
   .command('setup')
   .description('Configure GitPT with your OpenRouter API key and model selection')
   .action(setupCommand);
 
-// Add command (pass-through to git add)
+program
+  .command('model [model-id]')
+  .description('Change the AI model used for generating commit messages')
+  .action(modelCommand);
+
+// Enhanced git commands
 program
   .command('add [files...]')
   .description('Add files to git staging area (pass-through to git add)')
+  .allowUnknownOption(true) // Pass through other git add options
   .action(addCommand);
 
-// Commit command
 program
   .command('commit')
   .description('Generate AI-powered commit message based on staged changes')
@@ -45,13 +52,6 @@ program
   .allowUnknownOption(true) // Pass through other git commit options
   .action(commitCommand);
 
-// Model command
-program
-  .command('model [model-id]')
-  .description('Change the AI model used for generating commit messages')
-  .action(modelCommand);
-
-// Pull request command
 program
   .command('pr create')
   .description('Create a pull request with AI-generated title and description')
@@ -61,7 +61,27 @@ program
   .option('-B, --base <branch>', 'Base branch to create PR against')
   .option('-e, --edit', 'Edit PR details before submission', true)
   .option('--no-edit', 'Skip editing PR details')
+  .allowUnknownOption(true)
   .action(prCreateCommand);
+
+// Handle unknown commands by passing them to git
+program.on('command:*', (operands) => {
+  if (!isGitRepository()) {
+    console.error(chalk.red('Error: Not a git repository'));
+    process.exit(1);
+  }
+  
+  try {
+    // Get all arguments passed to the original command
+    const args = process.argv.slice(2);
+    
+    // Execute git with all arguments
+    execSync(`git ${args.join(' ')}`, { stdio: 'inherit' });
+  } catch (error) {
+    // Git will handle its own error output through stdio: 'inherit'
+    process.exit(1);
+  }
+});
 
 // Main logic
 async function main() {

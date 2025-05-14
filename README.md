@@ -1,12 +1,13 @@
 # GitPT
 
-Git Prompt Tool is a CLI tool that helps you write commit messages using AI through [OpenRouter](https://openrouter.ai/).
+Git Prompt Tool is a CLI tool that helps you write commit messages using AI through [OpenRouter](https://openrouter.ai/). It acts as a complete git wrapper, enhancing specific commands with AI while passing through all other git commands directly.
 
 ## Features
 
+- Acts as a complete git replacement - all git commands are supported
 - Generate commit messages with AI based on your code changes
 - Create pull requests with AI-generated titles and descriptions
-- Compatible with all regular git commit options (you can treat it as an alias)
+- Compatible with all regular git options (flags, arguments, etc.)
 - Edit suggested messages before committing
 - Works with various AI models via OpenRouter
 
@@ -36,16 +37,36 @@ You'll need an [OpenRouter](https://openrouter.ai/) account to get an API key.
 
 ## Usage
 
-### Adding Files
+### Using GitPT as a Complete Git Replacement
 
-Add files to the staging area using either git directly or the GitPT wrapper:
+GitPT can be used as a direct replacement for git - any git command can be run through GitPT:
 
 ```bash
-# Standard git command
-git add .
+# Standard git commands work exactly the same
+gitpt status
+gitpt log
+gitpt branch
+gitpt checkout -b new-feature
+gitpt push origin main
 
-# Or using GitPT wrapper
+# GitPT passes all arguments and options to git
+gitpt log --oneline --graph
+gitpt merge --no-ff feature-branch
+```
+
+### Adding Files
+
+Add files to the staging area just like you would with git:
+
+```bash
+# Same as git add .
 gitpt add .
+
+# Same as git add -p
+gitpt add -p
+
+# Same as git add src/*.ts
+gitpt add src/*.ts
 ```
 
 ### Creating Commits
@@ -128,11 +149,15 @@ gitpt pr create --title "Your PR title here"
 
 ## How It Works
 
-GitPT leverages AI via OpenRouter to enhance your Git workflow:
+GitPT leverages AI via OpenRouter to enhance your Git workflow while acting as a complete git wrapper:
+
+- **Command Handling:** GitPT intelligently routes commands - enhanced commands (commit, pr) use AI capabilities while all other git commands are passed directly to git.
 
 - **For commits:** Sends a diff of your staged changes to the AI, which generates a contextual commit message following best practices.
 
 - **For pull requests:** Analyzes the commits and file changes between your branch and the base branch, then generates a suitable title and detailed description for your PR.
+
+- **For other git commands:** Passes them through directly to git with all arguments and options preserved, ensuring complete compatibility with your existing git workflow.
 
 ## Development
 
