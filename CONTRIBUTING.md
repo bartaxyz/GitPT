@@ -71,10 +71,12 @@ Thank you for your interest in contributing to GitPT! This document provides gui
 4. **Commit your changes**:
    Follow the [Commit Message Guidelines](#commit-message-guidelines).
 
-5. **Push your branch and create a pull request**:
+5. **Push your branch and create a pull request using GitPT**:
    ```bash
    git push origin feature/your-feature-name
+   gitpt pr create
    ```
+   Using `gitpt pr create` is recommended as it will automatically generate an appropriate PR title and description based on your changes, following the project's standards.
 
 6. **Code review**:
    Wait for maintainers to review your PR. Make any requested changes.
