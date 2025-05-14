@@ -64,27 +64,24 @@ program
   .allowUnknownOption(true)
   .action(prCreateCommand);
 
-// Default command handler for all other git commands
-program
-  .command('*', { hidden: true }) // Catch-all command that won't show in help
-  .allowUnknownOption(true)
-  .action((cmd, options) => {
-    if (!isGitRepository()) {
-      console.error(chalk.red('Error: Not a git repository'));
-      process.exit(1);
-    }
+// Handle unknown commands by passing them to git
+program.on('command:*', (operands) => {
+  if (!isGitRepository()) {
+    console.error(chalk.red('Error: Not a git repository'));
+    process.exit(1);
+  }
+  
+  try {
+    // Get all arguments passed to the original command
+    const args = process.argv.slice(2);
     
-    try {
-      // Get all arguments passed to the original command
-      const args = process.argv.slice(2);
-      
-      // Execute git with all arguments
-      execSync(`git ${args.join(' ')}`, { stdio: 'inherit' });
-    } catch (error) {
-      // Git will handle its own error output through stdio: 'inherit'
-      process.exit(1);
-    }
-  });
+    // Execute git with all arguments
+    execSync(`git ${args.join(' ')}`, { stdio: 'inherit' });
+  } catch (error) {
+    // Git will handle its own error output through stdio: 'inherit'
+    process.exit(1);
+  }
+});
 
 // Main logic
 async function main() {
