@@ -112,8 +112,8 @@ GitPT uses GitHub Actions and semantic-release for automated versioning and publ
 
 ### Automated Release Process
 
-1. **Merge to main**:
-   When changes are merged to the `main` branch, the GitHub Actions workflow automatically:
+1. **Merge to master**:
+   When changes are merged to the `master` branch, the GitHub Actions workflow automatically:
    - Analyzes commit messages
    - Determines the appropriate version bump
    - Updates package.json
