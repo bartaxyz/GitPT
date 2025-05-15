@@ -108,41 +108,25 @@ GitPT uses conventional commits to automate versioning and release notes. Please
 
 ## Release Process
 
-GitPT uses GitHub Actions and semantic-release for automated versioning and publishing.
+GitPT uses GitHub Releases to trigger the publishing workflow.
 
-### Automated Release Process
+### Release Process
 
-1. **Merge to master**:
-   When changes are merged to the `master` branch, the GitHub Actions workflow automatically:
-   - Analyzes commit messages
-   - Determines the appropriate version bump
-   - Updates package.json
-   - Creates a git tag
-   - Publishes to npm
-   - Creates a GitHub release with notes
+1. **Create a new GitHub Release**:
+   - Go to the repository on GitHub
+   - Navigate to "Releases" 
+   - Click "Draft a new release"
+   - Create a new tag (e.g., `v1.0.1`)
+   - Add a title and description for the release
+   - Click "Publish release"
 
-### Manual Release Process
+2. **GitHub Actions** will automatically:
+   - Update package.json with the release version
+   - Build the package
+   - Publish to npm
+   - Commit the updated package.json back to the repository
 
-For manual releases:
-
-1. **Update version**:
-   ```bash
-   npm version patch|minor|major
-   ```
-
-2. **Push with tags**:
-   ```bash
-   git push --follow-tags
-   ```
-
-3. **GitHub Actions** will automatically publish packages pushed with version tags (format: `v*`)
-
-### Version Determination
-
-Semantic-release determines version bumps based on commit messages:
-- `fix:` → Patch release (1.0.0 → 1.0.1)
-- `feat:` → Minor release (1.0.0 → 1.1.0)
-- `feat!:`, `fix!:` or commits with `BREAKING CHANGE:` → Major release (1.0.0 → 2.0.0)
+The workflow is triggered when a GitHub Release is published. This ensures a clean, consistent release process that's easy to track through GitHub's UI.
 
 ## Code Style
 
