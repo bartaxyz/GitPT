@@ -48,5 +48,9 @@
     "configstore": "^7.0.0",
     "inquirer": "^12.5.2",
     "node-fetch": "^3.3.2"
+  },
+  "optionalDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3"
   }
 }

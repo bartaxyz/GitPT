@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import { isGitRepository, hasStagedChanges, getStagedChanges, executeGitCommit } from '../utils/git.js';
 import { generateCommitMessage } from '../utils/api.js';
 import { getConfig } from '../utils/config.js';
+import { hasCommitlintConfig, validateCommitMessage } from '../utils/commitlint.js';
 
 interface CommitOptions {
   message?: string;
@@ -41,8 +42,36 @@ export async function commitCommand(options: CommitOptions): Promise<void> {
       
       console.log(chalk.blue('Generating commit message...'));
       
+      // Check if commitlint is configured
+      if (hasCommitlintConfig()) {
+        console.log(chalk.blue('Commitlint configuration detected. Generating message according to rules...'));
+      }
+      
       // Generate commit message
       commitMessage = await generateCommitMessage(diff);
+      
+      // If commitlint is configured, validate the message
+      if (hasCommitlintConfig()) {
+        console.log(chalk.blue('Validating commit message against commitlint rules...'));
+        const validation = await validateCommitMessage(commitMessage);
+        
+        if (!validation.valid && validation.errors) {
+          console.log(chalk.yellow('Commit message failed validation. Regenerating...'));
+          console.log(chalk.gray(validation.errors));
+          
+          // Regenerate with validation errors
+          commitMessage = await generateCommitMessage(diff, validation.errors);
+          
+          // Validate again
+          const revalidation = await validateCommitMessage(commitMessage);
+          if (!revalidation.valid) {
+            console.log(chalk.yellow('Warning: Regenerated message still has validation issues.'));
+            console.log(chalk.gray(revalidation.errors));
+          }
+        } else {
+          console.log(chalk.green('✓ Commit message passed validation'));
+        }
+      }
       
       console.log(chalk.green('✓ Commit message generated'));
       console.log('');
