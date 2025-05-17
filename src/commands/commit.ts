@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import { isGitRepository, hasStagedChanges, getStagedChanges, executeGitCommit } from '../utils/git.js';
 import { generateCommitMessage } from '../utils/api.js';
 import { getConfig } from '../utils/config.js';
+import { hasCommitlintConfig } from '../utils/commitlint.js';
 
 interface CommitOptions {
   message?: string;
@@ -40,6 +41,11 @@ export async function commitCommand(options: CommitOptions): Promise<void> {
       const diff = getStagedChanges();
       
       console.log(chalk.blue('Generating commit message...'));
+      
+      // Check if commitlint is configured
+      if (hasCommitlintConfig()) {
+        console.log(chalk.blue('Commitlint configuration detected. Generating message according to rules...'));
+      }
       
       // Generate commit message
       commitMessage = await generateCommitMessage(diff);
