@@ -6,10 +6,15 @@ Git Prompt Tool is a CLI tool that helps you write commit messages using AI thro
 
 - Acts as a complete git replacement - all git commands are supported
 - Generate commit messages with AI based on your code changes
+
+  `gitpt commit`
 - Create pull requests with AI-generated titles and descriptions
+
+  `gitpt pr create`
 - Compatible with all regular git options (flags, arguments, etc.)
 - Edit suggested messages before committing
 - Works with various AI models via OpenRouter
+- [Commitlint](https://commitlint.js.org/) support - read directly from your repository
 
 ## Installation
 
@@ -59,14 +64,8 @@ gitpt merge --no-ff feature-branch
 Add files to the staging area just like you would with git:
 
 ```bash
-# Same as git add .
+# Same as git add . (supports all the regular git add options)
 gitpt add .
-
-# Same as git add -p
-gitpt add -p
-
-# Same as git add src/*.ts
-gitpt add src/*.ts
 ```
 
 ### Creating Commits
@@ -75,14 +74,22 @@ Generate an AI-powered commit message based on your staged changes:
 
 ```bash
 gitpt commit
+
+# Or supply -m argument, if you want to avoid gitpt generating the message
+gitpt commit -m "feat: file hash validation"
+
+# Pass any other git commit options
+gitpt commit --amend
 ```
 
 The tool will:
 1. Analyze your staged changes
 2. Generate a commit message using the configured AI model
-3. Show you the suggested message
-4. Let you edit the message before committing
-5. Create the commit with your approved message
+3. Validate against commitlint rules (if configured)
+4. Regenerate the message if it fails validation
+5. Show you the suggested message
+6. Let you edit the message before committing
+7. Create the commit with your approved message
 
 ### Changing Models
 
@@ -99,20 +106,9 @@ gitpt model openai/gpt-4o
 gitpt model anthropic/claude-3-haiku
 ```
 
-### Commit Options
+## GitHub Usage
 
-You can use any standard git commit options with the `gitpt commit` command:
-
-```bash
-# Skip editing the message
-gitpt commit --no-edit
-
-# Provide your own message instead of generating one
-gitpt commit -m "Your message here"
-
-# Pass any other git commit options
-gitpt commit --amend
-```
+If you have GitHub CLI (`gh`) installed, you can use GitPT to interact with GitHub (e.g. generate full pull requests).
 
 ### Creating Pull Requests
 
@@ -145,8 +141,6 @@ gitpt pr create --no-edit
 gitpt pr create --title "Your PR title here"
 ```
 
-> **Note:** This command requires GitHub CLI (`gh`) to be installed and authenticated.
-
 ## How It Works
 
 GitPT leverages AI via OpenRouter to enhance your Git workflow while acting as a complete git wrapper:
@@ -154,6 +148,8 @@ GitPT leverages AI via OpenRouter to enhance your Git workflow while acting as a
 - **Command Handling:** GitPT intelligently routes commands - enhanced commands (commit, pr) use AI capabilities while all other git commands are passed directly to git.
 
 - **For commits:** Sends a diff of your staged changes to the AI, which generates a contextual commit message following best practices.
+
+- **Commitlint Integration:** Automatically detects commitlint configuration files and validates generated commit messages against your project's commit conventions. If validation fails, it regenerates a compliant message.
 
 - **For pull requests:** Analyzes the commits and file changes between your branch and the base branch, then generates a suitable title and detailed description for your PR.
 
@@ -175,6 +171,20 @@ npm run build
 # Link for local development
 npm link
 ```
+
+## Commitlint Integration
+
+GitPT automatically detects and integrates with [commitlint](https://commitlint.js.org/) if it's configured in your repository:
+
+- **Automatic Detection:** GitPT checks for common commitlint configuration files (commitlint.config.js, .commitlintrc.*, etc.)
+
+- **Rule-Aware Generation:** When commitlint is detected, GitPT instructs the AI to generate messages that follow your specific commit conventions
+
+- **Validation & Regeneration:** Generated messages are validated against your commitlint rules before committing. If validation fails, GitPT automatically regenerates a compliant message
+
+- **Error Feedback:** Validation errors are sent to the AI to help it understand how to fix the message
+
+This integration ensures that all AI-generated commit messages follow your team's established commit conventions without requiring manual corrections.
 
 ## License
 
