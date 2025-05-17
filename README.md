@@ -38,6 +38,9 @@ This will guide you through:
 1. Entering your OpenRouter API key
 2. Selecting an AI model from popular options or specifying a custom one
 
+_It's recommended using small models, such as `openai/gpt-4.1-mini` as your model choice. Mainly due to its large context window, fast response times & cost-effective pricing._
+
+
 You'll need an [OpenRouter](https://openrouter.ai/) account to get an API key.
 
 ## Usage
@@ -93,7 +96,7 @@ The tool will:
 
 ### Changing Models
 
-You can change the AI model at any time without re-entering your API key:
+You can change the AI model at any time without re-entering your API key.
 
 ```bash
 # Select model interactively (fetches available models from OpenRouter)
@@ -105,6 +108,8 @@ gitpt model openai/gpt-4o
 # Switch to a different Claude model
 gitpt model anthropic/claude-3-haiku
 ```
+
+_It's recommended using small models, such as `openai/gpt-4.1-mini` as your model choice. Mainly due to its large context window, fast response times & cost-effective pricing._
 
 ## GitHub Usage
 
