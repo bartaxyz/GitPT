@@ -17,7 +17,7 @@ interface OpenRouterResponse {
   }>;
 }
 
-export async function generateCommitMessage(diff: string): Promise<string> {
+export async function generateCommitMessage(diff: string, validationErrors?: string): Promise<string> {
   // Check if commitlint is configured
   const hasCommitlint = hasCommitlintConfig();
   const config = getConfig();
@@ -44,7 +44,7 @@ export async function generateCommitMessage(diff: string): Promise<string> {
          - feat: add user authentication
          - fix: resolve null pointer in login
          - chore: update dependencies
-         - style: format css files`}`,
+         - style: format css files`}${validationErrors ? `\n\nYOUR PREVIOUS MESSAGE FAILED VALIDATION WITH THESE ERRORS:\n${validationErrors}\n\nFIX THESE ISSUES IN YOUR NEW MESSAGE.` : ''}`,
     },
     {
       role: "user",
