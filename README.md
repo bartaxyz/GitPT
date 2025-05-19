@@ -100,30 +100,13 @@ The tool will:
 You can change the AI model at any time:
 
 ```bash
-# Select model interactively (fetches available models from OpenRouter)
+# Select model interactively (either OpenRouter or a local LLM)
 gitpt model
-
-# Specify model directly
-gitpt model openai/gpt-4o
-
-# Switch to a different Claude model
-gitpt model anthropic/claude-3-haiku
 ```
 
 _It's recommended using small models, such as `openai/gpt-4.1-mini` as your model choice. Mainly due to its large context window, fast response times & cost-effective pricing._
 
-### Using a Local LLM
-
-You can configure GitPT to use a local LLM with an OpenAI-compatible API instead of OpenRouter:
-
-```bash
-# Configure a local LLM
-gitpt model --local
-```
-
-This will prompt you for:
-1. The API endpoint URL (e.g., http://127.0.0.1:1234)
-2. The model name to use with your local LLM
+#### Using a Local LLM
 
 GitPT works with any local LLM that provides an OpenAI-compatible API endpoint, such as:
 - [Ollama](https://ollama.ai/)

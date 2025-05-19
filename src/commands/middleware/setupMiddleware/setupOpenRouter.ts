@@ -1,7 +1,8 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
+import { OPENROUTER_API_URL } from "../../../llm/index.js";
 import { GitPTConfig, saveConfig } from "../../../config.js";
-import { getLLMClient } from "../../../llm/index.js";
+import { getAvailableModels } from "./getAvailableModels.js";
 import { getOrUpdateApiKey } from "./getOrUpdateApiKey.js";
 import { selectModel } from "./selectModel.js";
 
@@ -28,8 +29,9 @@ export const setupOpenRouter = async (
   try {
     console.log(chalk.gray("Fetching available models from OpenRouter..."));
 
-    const modelsList = await getLLMClient().models.list();
-    const models = modelsList.data;
+    const models = await getAvailableModels({
+      baseURLOverride: OPENROUTER_API_URL,
+    });
 
     if (models.length > 0) {
       console.log(

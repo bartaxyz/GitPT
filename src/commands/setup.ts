@@ -16,7 +16,7 @@ export const setupCommand = async (
     clearConfig();
   }
 
-  await setupMiddleware();
+  await setupMiddleware({ context: "setup" });
 
   console.log("");
   console.log(

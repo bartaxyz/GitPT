@@ -28,12 +28,14 @@ export const setupLocalLLM = async (
     },
   ]);
 
-  const localLLMEndpoint = endpointAnswer.localLLMEndpoint;
   console.log(
     chalk.gray("Trying to fetch available models from local LLM server...")
   );
 
-  const models = await getAvailableModels();
+  const models = await getAvailableModels({
+    baseURLOverride: endpointAnswer.localLLMEndpoint,
+  });
+
   let selectedModel: string;
 
   if (models.length > 0) {
@@ -61,11 +63,11 @@ export const setupLocalLLM = async (
     selectedModel = modelAnswer.model;
   }
 
-  const updatedConfig = {
+  const updatedConfig: GitPTConfig = {
     ...existingConfig,
-    useLocalLLM: true,
-    localLLMEndpoint,
+    provider: "local",
     model: selectedModel,
+    customLLMEndpoint: endpointAnswer.localLLMEndpoint,
   };
 
   // Save the config

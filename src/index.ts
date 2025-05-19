@@ -5,6 +5,7 @@ import { execSync } from "child_process";
 import { Command } from "commander";
 import packageJSON from "../package.json" with { type: "json" };
 import { commitCommand } from "./commands/commit/index.js";
+import { configCommand } from "./commands/config.js";
 import { modelCommand } from "./commands/model.js";
 import { prCreateCommand } from "./commands/pr/index.js";
 import { setupCommand } from "./commands/setup.js";
@@ -23,6 +24,11 @@ program
     "Configure GitPT with your OpenRouter API key and model selection"
   )
   .action(setupCommand);
+
+program
+  .command("config")
+  .description("Configure GitPT with your OpenRouter API key and model selection")
+  .action(configCommand);
 
 program
   .command("model")
