@@ -1,29 +1,20 @@
-#!/usr/bin/env -S node --experimental-specifier-resolution=node
+#!/usr/bin/env node
 
 import chalk from "chalk";
 import { execSync } from "child_process";
 import { Command } from "commander";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import packageJSON from "../package.json";
 import { commitCommand } from "./commands/commit";
 import { modelCommand } from "./commands/model";
 import { prCreateCommand } from "./commands/pr";
 import { setupCommand } from "./commands/setup";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const packageJson = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../package.json"), "utf8")
-);
-const version = packageJson.version;
 
 const program = new Command();
 
 program
   .name("gitpt")
   .description("Git Prompt Tool helps you write commit messages using AI")
-  .version(version);
+  .version(packageJSON.version);
 
 // GitPT-specific commands
 program
