@@ -1,7 +1,7 @@
-import Configstore from 'configstore';
-import chalk from 'chalk';
+import Configstore from "configstore";
+import chalk from "chalk";
 
-const config = new Configstore('gitpt');
+const config = new Configstore("gitpt");
 
 export interface GitPTConfig {
   apiKey: string;
@@ -12,37 +12,37 @@ export interface GitPTConfig {
 
 export function getConfig(): GitPTConfig | null {
   try {
-    const apiKey = config.get('apiKey');
-    const model = config.get('model');
-    const useLocalLLM = config.get('useLocalLLM');
-    const localLLMEndpoint = config.get('localLLMEndpoint');
+    const apiKey = config.get("apiKey");
+    const model = config.get("model");
+    const useLocalLLM = config.get("useLocalLLM");
+    const localLLMEndpoint = config.get("localLLMEndpoint");
 
     if (!apiKey || !model) {
       return null;
     }
 
-    return { 
-      apiKey, 
+    return {
+      apiKey,
       model,
       useLocalLLM,
-      localLLMEndpoint
+      localLLMEndpoint,
     };
   } catch (error) {
-    console.error(chalk.red('Error reading configuration:'), error);
+    console.error(chalk.red("Error reading configuration:"), error);
     return null;
   }
 }
 
 export function saveConfig(newConfig: GitPTConfig): void {
-  config.set('apiKey', newConfig.apiKey);
-  config.set('model', newConfig.model);
-  
+  config.set("apiKey", newConfig.apiKey);
+  config.set("model", newConfig.model);
+
   if (newConfig.useLocalLLM !== undefined) {
-    config.set('useLocalLLM', newConfig.useLocalLLM);
+    config.set("useLocalLLM", newConfig.useLocalLLM);
   }
-  
+
   if (newConfig.localLLMEndpoint !== undefined) {
-    config.set('localLLMEndpoint', newConfig.localLLMEndpoint);
+    config.set("localLLMEndpoint", newConfig.localLLMEndpoint);
   }
 }
 

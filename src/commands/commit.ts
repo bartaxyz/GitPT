@@ -43,33 +43,85 @@ export async function commitCommand(options: CommitOptions): Promise<void> {
       console.log(chalk.blue('Generating commit message...'));
       
       // Check if commitlint is configured
-      if (hasCommitlintConfig()) {
-        console.log(chalk.blue('Commitlint configuration detected. Generating message according to rules...'));
+      let hasCommitlint = false;
+      try {
+        hasCommitlint = hasCommitlintConfig();
+        if (hasCommitlint) {
+          console.log(chalk.blue('Commitlint configuration detected. Generating message according to rules...'));
+        }
+      } catch (error) {
+        console.warn(chalk.yellow('Warning: Error detecting commitlint config, proceeding without commitlint validation.'));
       }
       
-      // Generate commit message
+      // Generate first commit message
       commitMessage = await generateCommitMessage(diff);
       
-      // If commitlint is configured, validate the message
-      if (hasCommitlintConfig()) {
-        console.log(chalk.blue('Validating commit message against commitlint rules...'));
-        const validation = await validateCommitMessage(commitMessage);
-        
-        if (!validation.valid && validation.errors) {
-          console.log(chalk.yellow('Commit message failed validation. Regenerating...'));
-          console.log(chalk.gray(validation.errors));
+      // If commitlint is configured, try to validate and regenerate up to 3 times
+      if (hasCommitlint) {
+        try {
+          console.log(chalk.blue('Validating commit message against commitlint rules...'));
           
-          // Regenerate with validation errors
-          commitMessage = await generateCommitMessage(diff, validation.errors);
+          // Try up to 3 times to get a valid message
+          let validMessage = false;
+          let attempts = 0;
+          const MAX_ATTEMPTS = 3;
+          let validationErrors: string | undefined;
           
-          // Validate again
-          const revalidation = await validateCommitMessage(commitMessage);
-          if (!revalidation.valid) {
-            console.log(chalk.yellow('Warning: Regenerated message still has validation issues.'));
-            console.log(chalk.gray(revalidation.errors));
+          while (!validMessage && attempts < MAX_ATTEMPTS) {
+            const validation = await validateCommitMessage(commitMessage);
+            
+            if (validation.valid) {
+              console.log(chalk.green('✓ Commit message passed validation'));
+              validMessage = true;
+              break;
+            } else {
+              attempts++;
+              console.log(chalk.yellow(`Commit message failed validation. ${attempts < MAX_ATTEMPTS ? 'Regenerating...' : 'Max attempts reached.'}`));
+              
+              if (validation.errors) {
+                console.log(chalk.gray(validation.errors));
+                validationErrors = validation.errors;
+              }
+              
+              if (attempts < MAX_ATTEMPTS) {
+                // Try regenerating with validation errors
+                try {
+                  commitMessage = await generateCommitMessage(diff, validationErrors);
+                } catch (error) {
+                  console.warn(chalk.yellow('Error regenerating message, breaking validation loop.'));
+                  break;
+                }
+              } else {
+                // Ask user what to do after max attempts
+                const { action } = await inquirer.prompt([
+                  {
+                    type: 'list',
+                    name: 'action',
+                    message: 'Failed to generate a valid commit message after 3 attempts. What would you like to do?',
+                    choices: [
+                      { name: 'Proceed with invalid message', value: 'proceed' },
+                      { name: 'Edit message manually', value: 'edit' },
+                      { name: 'Abort commit', value: 'abort' }
+                    ]
+                  }
+                ]);
+                
+                if (action === 'abort') {
+                  console.log(chalk.red('Commit aborted due to validation failures.'));
+                  process.exit(1);
+                } else if (action === 'edit') {
+                  options.edit = true; // Force editor to open
+                } else {
+                  console.log(chalk.yellow('Proceeding with invalid message...'));
+                }
+                break;
+              }
+            }
           }
-        } else {
-          console.log(chalk.green('✓ Commit message passed validation'));
+        } catch (error) {
+          // If there's an error with commitlint validation, continue without it
+          console.warn(chalk.yellow('Warning: Error during commitlint validation, proceeding without validation.'));
+          console.warn(chalk.gray('This may be due to an ESM module cycle conflict or missing commitlint dependencies.'));
         }
       }
       
@@ -96,6 +148,41 @@ export async function commitCommand(options: CommitOptions): Promise<void> {
     ]);
 
     commitMessage = answer.message;
+    
+    // Validate the edited message once
+    try {
+      const hasCommitlint = hasCommitlintConfig();
+      if (hasCommitlint) {
+        console.log(chalk.blue('Validating edited commit message...'));
+        const validation = await validateCommitMessage(commitMessage);
+        if (!validation.valid) {
+          console.log(chalk.yellow('Warning: Edited message still has validation issues.'));
+          if (validation.errors) {
+            console.log(chalk.gray(validation.errors));
+          }
+          
+          // Ask if user wants to proceed anyway
+          const { proceed } = await inquirer.prompt([
+            {
+              type: 'confirm',
+              name: 'proceed',
+              message: 'Proceed with invalid commit message?',
+              default: false
+            }
+          ]);
+          
+          if (!proceed) {
+            console.log(chalk.red('Commit aborted by user.'));
+            process.exit(1);
+          }
+        } else {
+          console.log(chalk.green('✓ Edited message passed validation'));
+        }
+      }
+    } catch (error) {
+      // If validation fails, just warn and continue
+      console.warn(chalk.yellow('Could not validate edited message, proceeding anyway.'));
+    }
   }
 
   // Extract other git options to pass through
