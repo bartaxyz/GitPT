@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=esm",
+    "build": "node esbuild.config.js",
     "test": "npm run typecheck",
     "prepublishOnly": "npm run build"
   },
