@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import { getConfig } from "./config.js";
 import { hasCommitlintConfig, getCommitlintRules } from "./commitlint.js";
+import { generateWithLocalLLM, checkLocalLLMConnection } from "./localLLM.js";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
@@ -9,7 +10,7 @@ interface Message {
   content: string;
 }
 
-interface OpenRouterResponse {
+interface LLMResponse {
   choices: Array<{
     message: {
       content: string;
@@ -26,7 +27,7 @@ export async function generateCommitMessage(diff: string, validationErrors?: str
     throw new Error('GitPT is not configured. Please run "gitpt setup" first.');
   }
 
-  const { apiKey, model } = config;
+  const { apiKey, model, useLocalLLM } = config;
 
   const messages: Message[] = [
     {
@@ -52,6 +53,15 @@ export async function generateCommitMessage(diff: string, validationErrors?: str
     },
   ];
 
+  // Determine whether to use local LLM or OpenRouter based on config
+  if (useLocalLLM) {
+    return await generateWithLocalLLM(messages);
+  } else {
+    return await generateWithOpenRouter(messages, apiKey, model);
+  }
+}
+
+async function generateWithOpenRouter(messages: Message[], apiKey: string, model: string): Promise<string> {
   try {
     const response = await fetch(OPENROUTER_API_URL, {
       method: "POST",
@@ -74,10 +84,44 @@ export async function generateCommitMessage(diff: string, validationErrors?: str
       );
     }
 
-    const data = (await response.json()) as OpenRouterResponse;
+    const data = (await response.json()) as LLMResponse;
     return data.choices[0].message.content.trim();
   } catch (error) {
-    console.error("Error generating commit message:", error);
-    throw new Error("Failed to generate commit message");
+    console.error("Error generating with OpenRouter:", error);
+    throw new Error("Failed to generate commit message with OpenRouter");
+  }
+}
+
+// Add fallback functionality if needed
+export async function attemptFallbackIfNeeded(generator: () => Promise<string>): Promise<string> {
+  const config = getConfig();
+  if (!config) {
+    throw new Error('GitPT is not configured. Please run "gitpt setup" first.');
+  }
+
+  try {
+    // Try the primary generator function
+    return await generator();
+  } catch (error) {
+    // If using local LLM and it fails, try falling back to OpenRouter
+    if (config.useLocalLLM) {
+      console.warn("Local LLM failed, attempting fallback to OpenRouter...");
+      
+      // Check if we have valid OpenRouter credentials
+      if (config.apiKey) {
+        const isLocalAvailable = await checkLocalLLMConnection();
+        
+        if (!isLocalAvailable) {
+          // Temporarily override config for this request
+          const tempConfig = { ...config, useLocalLLM: false };
+          
+          // Pass modified config to the original function
+          return await generator();
+        }
+      }
+    }
+    
+    // If no fallback available or fallback also failed, rethrow
+    throw error;
   }
 }

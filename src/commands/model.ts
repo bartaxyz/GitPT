@@ -2,6 +2,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import fetch from 'node-fetch';
 import { getConfig, saveConfig } from '../utils/config.js';
+import { checkLocalLLMConnection } from '../utils/localLLM.js';
 
 // List of popular models available on OpenRouter
 const POPULAR_MODELS = [
@@ -45,7 +46,7 @@ async function fetchAvailableModels(apiKey: string): Promise<OpenRouterModel[]> 
   }
 }
 
-export async function modelCommand(modelId?: string): Promise<void> {
+export async function modelCommand(modelId?: string, options?: { local?: boolean }): Promise<void> {
   console.log(chalk.blue('GitPT Model Selection'));
   
   // Check if config exists
@@ -56,15 +57,21 @@ export async function modelCommand(modelId?: string): Promise<void> {
     process.exit(1);
   }
   
+  // Handle local LLM setup if --local flag is provided
+  if (options?.local) {
+    await setupLocalLLM(existingConfig);
+    return;
+  }
+  
   let selectedModel: string;
   
   // If a model ID is provided directly, use it
   if (modelId) {
     selectedModel = modelId;
     
-    // Update config with the new model while keeping the existing API key
+    // Update config with the new model while keeping other settings
     saveConfig({
-      apiKey: existingConfig.apiKey,
+      ...existingConfig,
       model: selectedModel
     });
     
@@ -72,7 +79,28 @@ export async function modelCommand(modelId?: string): Promise<void> {
     return;
   }
   
-  // Otherwise, show interactive selection
+  // First determine if we're using local or remote LLM
+  const useLocalLLMAnswer = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'useLocalLLM',
+      message: 'Select LLM provider:',
+      choices: [
+        { name: 'OpenRouter (remote)', value: false },
+        { name: 'Local LLM', value: true }
+      ],
+      default: existingConfig.useLocalLLM === true ? 1 : 0
+    }
+  ]);
+  
+  const useLocalLLM = useLocalLLMAnswer.useLocalLLM;
+  
+  if (useLocalLLM) {
+    await setupLocalLLM(existingConfig);
+    return;
+  }
+  
+  // Otherwise, show interactive remote model selection
   console.log('Current model:', chalk.yellow(existingConfig.model));
   console.log('');
   
@@ -127,10 +155,11 @@ export async function modelCommand(modelId?: string): Promise<void> {
     // Get the selected model
     selectedModel = answers.modelChoice === 'custom' ? answers.customModel : answers.modelChoice;
     
-    // Save the updated configuration
+    // Save the updated configuration with useLocalLLM set to false
     saveConfig({
-      apiKey: existingConfig.apiKey,
-      model: selectedModel
+      ...existingConfig,
+      model: selectedModel,
+      useLocalLLM: false
     });
     
     console.log(chalk.green(`✓ Model updated to: ${chalk.yellow(selectedModel)}`));
@@ -138,5 +167,57 @@ export async function modelCommand(modelId?: string): Promise<void> {
   } catch (error) {
     console.error(chalk.red('Error updating model:'), error);
     process.exit(1);
+  }
+}
+
+async function setupLocalLLM(existingConfig: any): Promise<void> {
+  console.log(chalk.blue('Local LLM Setup'));
+  
+  const answers = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'localLLMEndpoint',
+      message: 'Enter local LLM API endpoint (e.g., http://127.0.0.1:1234):',
+      default: existingConfig.localLLMEndpoint || 'http://127.0.0.1:1234',
+      validate: (input: string) => {
+        if (!input) return 'API endpoint is required';
+        if (!input.startsWith('http://') && !input.startsWith('https://')) {
+          return 'Must be a valid URL starting with http:// or https://';
+        }
+        return true;
+      }
+    },
+    {
+      type: 'input',
+      name: 'model',
+      message: 'Enter model name to use with local endpoint:',
+      default: existingConfig.model,
+      validate: (input: string) => {
+        if (!input) return 'Model name is required';
+        return true;
+      }
+    }
+  ]);
+  
+  // Save local LLM configuration
+  saveConfig({
+    ...existingConfig,
+    useLocalLLM: true,
+    localLLMEndpoint: answers.localLLMEndpoint,
+    model: answers.model
+  });
+  
+  console.log(chalk.green('✓ Local LLM configuration saved'));
+  
+  // Test connection to local LLM
+  console.log(chalk.gray('Testing connection to local LLM...'));
+  const isConnected = await checkLocalLLMConnection();
+  
+  if (isConnected) {
+    console.log(chalk.green('✓ Successfully connected to local LLM'));
+  } else {
+    console.log(chalk.yellow('⚠ Could not connect to local LLM at the specified endpoint.'));
+    console.log(chalk.yellow('  Make sure your local LLM is running and the endpoint is correct.'));
+    console.log(chalk.yellow('  You can update this later with "gitpt model --local"'));
   }
 }

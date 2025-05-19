@@ -34,7 +34,8 @@ program
 program
   .command('model [model-id]')
   .description('Change the AI model used for generating commit messages')
-  .action(modelCommand);
+  .option('--local', 'Configure a local LLM endpoint instead of OpenRouter')
+  .action((modelId, options) => modelCommand(modelId, options));
 
 // Enhanced git commands
 program
