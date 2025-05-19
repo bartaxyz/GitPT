@@ -1,5 +1,5 @@
-import { createPullRequest } from "./createPullRequest";
-import { isAvailable } from "./isAvailable";
+import { createPullRequest } from "./createPullRequest.js";
+import { isAvailable } from "./isAvailable.js";
 
 export const gh = {
   createPullRequest,

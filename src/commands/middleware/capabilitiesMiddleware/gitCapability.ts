@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { git } from "@services/git";
+import { git } from "../../../services/git/index.js";
 
 export const gitCapability = (): void => {
   if (!git.isAvailable()) {

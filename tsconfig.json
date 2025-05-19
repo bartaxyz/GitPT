@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2024",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "isolatedModules": true,
     "outDir": "./dist",
@@ -11,12 +11,7 @@
     "declaration": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@services/*": ["src/services/*"],
-      "@middleware/*": ["src/commands/middleware/*"],
-      "@config": ["src/config.ts"]
-    }
+    "baseUrl": "."
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"]

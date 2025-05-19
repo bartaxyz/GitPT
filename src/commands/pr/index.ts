@@ -1,10 +1,10 @@
-import { capabilitiesMiddleware } from "@middleware/capabilitiesMiddleware";
-import { setupMiddleware } from "@middleware/setupMiddleware";
-import { gh } from "@services/gh";
-import { git } from "@services/git";
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { generatePRDetails } from "./generatePRDetails";
+import { capabilitiesMiddleware } from "../middleware/capabilitiesMiddleware/index.js";
+import { setupMiddleware } from "../middleware/setupMiddleware/index.js";
+import { gh } from "../../services/gh/index.js";
+import { git } from "../../services/git/index.js";
+import { generatePRDetails } from "./generatePRDetails.js";
 
 interface PullRequestOptions {
   title?: string;

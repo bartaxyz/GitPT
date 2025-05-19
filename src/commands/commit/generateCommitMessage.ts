@@ -1,11 +1,11 @@
-import { getConfig } from "@config";
-import { getLLMClient } from "src/llm";
+import { getConfig } from "../../config.js";
+import { getLLMClient } from "../../llm/index.js";
 import {
   getCommitlintRules,
   hasCommitlintConfig,
-} from "../../utils/commitlint";
-import { systemPrompt } from "./context/systemPrompt";
-import { userPrompt } from "./context/userPrompt";
+} from "../../utils/commitlint.js";
+import { systemPrompt } from "./context/systemPrompt.js";
+import { userPrompt } from "./context/userPrompt.js";
 
 export const generateCommitMessage = async (
   diff: string,

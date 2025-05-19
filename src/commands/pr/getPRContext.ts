@@ -1,6 +1,6 @@
-import { git } from "@services/git";
 import chalk from "chalk";
 import { execSync } from "child_process";
+import { git } from "../../services/git/index.js";
 
 export const getPRContext = (): string[] => {
   const currentBranch = git.getCurrentBranch();

@@ -1,14 +1,14 @@
-import { capabilitiesMiddleware } from "@middleware/capabilitiesMiddleware";
-import { setupMiddleware } from "@middleware/setupMiddleware";
-import { git } from "@services/git";
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { generateCommitMessage } from "./generateCommitMessage";
+import { capabilitiesMiddleware } from "../middleware/capabilitiesMiddleware/index.js";
+import { setupMiddleware } from "../middleware/setupMiddleware/index.js";
+import { git } from "../../services/git/index.js";
 import {
   hasCommitlintConfig,
   validateCommitMessage,
-} from "../../utils/commitlint";
-import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware";
+} from "../../utils/commitlint.js";
+import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware.js";
+import { generateCommitMessage } from "./generateCommitMessage.js";
 
 interface CommitOptions {
   message?: string;

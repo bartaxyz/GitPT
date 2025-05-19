@@ -1,9 +1,7 @@
-import { getConfig } from "@config";
-
-import { GitPTConfig } from "@config";
 import inquirer from "inquirer";
-import { setupLocalLLM } from "./setupLocalLLM";
-import { setupOpenRouter } from "./setupOpenRouter";
+import { getConfig, GitPTConfig } from "../../../config.js";
+import { setupLocalLLM } from "./setupLocalLLM.js";
+import { setupOpenRouter } from "./setupOpenRouter.js";
 
 export const setupMiddleware = async (): Promise<GitPTConfig> => {
   // Always get the current config, even if it's empty

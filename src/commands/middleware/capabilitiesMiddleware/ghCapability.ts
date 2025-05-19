@@ -1,6 +1,6 @@
-import { gh } from "@services/gh";
 import chalk from "chalk";
 import { execSync } from "child_process";
+import { gh } from "../../../services/gh/index.js";
 
 export const ghCapability = (): void => {
   if (!gh.isAvailable()) {

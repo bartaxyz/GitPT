@@ -1,13 +1,13 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-specifier-resolution=node
 
 import chalk from "chalk";
 import { execSync } from "child_process";
 import { Command } from "commander";
-import packageJSON from "../package.json";
-import { commitCommand } from "./commands/commit";
-import { modelCommand } from "./commands/model";
-import { prCreateCommand } from "./commands/pr";
-import { setupCommand } from "./commands/setup";
+import packageJSON from "../package.json" with { type: "json" };
+import { commitCommand } from "./commands/commit/index.js";
+import { modelCommand } from "./commands/model.js";
+import { prCreateCommand } from "./commands/pr/index.js";
+import { setupCommand } from "./commands/setup.js";
 
 const program = new Command();
 

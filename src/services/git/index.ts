@@ -1,14 +1,14 @@
-import { executeGitAdd } from "./executeGitAdd";
-import { executeGitCommit } from "./executeGitCommit";
-import { getChangedFiles } from "./getChangedFiles";
-import { getCommitsSinceBaseBranch } from "./getCommitsSinceBaseBranch";
-import { getCurrentBranch } from "./getCurrentBranch";
-import { getDefaultBranch } from "./getDefaultBranch";
-import { getStagedChanges } from "./getStagedChanges";
-import { getStagedFiles } from "./getStagedFiles";
-import { hasStagedChanges } from "./hasStagedChanges";
-import { isAvailable } from "./isAvailable";
-import { isGitRepository } from "./isGitRepository";
+import { executeGitAdd } from "./executeGitAdd.js";
+import { executeGitCommit } from "./executeGitCommit.js";
+import { getChangedFiles } from "./getChangedFiles.js";
+import { getCommitsSinceBaseBranch } from "./getCommitsSinceBaseBranch.js";
+import { getCurrentBranch } from "./getCurrentBranch.js";
+import { getDefaultBranch } from "./getDefaultBranch.js";
+import { getStagedChanges } from "./getStagedChanges.js";
+import { getStagedFiles } from "./getStagedFiles.js";
+import { hasStagedChanges } from "./hasStagedChanges.js";
+import { isAvailable } from "./isAvailable.js";
+import { isGitRepository } from "./isGitRepository.js";
 
 export const git = {
   add: executeGitAdd,

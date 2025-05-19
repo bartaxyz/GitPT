@@ -1,5 +1,5 @@
 import inquirer from "inquirer";
-import { Model } from "./types";
+import { Model } from "./types.js";
 
 /**
  * Show a list of models to select from

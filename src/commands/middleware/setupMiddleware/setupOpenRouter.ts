@@ -1,9 +1,9 @@
-import { GitPTConfig, saveConfig } from "@config";
 import chalk from "chalk";
-import { getLLMClient } from "src/llm";
-import { getOrUpdateApiKey } from "./getOrUpdateApiKey";
-import { selectModel } from "./selectModel";
 import inquirer from "inquirer";
+import { GitPTConfig, saveConfig } from "../../../config.js";
+import { getLLMClient } from "../../../llm/index.js";
+import { getOrUpdateApiKey } from "./getOrUpdateApiKey.js";
+import { selectModel } from "./selectModel.js";
 
 export const setupOpenRouter = async (
   existingConfig: GitPTConfig

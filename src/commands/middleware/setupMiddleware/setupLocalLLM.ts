@@ -1,8 +1,8 @@
-import { GitPTConfig, saveConfig } from "@config";
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { getAvailableModels } from "./getAvailableModels";
-import { selectModel } from "./selectModel";
+import { GitPTConfig, saveConfig } from "../../../config.js";
+import { getAvailableModels } from "./getAvailableModels.js";
+import { selectModel } from "./selectModel.js";
 
 /**
  * Set up a local LLM configuration

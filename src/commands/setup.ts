@@ -1,6 +1,6 @@
-import { clearConfig } from "@config";
-import { setupMiddleware } from "@middleware/setupMiddleware";
 import chalk from "chalk";
+import { clearConfig } from "../config.js";
+import { setupMiddleware } from "./middleware/setupMiddleware/index.js";
 
 export const setupCommand = async (
   options: { clearConfig?: boolean } = {}

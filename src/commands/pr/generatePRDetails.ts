@@ -1,9 +1,9 @@
-import { getConfig } from "@config";
 import chalk from "chalk";
-import { getLLMClient } from "src/llm";
-import { systemPrompt } from "./context/systemPrompt";
-import { userPrompt } from "./context/userPrompt";
-import { getPRContext } from "./getPRContext";
+import { getConfig } from "../../config.js";
+import { getLLMClient } from "../../llm/index.js";
+import { systemPrompt } from "./context/systemPrompt.js";
+import { userPrompt } from "./context/userPrompt.js";
+import { getPRContext } from "./getPRContext.js";
 
 export const generatePRDetails = async (): Promise<{
   title: string;

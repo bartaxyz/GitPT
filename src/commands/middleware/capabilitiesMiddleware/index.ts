@@ -1,5 +1,5 @@
-import { ghCapability } from "./ghCapability";
-import { gitCapability } from "./gitCapability";
+import { ghCapability } from "./ghCapability.js";
+import { gitCapability } from "./gitCapability.js";
 
 type Capability = "git" | "gh";
 

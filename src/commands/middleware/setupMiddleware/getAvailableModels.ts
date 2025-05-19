@@ -1,5 +1,5 @@
 import { Model } from "openai/resources/models";
-import { getLLMClient } from "src/llm";
+import { getLLMClient } from "../../../llm/index.js";
 
 export const getAvailableModels = async (): Promise<Model[]> => {
   let modelsList = await getLLMClient().models.list();

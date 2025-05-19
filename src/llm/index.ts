@@ -1,5 +1,5 @@
 import openai from "openai";
-import { getConfig } from "../config";
+import { getConfig } from "../config.js";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1";
 
