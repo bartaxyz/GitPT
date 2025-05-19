@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import { isGitRepository } from '../utils/git.js';
 import { getConfig } from '../utils/config.js';
 import fetch from 'node-fetch';
+import { checkLocalLLMConnection } from '../utils/localLLM.js';
 
 interface PullRequestOptions {
   title?: string;
@@ -202,7 +203,7 @@ async function generatePRDetails(baseBranch: string, currentBranch: string): Pro
     throw new Error('GitPT is not configured. Please run "gitpt setup" first.');
   }
 
-  const { apiKey, model } = config;
+  const { apiKey, model, useLocalLLM, localLLMEndpoint } = config;
   
   // Get context for PR
   const commitMessages = getCommitsSinceBaseBranch(baseBranch);
@@ -318,13 +319,22 @@ This PR adds user authentication using JWT tokens.
 3. Use the returned token to access protected endpoints`;
 
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    let endpoint: string;
+    let headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (useLocalLLM) {
+      endpoint = new URL('/v1/chat/completions', localLLMEndpoint).toString();
+    } else {
+      endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+      headers['Authorization'] = `Bearer ${apiKey}`;
+      headers['HTTP-Referer'] = 'https://github.com/bartaxyz/GitPT';
+    }
+
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://github.com/bartaxyz/GitPT',
-      },
+      headers,
       body: JSON.stringify({
         model: model,
         messages: [
