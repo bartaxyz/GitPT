@@ -1,6 +1,6 @@
 # GitPT
 
-Git Prompt Tool is a CLI tool that helps you write commit messages using AI through [OpenRouter](https://openrouter.ai/). It acts as a complete git wrapper, enhancing specific commands with AI while passing through all other git commands directly.
+Git Prompt Tool is a CLI tool that helps you write commit messages using AI through [OpenRouter](https://openrouter.ai/) or a local LLM. It acts as a complete git wrapper, enhancing specific commands with AI while passing through all other git commands directly.
 
 ## Features
 
@@ -14,6 +14,7 @@ Git Prompt Tool is a CLI tool that helps you write commit messages using AI thro
 - Compatible with all regular git options (flags, arguments, etc.)
 - Edit suggested messages before committing
 - Works with various AI models via OpenRouter
+- Support for local LLMs with OpenAI-compatible API
 - [Commitlint](https://commitlint.js.org/) support - read directly from your repository
 
 ## Installation
@@ -96,7 +97,7 @@ The tool will:
 
 ### Changing Models
 
-You can change the AI model at any time without re-entering your API key.
+You can change the AI model at any time:
 
 ```bash
 # Select model interactively (fetches available models from OpenRouter)
@@ -110,6 +111,25 @@ gitpt model anthropic/claude-3-haiku
 ```
 
 _It's recommended using small models, such as `openai/gpt-4.1-mini` as your model choice. Mainly due to its large context window, fast response times & cost-effective pricing._
+
+### Using a Local LLM
+
+You can configure GitPT to use a local LLM with an OpenAI-compatible API instead of OpenRouter:
+
+```bash
+# Configure a local LLM
+gitpt model --local
+```
+
+This will prompt you for:
+1. The API endpoint URL (e.g., http://127.0.0.1:1234)
+2. The model name to use with your local LLM
+
+GitPT works with any local LLM that provides an OpenAI-compatible API endpoint, such as:
+- [Ollama](https://ollama.ai/)
+- [LM Studio](https://lmstudio.ai/)
+- [LocalAI](https://localai.io/)
+- Custom setups with tools like llama.cpp
 
 ## GitHub Usage
 
@@ -148,7 +168,7 @@ gitpt pr create --title "Your PR title here"
 
 ## How It Works
 
-GitPT leverages AI via OpenRouter to enhance your Git workflow while acting as a complete git wrapper:
+GitPT leverages AI to enhance your Git workflow while acting as a complete git wrapper:
 
 - **Command Handling:** GitPT intelligently routes commands - enhanced commands (commit, pr) use AI capabilities while all other git commands are passed directly to git.
 
@@ -159,6 +179,8 @@ GitPT leverages AI via OpenRouter to enhance your Git workflow while acting as a
 - **For pull requests:** Analyzes the commits and file changes between your branch and the base branch, then generates a suitable title and detailed description for your PR.
 
 - **For other git commands:** Passes them through directly to git with all arguments and options preserved, ensuring complete compatibility with your existing git workflow.
+
+- **Local LLM Support:** Can use locally running LLM servers with OpenAI-compatible APIs instead of cloud-based services, providing privacy and offline capabilities.
 
 ## Development
 
