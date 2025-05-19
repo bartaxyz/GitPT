@@ -43,14 +43,13 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@commitlint/load": "^19.8.1",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "configstore": "^7.0.0",
     "inquirer": "^12.5.2",
     "node-fetch": "^3.3.2"
-  },
-  "optionalDependencies": {
-    "@commitlint/cli": "^18.4.3",
-    "@commitlint/config-conventional": "^18.4.3"
   }
 }

@@ -1,5 +1,5 @@
-import inquirer from 'inquirer';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 import fetch from 'node-fetch';
 import { getConfig, saveConfig } from '../utils/config.js';
 import { checkLocalLLMConnection } from '../utils/localLLM.js';
@@ -25,6 +25,20 @@ interface OpenRouterModel {
   };
 }
 
+// Interface for local models from OpenAI-compatible APIs
+interface LocalModel {
+  id: string;
+  object?: string;
+  created?: number;
+  owned_by?: string;
+}
+
+// Interface for local LLM response format
+interface LocalModelsResponse {
+  data: LocalModel[];
+  object?: string;
+}
+
 async function fetchAvailableModels(apiKey: string): Promise<OpenRouterModel[]> {
   try {
     const response = await fetch('https://openrouter.ai/api/v1/models', {
@@ -42,6 +56,42 @@ async function fetchAvailableModels(apiKey: string): Promise<OpenRouterModel[]> 
     return data.data;
   } catch (error) {
     console.error(chalk.red('Error fetching models:'), error);
+    return [];
+  }
+}
+
+// Function to fetch models from a local LLM server
+async function fetchLocalModels(endpointUrl: string): Promise<LocalModel[]> {
+  try {
+    const endpoint = new URL('/v1/models', endpointUrl).toString();
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    const response = await fetch(endpoint, {
+      method: "GET",
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch local models: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json() as LocalModelsResponse;
+    
+    // Handle various response formats from different LLM servers
+    if (data.data && Array.isArray(data.data)) {
+      return data.data;
+    } else if (Array.isArray(data)) {
+      // Some servers might return an array directly
+      return data as unknown as LocalModel[];
+    }
+    
+    return [];
+  } catch (error) {
+    console.error(chalk.yellow(`Could not fetch models from local LLM server: ${error}`));
     return [];
   }
 }
@@ -173,7 +223,8 @@ export async function modelCommand(modelId?: string, options?: { local?: boolean
 async function setupLocalLLM(existingConfig: any): Promise<void> {
   console.log(chalk.blue('Local LLM Setup'));
   
-  const answers = await inquirer.prompt([
+  // First ask for the endpoint URL
+  const endpointAnswer = await inquirer.prompt([
     {
       type: 'input',
       name: 'localLLMEndpoint',
@@ -186,25 +237,82 @@ async function setupLocalLLM(existingConfig: any): Promise<void> {
         }
         return true;
       }
-    },
-    {
-      type: 'input',
-      name: 'model',
-      message: 'Enter model name to use with local endpoint:',
-      default: existingConfig.model,
-      validate: (input: string) => {
-        if (!input) return 'Model name is required';
-        return true;
-      }
     }
   ]);
+  
+  const localLLMEndpoint = endpointAnswer.localLLMEndpoint;
+  
+  // Try to fetch available models from the local server
+  console.log(chalk.gray('Trying to fetch available models from local LLM server...'));
+  const localModels = await fetchLocalModels(localLLMEndpoint);
+  
+  let selectedModel: string;
+  
+  if (localModels.length > 0) {
+    console.log(chalk.green(`✓ Found ${localModels.length} models available on your local LLM server`));
+    
+    // Let the user select from available models
+    const modelChoices = localModels.map(model => ({
+      name: model.id,
+      value: model.id
+    }));
+    
+    // Add custom option
+    modelChoices.push({ name: 'Other (specify model identifier)', value: 'custom' });
+    
+    const modelAnswer = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'modelChoice',
+        message: 'Select a model from your local LLM server:',
+        choices: modelChoices,
+        default: () => {
+          // Try to find current model in the list to set as default
+          const currentIndex = modelChoices.findIndex(choice => choice.value === existingConfig.model);
+          return currentIndex >= 0 ? currentIndex : 0;
+        }
+      },
+      {
+        type: 'input',
+        name: 'customModel',
+        message: 'Enter model identifier:',
+        when: (answers) => answers.modelChoice === 'custom',
+        validate: (input: string) => {
+          if (!input) return 'Model identifier is required';
+          return true;
+        }
+      }
+    ]);
+    
+    selectedModel = modelAnswer.modelChoice === 'custom' 
+      ? modelAnswer.customModel 
+      : modelAnswer.modelChoice;
+  } else {
+    console.log(chalk.yellow('Could not fetch models from local LLM server, please enter model name manually'));
+    
+    // Ask for model name manually
+    const modelAnswer = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'model',
+        message: 'Enter model name to use with local endpoint:',
+        default: existingConfig.model || 'gpt-3.5-turbo',
+        validate: (input: string) => {
+          if (!input) return 'Model name is required';
+          return true;
+        }
+      }
+    ]);
+    
+    selectedModel = modelAnswer.model;
+  }
   
   // Save local LLM configuration
   saveConfig({
     ...existingConfig,
     useLocalLLM: true,
-    localLLMEndpoint: answers.localLLMEndpoint,
-    model: answers.model
+    localLLMEndpoint: localLLMEndpoint,
+    model: selectedModel
   });
   
   console.log(chalk.green('✓ Local LLM configuration saved'));
