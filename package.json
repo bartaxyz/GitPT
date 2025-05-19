@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "node esbuild.config.js",
+    "build": "tsc",
     "test": "npm run typecheck",
     "prepublishOnly": "npm run build"
   },
@@ -38,7 +38,6 @@
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.14.1",
     "@types/node-fetch": "^2.6.12",
-    "esbuild": "^0.25.4",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3"
   },
