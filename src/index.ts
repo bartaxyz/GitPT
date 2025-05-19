@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --experimental-specifier-resolution=node
 
 import chalk from "chalk";
 import { execSync } from "child_process";
@@ -6,10 +6,10 @@ import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { commitCommand } from "./commands/commit.js";
-import { modelCommand } from "./commands/model.js";
-import { prCreateCommand } from "./commands/pr.js";
-import { setupCommand } from "./commands/setup.js";
+import { commitCommand } from "./commands/commit";
+import { modelCommand } from "./commands/model";
+import { prCreateCommand } from "./commands/pr";
+import { setupCommand } from "./commands/setup";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,10 +34,9 @@ program
   .action(setupCommand);
 
 program
-  .command("model [model-id]")
+  .command("model")
   .description("Change the AI model used for generating commit messages")
-  .option("--local", "Configure a local LLM endpoint instead of OpenRouter")
-  .action((modelId, options) => modelCommand(modelId, options));
+  .action(modelCommand);
 
 // Enhanced git commands
 program
