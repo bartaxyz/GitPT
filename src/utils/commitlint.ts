@@ -43,7 +43,7 @@ export function hasCommitlintConfig(): boolean {
  */
 export async function readCommitlintConfig(): Promise<any> {
   const config = await loadConfig();
-  console.log(config);
+  // console.log(config);
   return config.rules;
 }
 
