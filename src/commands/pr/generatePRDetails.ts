@@ -12,7 +12,7 @@ export const generatePRDetails = async (): Promise<{
   const { model } = getConfig();
 
   const context = getPRContext().join("\n\n");
-  const userPromptWithContext = [userPrompt, context].join("\n\n");
+  const userPromptWithContext = userPrompt(context);
 
   const llmClient = getLLMClient();
 

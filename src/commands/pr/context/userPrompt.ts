@@ -1,5 +1,7 @@
-export const userPrompt = `
+export const userPrompt = (context: string) => `
 Generate a pull request title and description for the following changes:
+
+${context}
 
 Format your response exactly like this example:
 Title: Add user authentication with JWT
