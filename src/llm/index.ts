@@ -15,8 +15,6 @@ export const getLLMClient = (options?: {
     baseURLOverride ?? customLLMEndpoint ?? OPENROUTER_API_URL
   );
 
-  console.log({ baseURL });
-
   return new openai.OpenAI({
     apiKey,
     baseURL,
