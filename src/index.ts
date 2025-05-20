@@ -1,29 +1,21 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-specifier-resolution=node
 
 import chalk from "chalk";
 import { execSync } from "child_process";
 import { Command } from "commander";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { commitCommand } from "./commands/commit.js";
+import packageJSON from "../package.json" with { type: "json" };
+import { commitCommand } from "./commands/commit/index.js";
+import { configCommand } from "./commands/config.js";
 import { modelCommand } from "./commands/model.js";
-import { prCreateCommand } from "./commands/pr.js";
+import { prCreateCommand } from "./commands/pr/index.js";
 import { setupCommand } from "./commands/setup.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const packageJson = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../package.json"), "utf8")
-);
-const version = packageJson.version;
 
 const program = new Command();
 
 program
   .name("gitpt")
   .description("Git Prompt Tool helps you write commit messages using AI")
-  .version(version);
+  .version(packageJSON.version);
 
 // GitPT-specific commands
 program
@@ -34,10 +26,14 @@ program
   .action(setupCommand);
 
 program
-  .command("model [model-id]")
+  .command("config")
+  .description("Configure GitPT with your OpenRouter API key and model selection")
+  .action(configCommand);
+
+program
+  .command("model")
   .description("Change the AI model used for generating commit messages")
-  .option("--local", "Configure a local LLM endpoint instead of OpenRouter")
-  .action((modelId, options) => modelCommand(modelId, options));
+  .action(modelCommand);
 
 // Enhanced git commands
 program
