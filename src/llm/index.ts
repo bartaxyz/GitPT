@@ -9,10 +9,12 @@ export const getLLMClient = (options?: {
 }): openai => {
   const { baseURLOverride } = options || {};
 
-  const { apiKey, customLLMEndpoint } = getConfig();
+  const { apiKey, customLLMEndpoint, provider } = getConfig();
+
+  const localLLMEndpoint = provider === "local" ? customLLMEndpoint : undefined;
 
   const baseURL = formatBaseURL(
-    baseURLOverride ?? customLLMEndpoint ?? OPENROUTER_API_URL
+    baseURLOverride ?? localLLMEndpoint ?? OPENROUTER_API_URL
   );
 
   return new openai.OpenAI({
