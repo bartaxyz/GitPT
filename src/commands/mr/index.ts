@@ -1,13 +1,13 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { gh } from "../../services/gh/index.js";
 import { git } from "../../services/git/index.js";
+import { glab } from "../../services/gitlab/index.js";
 import { capabilitiesMiddleware } from "../middleware/capabilitiesMiddleware/index.js";
 import { setupMiddleware } from "../middleware/setupMiddleware/index.js";
-import { generatePRDetails } from "./generatePRDetails.js";
-import { Host } from "./types.js";
+import { generatePRDetails } from "../pr/generatePRDetails.js";
+import { Host } from "../pr/types.js";
 
-interface PullRequestOptions {
+interface MergeRequestOptions {
   title?: string;
   body?: string;
   draft?: boolean;
@@ -16,10 +16,10 @@ interface PullRequestOptions {
   [key: string]: any;
 }
 
-export const prCreateCommand = async (
-  options: PullRequestOptions = {}
+export const mrCreateCommand = async (
+  options: MergeRequestOptions = {}
 ): Promise<void> => {
-  capabilitiesMiddleware(["git", "gh"]);
+  capabilitiesMiddleware(["git", "glab"]);
   await setupMiddleware();
 
   try {
@@ -28,13 +28,13 @@ export const prCreateCommand = async (
     let title: string = options.title || "";
     let body: string = options.body || "";
 
-    // Generate PR details if not provided
+    // Generate MR details if not provided
     if (!title || !body) {
-      const generatedDetails = await generatePRDetails(Host.GITHUB);
+      const generatedDetails = await generatePRDetails(Host.GITLAB);
       title = title || generatedDetails.title;
       body = body || generatedDetails.body;
 
-      console.log(chalk.green("✓ PR details generated"));
+      console.log(chalk.green("✓ MR details generated"));
       console.log("");
       console.log(chalk.cyan("Title:"));
       console.log(title);
@@ -50,19 +50,19 @@ export const prCreateCommand = async (
         {
           type: "input",
           name: "title",
-          message: "Edit PR title:",
+          message: "Edit MR title:",
           default: title,
         },
         {
           type: "editor",
           name: "body",
-          message: "Edit PR description:",
+          message: "Edit MR description:",
           default: body,
         },
         {
           type: "confirm",
           name: "draft",
-          message: "Create as draft PR?",
+          message: "Create as draft MR?",
           default: options.draft || false,
         },
       ]);
@@ -71,11 +71,11 @@ export const prCreateCommand = async (
       body = answers.body;
       const isDraft = answers.draft;
 
-      // Create the PR
-      gh.createPullRequest(title, body, baseBranch, isDraft);
+      // Create the MR
+      glab.createMergeRequest(title, body, baseBranch, isDraft);
     } else {
-      // Create the PR without editing
-      gh.createPullRequest(title, body, baseBranch, options.draft || false);
+      // Create the MR without editing
+      glab.createMergeRequest(title, body, baseBranch, options.draft || false);
     }
   } catch (error) {
     console.error(

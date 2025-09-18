@@ -1,10 +1,13 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
 import { git } from "../../services/git/index.js";
+import { Host, requestTermShort } from "./types.js";
 
-export const getPRContext = (): string[] => {
+export const getPRContext = (host: Host): string[] => {
+  const requestTerm = requestTermShort[host];
+
   const currentBranch = git.getCurrentBranch();
-  const baseBranch = git.getDefaultBranch();
+  const baseBranch = git.getDefaultBranch(host);
 
   // Get context for PR
   const commitMessages = git.getCommitsSinceBaseBranch(baseBranch);
@@ -15,7 +18,7 @@ export const getPRContext = (): string[] => {
     console.log(chalk.yellow("No commits or changed files detected."));
     console.log(
       chalk.yellow(
-        "Will attempt to generate PR details using branch name and repository context."
+        `Will attempt to generate ${requestTerm} details using branch name and repository context.`
       )
     );
   }
@@ -24,18 +27,43 @@ export const getPRContext = (): string[] => {
   let repoName = "";
   let repoDescription = "";
 
-  try {
-    // Try to get repo information from GitHub CLI
-    const repoInfo = JSON.parse(
-      execSync("gh repo view --json name,description").toString().trim()
-    );
-    repoName = repoInfo.name || "";
-    repoDescription = repoInfo.description || "";
-  } catch (error) {
-    // Continue without this info
+  if (host === Host.GITHUB) {
+    try {
+      // Try to get repo information from GitHub CLI
+      const repoInfo = JSON.parse(
+        execSync("gh repo view --json name,description").toString().trim()
+      );
+      repoName = repoInfo.name || "";
+      repoDescription = repoInfo.description || "";
+    } catch (error) {
+      // Continue without this info
+    }
+  } else if (host === Host.GITLAB) {
+    try {
+      // Get repo name and description from glab CLI output
+      const repoViewOutput = execSync("glab repo view").toString();
+      // The first line is usually the repo name (e.g. group/project)
+      // The description is usually after a blank line
+      const lines = repoViewOutput.split("\n");
+      repoName = lines[0]?.trim() || "";
+      // Find the first non-empty line after the first blank line
+      let foundBlank = false;
+      for (const line of lines.slice(1)) {
+        if (!foundBlank && line.trim() === "") {
+          foundBlank = true;
+          continue;
+        }
+        if (foundBlank && line.trim() !== "") {
+          repoDescription = line.trim();
+          break;
+        }
+      }
+    } catch (error) {
+      // Continue without this info
+    }
   }
 
-  console.log(chalk.blue("Generating PR title and description..."));
+  console.log(chalk.blue(`Generating ${requestTerm} title and description...`));
 
   // Build a rich context for the AI
   let contextSections = [

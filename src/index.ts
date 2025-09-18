@@ -7,6 +7,7 @@ import packageJSON from "../package.json" with { type: "json" };
 import { commitCommand } from "./commands/commit/index.js";
 import { configCommand } from "./commands/config.js";
 import { modelCommand } from "./commands/model.js";
+import { mrCreateCommand } from "./commands/mr/index.js";
 import { prCreateCommand } from "./commands/pr/index.js";
 import { setupCommand } from "./commands/setup.js";
 
@@ -59,6 +60,18 @@ program
   .option("--no-edit", "Skip editing PR details")
   .allowUnknownOption(true)
   .action(prCreateCommand);
+
+program
+  .command("mr create")
+  .description("Create a merge request with AI-generated title and description")
+  .option("-t, --title <title>", "Custom merge request title")
+  .option("-b, --body <body>", "Custom merge request description")
+  .option("-d, --draft", "Create as draft merge request")
+  .option("-B, --base <branch>", "Base branch to create MR against")
+  .option("-e, --edit", "Edit MR details before submission", true)
+  .option("--no-edit", "Skip editing MR details")
+  .allowUnknownOption(true)
+  .action(mrCreateCommand);
 
 // Handle unknown commands by passing them to git
 program.on("command:*", () => {

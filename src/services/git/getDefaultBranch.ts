@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
 
-export const getDefaultBranch = (): string => {
+export const getDefaultBranch = (host?: "github" | "gitlab"): string => {
   try {
     // First check for a default branch set in git config
     try {
@@ -15,18 +15,20 @@ export const getDefaultBranch = (): string => {
       // Continue if git config doesn't have default branch
     }
 
-    // Next, check if GitHub CLI can tell us the default branch
-    try {
-      const repoInfo = execSync(
-        "gh repo view --json defaultBranchRef --jq .defaultBranchRef.name"
-      )
-        .toString()
-        .trim();
-      if (repoInfo) {
-        return repoInfo;
+    // Check if GitHub CLI can tell us the default branch
+    if (host === "github") {
+      try {
+        const repoInfo = execSync(
+          "gh repo view --json defaultBranchRef --jq .defaultBranchRef.name"
+        )
+          .toString()
+          .trim();
+        if (repoInfo) {
+          return repoInfo;
+        }
+      } catch (error) {
+        // Continue if gh command fails
       }
-    } catch (error) {
-      // Continue if gh command fails
     }
 
     // Try to find default branch in remote branches list
@@ -45,7 +47,16 @@ export const getDefaultBranch = (): string => {
     for (const pattern of mainPatterns) {
       const defaultBranch = branches.find((b) => pattern.test(b.trim()));
       if (defaultBranch) {
-        return defaultBranch.trim().replace(/^origin\//, "");
+        // If the branch string contains 'HEAD ->', extract the branch name after it
+        const trimmed = defaultBranch.trim();
+        if (trimmed.startsWith("HEAD ->")) {
+          const match = trimmed.match(/HEAD -> origin\/([^,\s]+)/);
+          if (match && match[1]) {
+            return match[1];
+          }
+        }
+        // Otherwise, just strip 'origin/'
+        return trimmed.replace(/^origin\//, "");
       }
     }
 
@@ -68,4 +79,4 @@ export const getDefaultBranch = (): string => {
     console.log(chalk.yellow('Error detecting default branch, using "main"'));
     return "main";
   }
-}
+};

@@ -4,14 +4,19 @@ import { getLLMClient } from "../../llm/index.js";
 import { systemPrompt } from "./context/systemPrompt.js";
 import { userPrompt } from "./context/userPrompt.js";
 import { getPRContext } from "./getPRContext.js";
+import { Host, requestTermShort } from "./types.js";
 
-export const generatePRDetails = async (): Promise<{
+export const generatePRDetails = async (
+  host: Host
+): Promise<{
   title: string;
   body: string;
 }> => {
   const { model } = getConfig();
 
-  const context = getPRContext().join("\n\n");
+  const requestTerm = requestTermShort[host];
+
+  const context = getPRContext(host).join("\n\n");
   const userPromptWithContext = userPrompt(context);
 
   const llmClient = getLLMClient();
@@ -40,7 +45,7 @@ export const generatePRDetails = async (): Promise<{
 
     return { title, body };
   } catch (error) {
-    console.error(chalk.red("Error generating PR details:"), error);
-    throw new Error("Failed to generate PR details");
+    console.error(chalk.red(`Error generating ${requestTerm} details:`), error);
+    throw new Error(`Failed to generate ${requestTerm} details`);
   }
 };
