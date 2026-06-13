@@ -1,0 +1,19 @@
+diff --git a/src/llm/index.ts b/src/llm/index.ts
+index 2347b29..61c2657 100644
+--- a/src/llm/index.ts
++++ b/src/llm/index.ts
+@@ -9,10 +9,12 @@ export const getLLMClient = (options?: {
+ }): openai => {
+   const { baseURLOverride } = options || {};
+ 
+-  const { apiKey, customLLMEndpoint } = getConfig();
++  const { apiKey, customLLMEndpoint, provider } = getConfig();
++
++  const localLLMEndpoint = provider === "local" ? customLLMEndpoint : undefined;
+ 
+   const baseURL = formatBaseURL(
+-    baseURLOverride ?? customLLMEndpoint ?? OPENROUTER_API_URL
++    baseURLOverride ?? localLLMEndpoint ?? OPENROUTER_API_URL
+   );
+ 
+   return new openai.OpenAI({

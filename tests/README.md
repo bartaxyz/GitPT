@@ -35,6 +35,18 @@ response quality can't be asserted deterministically.
 
 ## Fixtures
 
-`tests/fixtures/*.patch` are synthetic unified diffs covering the cases that
-matter: small (fits), large multi-file, lockfile-heavy, and a single oversized
-file. Add new `.patch` files there and they are picked up automatically.
+`tests/fixtures/*.patch` are unified diffs covering the cases that matter:
+
+- **Real diffs** pulled from GitPT's own git history (`01`–`05`): a focused
+  bugfix, a small feature, a multi-file feature, a feature with a real
+  dependency/lockfile change, and a refactor. These exercise message quality on
+  real code.
+- **Synthetic diffs** (`06`, `07`) for pure mechanics: an extreme lockfile churn
+  and a single oversized file (hunk splitting).
+
+`expectations.json` maps each fixture to its origin commit, the real commit
+message (reference), and what a good message should mention — printed during the
+run so generated vs. reference can be compared by eye.
+
+Add new `.patch` files (and optionally an `expectations.json` entry) and they
+are picked up automatically.
