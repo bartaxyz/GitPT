@@ -44,6 +44,9 @@ const isModelAvailable = (
   return { available, reason: output.trim() };
 };
 
+export const isAppleModelAvailable = (modelId: string): boolean =>
+  isModelAvailable(modelId).available;
+
 export const setupApple = async (
   existingConfig: GitPTConfig
 ): Promise<GitPTConfig> => {
