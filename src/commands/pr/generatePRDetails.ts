@@ -4,6 +4,7 @@ import { getLLMClient } from "../../llm/index.js";
 import { systemPrompt } from "./context/systemPrompt.js";
 import { userPrompt } from "./context/userPrompt.js";
 import { getPRContext } from "./getPRContext.js";
+import { getPRTemplate } from "./getPRTemplate.js";
 
 export const generatePRDetails = async (): Promise<{
   title: string;
@@ -12,7 +13,8 @@ export const generatePRDetails = async (): Promise<{
   const { model } = getConfig();
 
   const context = getPRContext().join("\n\n");
-  const userPromptWithContext = userPrompt(context);
+  const template = getPRTemplate();
+  const userPromptWithContext = userPrompt(context, template ?? undefined);
 
   const llmClient = getLLMClient();
 
