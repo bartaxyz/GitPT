@@ -15,6 +15,12 @@ Critical Rules:
 - Do NOT include a detailed message body section, just the commit title line
 - Do NOT use multiple lines, even for a single message
 
+Reading the diff (IMPORTANT):
+- The user message is a unified git diff.
+- Lines starting with "+" were ADDED; lines starting with "-" were REMOVED. Lines with no prefix are unchanged context.
+- Describe what actually happened: use "remove"/"delete" for removed lines, "add" for added lines, and "update"/"change" when lines were both removed and added.
+- Never describe a removed line as if it were added (or vice versa).
+
 Examples of Good Commit Messages:
 - feat: add user authentication system
 - fix: resolve crash when opening settings menu
