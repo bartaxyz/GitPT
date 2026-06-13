@@ -1,0 +1,486 @@
+diff --git a/src/services/payments/charge.ts b/src/services/payments/charge.ts
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/src/services/payments/charge.ts
+@@ -0,0 +1,70 @@
++  const charge_0 = compute(0, "charge") + offset(0); // step 0
++  const charge_1 = compute(1, "charge") + offset(1); // step 1
++  const charge_2 = compute(2, "charge") + offset(2); // step 2
++  const charge_3 = compute(3, "charge") + offset(3); // step 3
++  const charge_4 = compute(4, "charge") + offset(4); // step 4
++  const charge_5 = compute(5, "charge") + offset(5); // step 5
++  const charge_6 = compute(6, "charge") + offset(6); // step 6
++  const charge_7 = compute(7, "charge") + offset(7); // step 7
++  const charge_8 = compute(8, "charge") + offset(8); // step 8
++  const charge_9 = compute(9, "charge") + offset(9); // step 9
++  const charge_10 = compute(10, "charge") + offset(10); // step 10
++  const charge_11 = compute(11, "charge") + offset(11); // step 11
++  const charge_12 = compute(12, "charge") + offset(12); // step 12
++  const charge_13 = compute(13, "charge") + offset(13); // step 13
++  const charge_14 = compute(14, "charge") + offset(14); // step 14
++  const charge_15 = compute(15, "charge") + offset(15); // step 15
++  const charge_16 = compute(16, "charge") + offset(16); // step 16
++  const charge_17 = compute(17, "charge") + offset(17); // step 17
++  const charge_18 = compute(18, "charge") + offset(18); // step 18
++  const charge_19 = compute(19, "charge") + offset(19); // step 19
++  const charge_20 = compute(20, "charge") + offset(20); // step 20
++  const charge_21 = compute(21, "charge") + offset(21); // step 21
++  const charge_22 = compute(22, "charge") + offset(22); // step 22
++  const charge_23 = compute(23, "charge") + offset(23); // step 23
++  const charge_24 = compute(24, "charge") + offset(24); // step 24
++  const charge_25 = compute(25, "charge") + offset(25); // step 25
++  const charge_26 = compute(26, "charge") + offset(26); // step 26
++  const charge_27 = compute(27, "charge") + offset(27); // step 27
++  const charge_28 = compute(28, "charge") + offset(28); // step 28
++  const charge_29 = compute(29, "charge") + offset(29); // step 29
++  const charge_30 = compute(30, "charge") + offset(30); // step 30
++  const charge_31 = compute(31, "charge") + offset(31); // step 31
++  const charge_32 = compute(32, "charge") + offset(32); // step 32
++  const charge_33 = compute(33, "charge") + offset(33); // step 33
++  const charge_34 = compute(34, "charge") + offset(34); // step 34
++  const charge_35 = compute(35, "charge") + offset(35); // step 35
++  const charge_36 = compute(36, "charge") + offset(36); // step 36
++  const charge_37 = compute(37, "charge") + offset(37); // step 37
++  const charge_38 = compute(38, "charge") + offset(38); // step 38
++  const charge_39 = compute(39, "charge") + offset(39); // step 39
++  const charge_40 = compute(40, "charge") + offset(40); // step 40
++  const charge_41 = compute(41, "charge") + offset(41); // step 41
++  const charge_42 = compute(42, "charge") + offset(42); // step 42
++  const charge_43 = compute(43, "charge") + offset(43); // step 43
++  const charge_44 = compute(44, "charge") + offset(44); // step 44
++  const charge_45 = compute(45, "charge") + offset(45); // step 45
++  const charge_46 = compute(46, "charge") + offset(46); // step 46
++  const charge_47 = compute(47, "charge") + offset(47); // step 47
++  const charge_48 = compute(48, "charge") + offset(48); // step 48
++  const charge_49 = compute(49, "charge") + offset(49); // step 49
++  const charge_50 = compute(50, "charge") + offset(50); // step 50
++  const charge_51 = compute(51, "charge") + offset(51); // step 51
++  const charge_52 = compute(52, "charge") + offset(52); // step 52
++  const charge_53 = compute(53, "charge") + offset(53); // step 53
++  const charge_54 = compute(54, "charge") + offset(54); // step 54
++  const charge_55 = compute(55, "charge") + offset(55); // step 55
++  const charge_56 = compute(56, "charge") + offset(56); // step 56
++  const charge_57 = compute(57, "charge") + offset(57); // step 57
++  const charge_58 = compute(58, "charge") + offset(58); // step 58
++  const charge_59 = compute(59, "charge") + offset(59); // step 59
++  const charge_60 = compute(60, "charge") + offset(60); // step 60
++  const charge_61 = compute(61, "charge") + offset(61); // step 61
++  const charge_62 = compute(62, "charge") + offset(62); // step 62
++  const charge_63 = compute(63, "charge") + offset(63); // step 63
++  const charge_64 = compute(64, "charge") + offset(64); // step 64
++  const charge_65 = compute(65, "charge") + offset(65); // step 65
++  const charge_66 = compute(66, "charge") + offset(66); // step 66
++  const charge_67 = compute(67, "charge") + offset(67); // step 67
++  const charge_68 = compute(68, "charge") + offset(68); // step 68
++  const charge_69 = compute(69, "charge") + offset(69); // step 69
+
+diff --git a/src/services/payments/refund.ts b/src/services/payments/refund.ts
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/src/services/payments/refund.ts
+@@ -0,0 +1,70 @@
++  const refund_0 = compute(0, "refund") + offset(0); // step 0
++  const refund_1 = compute(1, "refund") + offset(1); // step 1
++  const refund_2 = compute(2, "refund") + offset(2); // step 2
++  const refund_3 = compute(3, "refund") + offset(3); // step 3
++  const refund_4 = compute(4, "refund") + offset(4); // step 4
++  const refund_5 = compute(5, "refund") + offset(5); // step 5
++  const refund_6 = compute(6, "refund") + offset(6); // step 6
++  const refund_7 = compute(7, "refund") + offset(7); // step 7
++  const refund_8 = compute(8, "refund") + offset(8); // step 8
++  const refund_9 = compute(9, "refund") + offset(9); // step 9
++  const refund_10 = compute(10, "refund") + offset(10); // step 10
++  const refund_11 = compute(11, "refund") + offset(11); // step 11
++  const refund_12 = compute(12, "refund") + offset(12); // step 12
++  const refund_13 = compute(13, "refund") + offset(13); // step 13
++  const refund_14 = compute(14, "refund") + offset(14); // step 14
++  const refund_15 = compute(15, "refund") + offset(15); // step 15
++  const refund_16 = compute(16, "refund") + offset(16); // step 16
++  const refund_17 = compute(17, "refund") + offset(17); // step 17
++  const refund_18 = compute(18, "refund") + offset(18); // step 18
++  const refund_19 = compute(19, "refund") + offset(19); // step 19
++  const refund_20 = compute(20, "refund") + offset(20); // step 20
++  const refund_21 = compute(21, "refund") + offset(21); // step 21
++  const refund_22 = compute(22, "refund") + offset(22); // step 22
++  const refund_23 = compute(23, "refund") + offset(23); // step 23
++  const refund_24 = compute(24, "refund") + offset(24); // step 24
++  const refund_25 = compute(25, "refund") + offset(25); // step 25
++  const refund_26 = compute(26, "refund") + offset(26); // step 26
++  const refund_27 = compute(27, "refund") + offset(27); // step 27
++  const refund_28 = compute(28, "refund") + offset(28); // step 28
++  const refund_29 = compute(29, "refund") + offset(29); // step 29
++  const refund_30 = compute(30, "refund") + offset(30); // step 30
++  const refund_31 = compute(31, "refund") + offset(31); // step 31
++  const refund_32 = compute(32, "refund") + offset(32); // step 32
++  const refund_33 = compute(33, "refund") + offset(33); // step 33
++  const refund_34 = compute(34, "refund") + offset(34); // step 34
++  const refund_35 = compute(35, "refund") + offset(35); // step 35
++  const refund_36 = compute(36, "refund") + offset(36); // step 36
++  const refund_37 = compute(37, "refund") + offset(37); // step 37
++  const refund_38 = compute(38, "refund") + offset(38); // step 38
++  const refund_39 = compute(39, "refund") + offset(39); // step 39
++  const refund_40 = compute(40, "refund") + offset(40); // step 40
++  const refund_41 = compute(41, "refund") + offset(41); // step 41
++  const refund_42 = compute(42, "refund") + offset(42); // step 42
++  const refund_43 = compute(43, "refund") + offset(43); // step 43
++  const refund_44 = compute(44, "refund") + offset(44); // step 44
++  const refund_45 = compute(45, "refund") + offset(45); // step 45
++  const refund_46 = compute(46, "refund") + offset(46); // step 46
++  const refund_47 = compute(47, "refund") + offset(47); // step 47
++  const refund_48 = compute(48, "refund") + offset(48); // step 48
++  const refund_49 = compute(49, "refund") + offset(49); // step 49
++  const refund_50 = compute(50, "refund") + offset(50); // step 50
++  const refund_51 = compute(51, "refund") + offset(51); // step 51
++  const refund_52 = compute(52, "refund") + offset(52); // step 52
++  const refund_53 = compute(53, "refund") + offset(53); // step 53
++  const refund_54 = compute(54, "refund") + offset(54); // step 54
++  const refund_55 = compute(55, "refund") + offset(55); // step 55
++  const refund_56 = compute(56, "refund") + offset(56); // step 56
++  const refund_57 = compute(57, "refund") + offset(57); // step 57
++  const refund_58 = compute(58, "refund") + offset(58); // step 58
++  const refund_59 = compute(59, "refund") + offset(59); // step 59
++  const refund_60 = compute(60, "refund") + offset(60); // step 60
++  const refund_61 = compute(61, "refund") + offset(61); // step 61
++  const refund_62 = compute(62, "refund") + offset(62); // step 62
++  const refund_63 = compute(63, "refund") + offset(63); // step 63
++  const refund_64 = compute(64, "refund") + offset(64); // step 64
++  const refund_65 = compute(65, "refund") + offset(65); // step 65
++  const refund_66 = compute(66, "refund") + offset(66); // step 66
++  const refund_67 = compute(67, "refund") + offset(67); // step 67
++  const refund_68 = compute(68, "refund") + offset(68); // step 68
++  const refund_69 = compute(69, "refund") + offset(69); // step 69
+
+diff --git a/src/services/payments/webhook.ts b/src/services/payments/webhook.ts
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/src/services/payments/webhook.ts
+@@ -0,0 +1,70 @@
++  const webhook_0 = compute(0, "webhook") + offset(0); // step 0
++  const webhook_1 = compute(1, "webhook") + offset(1); // step 1
++  const webhook_2 = compute(2, "webhook") + offset(2); // step 2
++  const webhook_3 = compute(3, "webhook") + offset(3); // step 3
++  const webhook_4 = compute(4, "webhook") + offset(4); // step 4
++  const webhook_5 = compute(5, "webhook") + offset(5); // step 5
++  const webhook_6 = compute(6, "webhook") + offset(6); // step 6
++  const webhook_7 = compute(7, "webhook") + offset(7); // step 7
++  const webhook_8 = compute(8, "webhook") + offset(8); // step 8
++  const webhook_9 = compute(9, "webhook") + offset(9); // step 9
++  const webhook_10 = compute(10, "webhook") + offset(10); // step 10
++  const webhook_11 = compute(11, "webhook") + offset(11); // step 11
++  const webhook_12 = compute(12, "webhook") + offset(12); // step 12
++  const webhook_13 = compute(13, "webhook") + offset(13); // step 13
++  const webhook_14 = compute(14, "webhook") + offset(14); // step 14
++  const webhook_15 = compute(15, "webhook") + offset(15); // step 15
++  const webhook_16 = compute(16, "webhook") + offset(16); // step 16
++  const webhook_17 = compute(17, "webhook") + offset(17); // step 17
++  const webhook_18 = compute(18, "webhook") + offset(18); // step 18
++  const webhook_19 = compute(19, "webhook") + offset(19); // step 19
++  const webhook_20 = compute(20, "webhook") + offset(20); // step 20
++  const webhook_21 = compute(21, "webhook") + offset(21); // step 21
++  const webhook_22 = compute(22, "webhook") + offset(22); // step 22
++  const webhook_23 = compute(23, "webhook") + offset(23); // step 23
++  const webhook_24 = compute(24, "webhook") + offset(24); // step 24
++  const webhook_25 = compute(25, "webhook") + offset(25); // step 25
++  const webhook_26 = compute(26, "webhook") + offset(26); // step 26
++  const webhook_27 = compute(27, "webhook") + offset(27); // step 27
++  const webhook_28 = compute(28, "webhook") + offset(28); // step 28
++  const webhook_29 = compute(29, "webhook") + offset(29); // step 29
++  const webhook_30 = compute(30, "webhook") + offset(30); // step 30
++  const webhook_31 = compute(31, "webhook") + offset(31); // step 31
++  const webhook_32 = compute(32, "webhook") + offset(32); // step 32
++  const webhook_33 = compute(33, "webhook") + offset(33); // step 33
++  const webhook_34 = compute(34, "webhook") + offset(34); // step 34
++  const webhook_35 = compute(35, "webhook") + offset(35); // step 35
++  const webhook_36 = compute(36, "webhook") + offset(36); // step 36
++  const webhook_37 = compute(37, "webhook") + offset(37); // step 37
++  const webhook_38 = compute(38, "webhook") + offset(38); // step 38
++  const webhook_39 = compute(39, "webhook") + offset(39); // step 39
++  const webhook_40 = compute(40, "webhook") + offset(40); // step 40
++  const webhook_41 = compute(41, "webhook") + offset(41); // step 41
++  const webhook_42 = compute(42, "webhook") + offset(42); // step 42
++  const webhook_43 = compute(43, "webhook") + offset(43); // step 43
++  const webhook_44 = compute(44, "webhook") + offset(44); // step 44
++  const webhook_45 = compute(45, "webhook") + offset(45); // step 45
++  const webhook_46 = compute(46, "webhook") + offset(46); // step 46
++  const webhook_47 = compute(47, "webhook") + offset(47); // step 47
++  const webhook_48 = compute(48, "webhook") + offset(48); // step 48
++  const webhook_49 = compute(49, "webhook") + offset(49); // step 49
++  const webhook_50 = compute(50, "webhook") + offset(50); // step 50
++  const webhook_51 = compute(51, "webhook") + offset(51); // step 51
++  const webhook_52 = compute(52, "webhook") + offset(52); // step 52
++  const webhook_53 = compute(53, "webhook") + offset(53); // step 53
++  const webhook_54 = compute(54, "webhook") + offset(54); // step 54
++  const webhook_55 = compute(55, "webhook") + offset(55); // step 55
++  const webhook_56 = compute(56, "webhook") + offset(56); // step 56
++  const webhook_57 = compute(57, "webhook") + offset(57); // step 57
++  const webhook_58 = compute(58, "webhook") + offset(58); // step 58
++  const webhook_59 = compute(59, "webhook") + offset(59); // step 59
++  const webhook_60 = compute(60, "webhook") + offset(60); // step 60
++  const webhook_61 = compute(61, "webhook") + offset(61); // step 61
++  const webhook_62 = compute(62, "webhook") + offset(62); // step 62
++  const webhook_63 = compute(63, "webhook") + offset(63); // step 63
++  const webhook_64 = compute(64, "webhook") + offset(64); // step 64
++  const webhook_65 = compute(65, "webhook") + offset(65); // step 65
++  const webhook_66 = compute(66, "webhook") + offset(66); // step 66
++  const webhook_67 = compute(67, "webhook") + offset(67); // step 67
++  const webhook_68 = compute(68, "webhook") + offset(68); // step 68
++  const webhook_69 = compute(69, "webhook") + offset(69); // step 69
+
+diff --git a/package.json b/package.json
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/package.json
+@@ -0,0 +1,3 @@
++  "dependencies": {
++    "stripe": "^14.0.0"
++  }
+
+diff --git a/package-lock.json b/package-lock.json
+index 1111111..2222222 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -100,0 +101,240 @@
++    "node_modules/dep-0": {
++      "version": "1.2.0",
++      "resolved": "https://registry.npmjs.org/dep-0/-/dep-0-1.2.0.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-1": {
++      "version": "1.2.1",
++      "resolved": "https://registry.npmjs.org/dep-1/-/dep-1-1.2.1.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-2": {
++      "version": "1.2.2",
++      "resolved": "https://registry.npmjs.org/dep-2/-/dep-2-1.2.2.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-3": {
++      "version": "1.2.3",
++      "resolved": "https://registry.npmjs.org/dep-3/-/dep-3-1.2.3.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-4": {
++      "version": "1.2.4",
++      "resolved": "https://registry.npmjs.org/dep-4/-/dep-4-1.2.4.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-5": {
++      "version": "1.2.5",
++      "resolved": "https://registry.npmjs.org/dep-5/-/dep-5-1.2.5.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa5==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-6": {
++      "version": "1.2.6",
++      "resolved": "https://registry.npmjs.org/dep-6/-/dep-6-1.2.6.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa6==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-7": {
++      "version": "1.2.7",
++      "resolved": "https://registry.npmjs.org/dep-7/-/dep-7-1.2.7.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa7==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-8": {
++      "version": "1.2.8",
++      "resolved": "https://registry.npmjs.org/dep-8/-/dep-8-1.2.8.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa8==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-9": {
++      "version": "1.2.9",
++      "resolved": "https://registry.npmjs.org/dep-9/-/dep-9-1.2.9.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-10": {
++      "version": "1.2.10",
++      "resolved": "https://registry.npmjs.org/dep-10/-/dep-10-1.2.10.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa10==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-11": {
++      "version": "1.2.11",
++      "resolved": "https://registry.npmjs.org/dep-11/-/dep-11-1.2.11.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa11==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-12": {
++      "version": "1.2.12",
++      "resolved": "https://registry.npmjs.org/dep-12/-/dep-12-1.2.12.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa12==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-13": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/dep-13/-/dep-13-1.2.13.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa13==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-14": {
++      "version": "1.2.14",
++      "resolved": "https://registry.npmjs.org/dep-14/-/dep-14-1.2.14.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa14==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-15": {
++      "version": "1.2.15",
++      "resolved": "https://registry.npmjs.org/dep-15/-/dep-15-1.2.15.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa15==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-16": {
++      "version": "1.2.16",
++      "resolved": "https://registry.npmjs.org/dep-16/-/dep-16-1.2.16.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa16==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-17": {
++      "version": "1.2.17",
++      "resolved": "https://registry.npmjs.org/dep-17/-/dep-17-1.2.17.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa17==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-18": {
++      "version": "1.2.18",
++      "resolved": "https://registry.npmjs.org/dep-18/-/dep-18-1.2.18.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa18==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-19": {
++      "version": "1.2.19",
++      "resolved": "https://registry.npmjs.org/dep-19/-/dep-19-1.2.19.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa19==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-20": {
++      "version": "1.2.20",
++      "resolved": "https://registry.npmjs.org/dep-20/-/dep-20-1.2.20.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa20==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-21": {
++      "version": "1.2.21",
++      "resolved": "https://registry.npmjs.org/dep-21/-/dep-21-1.2.21.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa21==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-22": {
++      "version": "1.2.22",
++      "resolved": "https://registry.npmjs.org/dep-22/-/dep-22-1.2.22.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa22==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-23": {
++      "version": "1.2.23",
++      "resolved": "https://registry.npmjs.org/dep-23/-/dep-23-1.2.23.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa23==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-24": {
++      "version": "1.2.24",
++      "resolved": "https://registry.npmjs.org/dep-24/-/dep-24-1.2.24.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa24==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-25": {
++      "version": "1.2.25",
++      "resolved": "https://registry.npmjs.org/dep-25/-/dep-25-1.2.25.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa25==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-26": {
++      "version": "1.2.26",
++      "resolved": "https://registry.npmjs.org/dep-26/-/dep-26-1.2.26.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa26==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-27": {
++      "version": "1.2.27",
++      "resolved": "https://registry.npmjs.org/dep-27/-/dep-27-1.2.27.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa27==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-28": {
++      "version": "1.2.28",
++      "resolved": "https://registry.npmjs.org/dep-28/-/dep-28-1.2.28.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa28==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-29": {
++      "version": "1.2.29",
++      "resolved": "https://registry.npmjs.org/dep-29/-/dep-29-1.2.29.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa29==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-30": {
++      "version": "1.2.30",
++      "resolved": "https://registry.npmjs.org/dep-30/-/dep-30-1.2.30.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa30==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-31": {
++      "version": "1.2.31",
++      "resolved": "https://registry.npmjs.org/dep-31/-/dep-31-1.2.31.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa31==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-32": {
++      "version": "1.2.32",
++      "resolved": "https://registry.npmjs.org/dep-32/-/dep-32-1.2.32.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa32==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-33": {
++      "version": "1.2.33",
++      "resolved": "https://registry.npmjs.org/dep-33/-/dep-33-1.2.33.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa33==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-34": {
++      "version": "1.2.34",
++      "resolved": "https://registry.npmjs.org/dep-34/-/dep-34-1.2.34.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa34==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-35": {
++      "version": "1.2.35",
++      "resolved": "https://registry.npmjs.org/dep-35/-/dep-35-1.2.35.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa35==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-36": {
++      "version": "1.2.36",
++      "resolved": "https://registry.npmjs.org/dep-36/-/dep-36-1.2.36.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa36==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-37": {
++      "version": "1.2.37",
++      "resolved": "https://registry.npmjs.org/dep-37/-/dep-37-1.2.37.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa37==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-38": {
++      "version": "1.2.38",
++      "resolved": "https://registry.npmjs.org/dep-38/-/dep-38-1.2.38.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa38==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-39": {
++      "version": "1.2.39",
++      "resolved": "https://registry.npmjs.org/dep-39/-/dep-39-1.2.39.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa39==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
