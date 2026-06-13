@@ -9,6 +9,7 @@ import {
 } from "../../utils/commitlint.js";
 import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware.js";
 import { generateCommitMessage } from "./generateCommitMessage.js";
+import { prepareCommitContext } from "./summarizeDiff.js";
 
 interface CommitOptions {
   message?: string;
@@ -30,6 +31,8 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
     try {
       // Get staged changes
       const diff = git.getStagedChanges();
+
+      const context = await prepareCommitContext(diff);
 
       console.log(chalk.blue("Generating commit message..."));
 
@@ -53,7 +56,7 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
       }
 
       // Generate first commit message
-      commitMessage = await generateCommitMessage(diff);
+      commitMessage = await generateCommitMessage(context);
 
       // If commitlint is configured, try to validate and regenerate up to 3 times
       if (hasCommitlint) {
@@ -96,7 +99,7 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
                 // Try regenerating with validation errors
                 try {
                   commitMessage = await generateCommitMessage(
-                    diff,
+                    context,
                     validationErrors
                   );
                 } catch (error) {

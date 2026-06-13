@@ -50,6 +50,7 @@
     "configstore": "^7.0.0",
     "inquirer": "^12.5.2",
     "node-fetch": "^3.3.2",
-    "openai": "^4.100.0"
+    "openai": "^4.100.0",
+    "ora": "^8.2.0"
   }
 }
