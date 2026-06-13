@@ -1,5 +1,12 @@
+import chalk from "chalk";
 import inquirer from "inquirer";
-import { getConfig, GitPTConfig, validateConfig } from "../../../config.js";
+import {
+  getConfig,
+  GitPTConfig,
+  saveConfig,
+  validateConfig,
+} from "../../../config.js";
+import { resolveDefaultModel } from "./defaultModels.js";
 import {
   isAppleFoundationModelsSupported,
   setupApple,
@@ -20,6 +27,19 @@ export const setupMiddleware = async (options?: {
     const isValidConfig = validateConfig();
     if (isValidConfig.isValid) {
       return getConfig();
+    }
+
+    if (!existingConfig.provider) {
+      const defaultModel = resolveDefaultModel();
+      if (defaultModel) {
+        saveConfig(defaultModel.config);
+        console.log(
+          chalk.gray(
+            `No model configured; using ${defaultModel.label} by default. Run 'gitpt model' to change.`
+          )
+        );
+        return getConfig();
+      }
     }
   }
 
