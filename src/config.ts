@@ -4,7 +4,7 @@ import Configstore from "configstore";
 const config = new Configstore("gitpt");
 
 export interface GitPTConfig {
-  provider?: "openrouter" | "local";
+  provider?: "openrouter" | "local" | "apple";
   customLLMEndpoint?: string;
   model?: string;
   apiKey?: string;

@@ -15,6 +15,7 @@ Git Prompt Tool is a CLI tool that helps you write commit messages using AI thro
 - Edit suggested messages before committing
 - Works with various AI models via OpenRouter
 - Support for local LLMs with OpenAI-compatible API
+- Support for Apple Foundation Models on-device (macOS 27+, no API key required)
 - [Commitlint](https://commitlint.js.org/) support - read directly from your repository
 
 ## Installation
@@ -113,6 +114,12 @@ GitPT works with any local LLM that provides an OpenAI-compatible API endpoint, 
 - [LM Studio](https://lmstudio.ai/)
 - [LocalAI](https://localai.io/)
 - Custom setups with tools like llama.cpp
+
+#### Using Apple Foundation Models
+
+On macOS 27 and later, GitPT can use Apple's on-device Foundation Models through the built-in `fm` CLI — no API key or network connection required. Select **Apple Foundation Models** when running `gitpt setup` or `gitpt model`.
+
+> Note: the on-device model has a small context window (~4096 tokens), so very large diffs may not fit.
 
 ## GitHub Usage
 

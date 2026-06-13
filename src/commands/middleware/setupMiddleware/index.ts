@@ -1,5 +1,9 @@
 import inquirer from "inquirer";
 import { getConfig, GitPTConfig, validateConfig } from "../../../config.js";
+import {
+  isAppleFoundationModelsSupported,
+  setupApple,
+} from "./setupApple.js";
 import { setupLocalLLM } from "./setupLocalLLM.js";
 import { setupOpenRouter } from "./setupOpenRouter.js";
 
@@ -20,28 +24,45 @@ export const setupMiddleware = async (options?: {
   }
 
   // For initial setup or model command, start by selecting the provider
-  const useLocalLLMAnswer = await inquirer.prompt([
+  const providerChoices: Array<{
+    name: string;
+    value: NonNullable<GitPTConfig["provider"]>;
+  }> = [
+    { name: "OpenRouter (remote)", value: "openrouter" },
+    ...(isAppleFoundationModelsSupported()
+      ? [
+          {
+            name: "Apple Foundation Models (macOS 27+)",
+            value: "apple" as const,
+          },
+        ]
+      : []),
+    { name: "Local LLM", value: "local" },
+  ];
+
+  const providerAnswer = await inquirer.prompt([
     {
       type: "list",
-      name: "useLocalLLM",
+      name: "provider",
       message: "Select LLM provider:",
-      choices: [
-        { name: "OpenRouter (remote)", value: false },
-        { name: "Local LLM", value: true },
-      ],
-      default: existingConfig.provider === "local" ? 1 : 0,
+      choices: providerChoices,
+      default: Math.max(
+        providerChoices.findIndex((c) => c.value === existingConfig.provider),
+        0
+      ),
     },
   ]);
 
   // Update config based on selected provider
-  existingConfig.provider = useLocalLLMAnswer.useLocalLLM
-    ? "local"
-    : "openrouter";
+  existingConfig.provider = providerAnswer.provider;
 
   // Proceed based on selected provider
-  if (useLocalLLMAnswer.useLocalLLM) {
-    return await setupLocalLLM(existingConfig);
-  } else {
-    return await setupOpenRouter(existingConfig);
+  switch (providerAnswer.provider) {
+    case "local":
+      return await setupLocalLLM(existingConfig);
+    case "apple":
+      return await setupApple(existingConfig);
+    default:
+      return await setupOpenRouter(existingConfig);
   }
 };

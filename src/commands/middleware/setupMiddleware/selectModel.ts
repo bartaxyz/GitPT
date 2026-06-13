@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import inquirer from "inquirer";
 import { Model } from "./types.js";
 
@@ -6,11 +7,14 @@ import { Model } from "./types.js";
  */
 export const selectModel = async (
   models: Model[],
-  existingModel?: string
+  existingModel?: string,
+  notes?: string[]
 ): Promise<string> => {
   const modelChoices = models.map((model) => ({
     name: model.name
-      ? `${model.name} (Context: ${model.context_length})`
+      ? model.context_length
+        ? `${model.name} (Context: ${model.context_length})`
+        : model.name
       : model.id,
     value: model.id,
   }));
@@ -20,12 +24,23 @@ export const selectModel = async (
     value: "custom",
   });
 
+  const choices: Array<
+    { name: string; value: string } | InstanceType<typeof inquirer.Separator>
+  > = [...modelChoices];
+
+  if (notes && notes.length > 0) {
+    choices.push(new inquirer.Separator(" "));
+    for (const note of notes) {
+      choices.push(new inquirer.Separator(chalk.gray(note)));
+    }
+  }
+
   const answers = await inquirer.prompt([
     {
       type: "list",
       name: "modelChoice",
       message: "Select an AI model:",
-      choices: modelChoices,
+      choices,
       default: () => {
         const currentIndex = modelChoices.findIndex(
           (choice) => choice.value === existingModel
