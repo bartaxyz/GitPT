@@ -1,0 +1,37 @@
+{
+  "01-real-bugfix-endpoint.patch": {
+    "origin": "0f52473",
+    "reference": "fix: llm provider endpoint resolution",
+    "shouldMention": "fixing provider/endpoint resolution"
+  },
+  "02-real-small-feature.patch": {
+    "origin": "edc5aeb",
+    "reference": "Add support for local LLM endpoint in PR details generation",
+    "shouldMention": "local LLM endpoint support for PR generation"
+  },
+  "03-real-feature-multifile.patch": {
+    "origin": "ff1d626",
+    "reference": "feat: add apple foundation models support",
+    "shouldMention": "the Apple Foundation Models provider"
+  },
+  "04-real-feature-with-deps.patch": {
+    "origin": "cddb33d",
+    "reference": "feat: add summary system for budget-constrained diff analysis",
+    "shouldMention": "diff summarization / fitting the context window"
+  },
+  "05-real-refactor.patch": {
+    "origin": "0883e90",
+    "reference": "Simplify model handling and enhance local LLM setup",
+    "shouldMention": "model handling / local LLM setup"
+  },
+  "06-synthetic-lockfile-heavy.patch": {
+    "origin": "synthetic",
+    "reference": "config change buried under a huge lockfile churn",
+    "shouldMention": "the retry-limit / config change, not the lockfile"
+  },
+  "07-synthetic-single-large-file.patch": {
+    "origin": "synthetic",
+    "reference": "one oversized generated file with many hunks",
+    "shouldMention": "changes to the schema / generated file"
+  }
+}
