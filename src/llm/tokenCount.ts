@@ -3,9 +3,7 @@ import { getConfig } from "../config.js";
 
 const estimateTokens = (text: string): number => Math.ceil(text.length / 4);
 
-export const countTokens = (text: string): number => {
-  const { provider } = getConfig();
-
+const countTokensUncached = (text: string, provider?: string): number => {
   if (provider === "apple") {
     const result = spawnSync("fm", ["token-count", "-q"], {
       input: text,
@@ -18,6 +16,20 @@ export const countTokens = (text: string): number => {
   }
 
   return estimateTokens(text);
+};
+
+const cache = new Map<string, number>();
+
+export const countTokens = (text: string): number => {
+  const { provider } = getConfig();
+  const key = `${provider ?? ""}:${text}`;
+
+  const cached = cache.get(key);
+  if (cached !== undefined) return cached;
+
+  const tokens = countTokensUncached(text, provider);
+  cache.set(key, tokens);
+  return tokens;
 };
 
 export const getContextWindow = (): number => {
