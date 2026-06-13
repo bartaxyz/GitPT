@@ -3,13 +3,17 @@ import inquirer from "inquirer";
 import { capabilitiesMiddleware } from "../middleware/capabilitiesMiddleware/index.js";
 import { setupMiddleware } from "../middleware/setupMiddleware/index.js";
 import { git } from "../../services/git/index.js";
+import { countTokens } from "../../llm/tokenCount.js";
 import {
+  getCommitlintRules,
   hasCommitlintConfig,
   validateCommitMessage,
 } from "../../utils/commitlint.js";
 import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware.js";
 import { generateCommitMessage } from "./generateCommitMessage.js";
 import { prepareCommitContext } from "./summarizeDiff.js";
+
+const RESERVED_VALIDATION_RETRY_TOKENS = 256;
 
 interface CommitOptions {
   message?: string;
@@ -32,21 +36,9 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
       // Get staged changes
       const diff = git.getStagedChanges();
 
-      const context = await prepareCommitContext(diff);
-
-      console.log(chalk.blue("Generating commit message..."));
-
-      // Check if commitlint is configured
       let hasCommitlint = false;
       try {
         hasCommitlint = hasCommitlintConfig();
-        if (hasCommitlint) {
-          console.log(
-            chalk.blue(
-              "Commitlint configuration detected. Generating message according to rules..."
-            )
-          );
-        }
       } catch (error) {
         console.warn(
           chalk.yellow(
@@ -55,8 +47,24 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
         );
       }
 
+      const baseRules = hasCommitlint ? getCommitlintRules() : "";
+      const reservedPromptTokens =
+        countTokens(baseRules) + RESERVED_VALIDATION_RETRY_TOKENS;
+
+      const context = await prepareCommitContext(diff, reservedPromptTokens);
+
+      console.log(chalk.blue("Generating commit message..."));
+
+      if (hasCommitlint) {
+        console.log(
+          chalk.blue(
+            "Commitlint configuration detected. Generating message according to rules..."
+          )
+        );
+      }
+
       // Generate first commit message
-      commitMessage = await generateCommitMessage(context);
+      commitMessage = await generateCommitMessage(context, undefined, baseRules);
 
       // If commitlint is configured, try to validate and regenerate up to 3 times
       if (hasCommitlint) {
@@ -100,7 +108,8 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
                 try {
                   commitMessage = await generateCommitMessage(
                     context,
-                    validationErrors
+                    validationErrors,
+                    baseRules
                   );
                 } catch (error) {
                   console.warn(

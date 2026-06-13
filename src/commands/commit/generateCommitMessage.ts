@@ -9,10 +9,9 @@ import { userPrompt } from "./context/userPrompt.js";
 
 export const generateCommitMessage = async (
   diff: string,
-  validationErrors?: string
+  validationErrors?: string,
+  precomputedBaseRules?: string
 ): Promise<string> => {
-  // Check if commitlint is configured
-  const hasCommitlint = hasCommitlintConfig();
   const config = getConfig();
 
   // Check if we have a configured model
@@ -24,7 +23,9 @@ export const generateCommitMessage = async (
 
   const { model } = config;
 
-  const baseRules = hasCommitlint ? getCommitlintRules() : "";
+  const baseRules =
+    precomputedBaseRules ??
+    (hasCommitlintConfig() ? getCommitlintRules() : "");
 
   const errorInfo = validationErrors
     ? `\n\nYOUR PREVIOUS MESSAGE FAILED VALIDATION WITH THESE ERRORS:\n${validationErrors}\n\nFIX THESE ISSUES IN YOUR NEW MESSAGE.`

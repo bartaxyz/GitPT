@@ -144,11 +144,17 @@ const summarizeChunk = async (content: string): Promise<string> => {
   return response.choices[0].message.content?.trim() || "";
 };
 
-export const prepareCommitContext = async (diff: string): Promise<string> => {
+export const prepareCommitContext = async (
+  diff: string,
+  reservedPromptTokens = 0
+): Promise<string> => {
   const window = getContextWindow();
   if (!Number.isFinite(window)) return diff;
 
-  const fitBudget = Math.floor((window - RESERVED_OUTPUT_TOKENS) * MARGIN);
+  const fitBudget = Math.max(
+    0,
+    Math.floor((window - RESERVED_OUTPUT_TOKENS - reservedPromptTokens) * MARGIN)
+  );
   if (finalPromptTokens(diff) <= fitBudget) return diff;
 
   const spinner = ora({ text: "Analyzing diff size..." }).start();
