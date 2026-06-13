@@ -22,7 +22,7 @@ if (!isSupported()) {
 
 if (!existsSync(join(distDir, "config.js"))) {
   console.error(
-    chalk.red("dist/ not built. Run `npm run test:quality` (it builds first).")
+    chalk.red("dist/ not built. Run `npm run test:apple` (it builds first).")
   );
   process.exit(1);
 }

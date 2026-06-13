@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "test": "npm run typecheck",
-    "test:quality": "npm run build && node tests/quality/run.mjs",
+    "test:apple": "npm run build && node tests/apple-foundation-models/run.mjs",
     "prepublishOnly": "npm run build"
   },
   "repository": {

@@ -1,10 +1,11 @@
-# Quality test suite
+# Apple Foundation Models test suite
 
 Manual, model-backed tests for the Apple Foundation Models provider and the
-diff-summarization pipeline.
+diff-summarization pipeline. This suite is Apple-specific: it runs the on-device
+`fm` model. Other providers would get their own suite alongside it.
 
 ```bash
-npm run test:quality
+npm run test:apple
 ```
 
 These tests run the real on-device `fm` model, so:
