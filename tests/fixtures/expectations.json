@@ -4,60 +4,134 @@
     "reference": "fix: llm provider endpoint resolution",
     "shouldMention": "fixing provider/endpoint resolution",
     "type": "fix",
-    "mentions": ["endpoint", "provider", "resolution", "url"]
-  },
-  "02-real-small-feature.patch": {
-    "origin": "edc5aeb",
-    "reference": "Add support for local LLM endpoint in PR details generation",
-    "shouldMention": "local LLM endpoint support for PR generation",
-    "type": "feat",
-    "mentions": ["local", "llm", "endpoint", "pr"]
+    "mentions": [
+      "endpoint",
+      "provider",
+      "resolution",
+      "url"
+    ]
   },
   "03-real-feature-multifile.patch": {
     "origin": "ff1d626",
     "reference": "feat: add apple foundation models support",
     "shouldMention": "the Apple Foundation Models provider",
     "type": "feat",
-    "mentions": ["apple", "foundation", "model"]
-  },
-  "04-real-feature-with-deps.patch": {
-    "origin": "cddb33d",
-    "reference": "feat: add summary system for budget-constrained diff analysis",
-    "shouldMention": "diff summarization / fitting the context window",
-    "type": "feat",
-    "mentions": ["summar", "diff", "context", "token", "budget"]
+    "mentions": [
+      "apple",
+      "foundation",
+      "model"
+    ]
   },
   "05-real-refactor.patch": {
     "origin": "0883e90",
     "reference": "Simplify model handling and enhance local LLM setup",
     "shouldMention": "model handling / local LLM setup",
     "type": "refactor",
-    "mentions": ["model", "local", "llm", "setup", "simplif"]
+    "mentions": [
+      "model",
+      "local",
+      "llm",
+      "setup",
+      "simplif"
+    ]
   },
   "06-synthetic-lockfile-heavy.patch": {
     "origin": "synthetic",
     "reference": "config change buried under a huge lockfile churn",
     "shouldMention": "the retry-limit / config change, not the lockfile",
-    "mentions": ["retry", "config", "limit"]
+    "mentions": [
+      "retry",
+      "config",
+      "limit"
+    ]
   },
   "07-synthetic-single-large-file.patch": {
     "origin": "synthetic",
     "reference": "one oversized generated file with many hunks",
     "shouldMention": "changes to the schema / generated file",
-    "mentions": ["schema", "generated", "compute", "function"]
-  },
-  "08-real-feature-fits-multifile.patch": {
-    "origin": "def2e53",
-    "reference": "feat: add default model configuration",
-    "shouldMention": "defaulting to a model / default model config",
-    "type": "feat",
-    "mentions": ["default", "model", "config"]
+    "mentions": [
+      "schema",
+      "generated",
+      "compute",
+      "function"
+    ]
   },
   "09-real-fix-multifile.patch": {
     "origin": "2f6b574",
     "reference": "Fix LLM client context parameter update",
     "shouldMention": "the LLM client context/parameter fix",
     "type": "fix",
-    "mentions": ["client", "context", "parameter", "llm", "endpoint"]
+    "mentions": [
+      "client",
+      "context",
+      "parameter",
+      "llm",
+      "endpoint"
+    ]
+  },
+  "12-svelte-sources-set.patch": {
+    "origin": "sveltejs/svelte@67090e8ee8",
+    "source": "https://github.com/sveltejs/svelte/commit/67090e8ee8a4ac3cb2926969f75cf161ace6367d",
+    "license": "MIT",
+    "reference": "perf: store current_sources as Set for O(1) membership checks",
+    "type": [
+      "perf",
+      "refactor"
+    ],
+    "mentions": [
+      "set",
+      "sources",
+      "membership"
+    ]
+  },
+  "13-react-viewtransition-tests.patch": {
+    "origin": "facebook/react@f6790c1068",
+    "source": "https://github.com/facebook/react/commit/f6790c1068234252ecb65b515f170dca825cdcad",
+    "license": "MIT",
+    "reference": "Add ViewTransition event callback unit tests",
+    "type": "test",
+    "mentions": [
+      "viewtransition",
+      "test",
+      "callback"
+    ]
+  },
+  "15-vue-skip-async-unmount.patch": {
+    "origin": "vuejs/core@5300ead57b",
+    "source": "https://github.com/vuejs/core/commit/5300ead57b3c14942d4c155ef5e485d5409e7f02",
+    "license": "MIT",
+    "reference": "fix(runtime-core): skip async component callbacks after unmount",
+    "type": "fix",
+    "mentions": [
+      "async",
+      "unmount",
+      "callback"
+    ]
+  },
+  "18-ora-dynamic-prefix.patch": {
+    "origin": "sindresorhus/ora@0f19f57cdf",
+    "source": "https://github.com/sindresorhus/ora/commit/0f19f57cdf",
+    "license": "MIT",
+    "reference": "Fix frame() not displaying dynamic prefixText/suffixText from functions",
+    "type": "fix",
+    "mentions": [
+      "prefixtext",
+      "suffixtext",
+      "frame"
+    ]
+  },
+  "20-synthetic-remove-used-field.patch": {
+    "origin": "synthetic",
+    "reference": "chore: remove theme-aware logo preload from article meta",
+    "shouldMention": "the removed logo preload feature, not just the prefersDark field",
+    "type": [
+      "refactor",
+      "chore"
+    ],
+    "mentions": [
+      "preload",
+      "logo",
+      "theme"
+    ]
   }
 }

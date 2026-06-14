@@ -1,0 +1,248 @@
+## System
+
+
+You are a helpful assistant that generates concise, informative Git commit messages.
+
+Follow these strict rules:
+1. Use conventional commit format: type: description
+2. Types are: feat, fix, docs, style, refactor, test, chore
+3. NO scopes in parentheses - do not use feat(scope)
+4. Keep the entire message under 100 characters
+5. Use present tense (e.g., "add feature" not "added feature")
+6. Be brief but descriptive about WHAT changed
+7. Do not include detailed explanations
+
+Critical Rules:
+- Return a SINGLE LINE commit message only, with no additional explanations or paragraphs
+- Do NOT include a detailed message body section, just the commit title line
+- Do NOT use multiple lines, even for a single message
+
+Examples of Good Commit Messages:
+- feat: add user authentication system
+- fix: resolve crash when opening settings menu
+- refactor: simplify data processing pipeline
+- docs: update installation instructions in README
+- chore: update npm dependencies to latest versions
+- style: fix indentation in CSS files
+- test: add unit tests for payment processing
+- perf: optimize database queries for faster loading
+- build: update webpack configuration
+- ci: fix GitHub Actions workflow
+
+Examples of Bad Commit Messages:
+- added login screen                    ❌ (missing type prefix)
+- feat(auth): implement OAuth login     ❌ (using scope parentheses)
+- This is a really long commit message that exceeds the limit and contains too much information ❌ (too long)
+- feat: Adding user auth
+  
+  This implements the login page...     ❌ (contains multiple lines)
+- "fix: update styling"                 ❌ (includes quotes)
+
+
+Follow the conventional commit format (type(scope): message)
+
+
+
+## User
+
+
+Generate a single-line commit message for the following git diff:
+
+diff --git a/src/generated/schema.ts b/src/generated/schema.ts
+index 1111111..2222222 100644
+--- a/src/generated/schema.ts
++++ b/src/generated/schema.ts
+@@ -1,3 +1,15 @@ function block0() {
+ // context line a
+ // context line b
++  const h0_0 = compute(0, "h0") + offset(0); // step 0
++  const h0_1 = compute(1, "h0") + offset(1); // step 1
++  const h0_2 = compute(2, "h0") + offset(2); // step 2
++  const h0_3 = compute(3, "h0") + offset(3); // step 3
++  const h0_4 = compute(4, "h0") + offset(4); // step 4
++  const h0_5 = compute(5, "h0") + offset(5); // step 5
++  const h0_6 = compute(6, "h0") + offset(6); // step 6
++  const h0_7 = compute(7, "h0") + offset(7); // step 7
++  const h0_8 = compute(8, "h0") + offset(8); // step 8
++  const h0_9 = compute(9, "h0") + offset(9); // step 9
++  const h0_10 = compute(10, "h0") + offset(10); // step 10
++  const h0_11 = compute(11, "h0") + offset(11); // step 11
+ // context line c
+@@ -11,3 +11,15 @@ function block1() {
+ // context line a
+ // context line b
++  const h1_0 = compute(0, "h1") + offset(0); // step 0
++  const h1_1 = compute(1, "h1") + offset(1); // step 1
++  const h1_2 = compute(2, "h1") + offset(2); // step 2
++  const h1_3 = compute(3, "h1") + offset(3); // step 3
++  const h1_4 = compute(4, "h1") + offset(4); // step 4
++  const h1_5 = compute(5, "h1") + offset(5); // step 5
++  const h1_6 = compute(6, "h1") + offset(6); // step 6
++  const h1_7 = compute(7, "h1") + offset(7); // step 7
++  const h1_8 = compute(8, "h1") + offset(8); // step 8
++  const h1_9 = compute(9, "h1") + offset(9); // step 9
++  const h1_10 = compute(10, "h1") + offset(10); // step 10
++  const h1_11 = compute(11, "h1") + offset(11); // step 11
+ // context line c
+@@ -21,3 +21,15 @@ function block2() {
+ // context line a
+ // context line b
++  const h2_0 = compute(0, "h2") + offset(0); // step 0
++  const h2_1 = compute(1, "h2") + offset(1); // step 1
++  const h2_2 = compute(2, "h2") + offset(2); // step 2
++  const h2_3 = compute(3, "h2") + offset(3); // step 3
++  const h2_4 = compute(4, "h2") + offset(4); // step 4
++  const h2_5 = compute(5, "h2") + offset(5); // step 5
++  const h2_6 = compute(6, "h2") + offset(6); // step 6
++  const h2_7 = compute(7, "h2") + offset(7); // step 7
++  const h2_8 = compute(8, "h2") + offset(8); // step 8
++  const h2_9 = compute(9, "h2") + offset(9); // step 9
++  const h2_10 = compute(10, "h2") + offset(10); // step 10
++  const h2_11 = compute(11, "h2") + offset(11); // step 11
+ // context line c
+@@ -31,3 +31,15 @@ function block3() {
+ // context line a
+ // context line b
++  const h3_0 = compute(0, "h3") + offset(0); // step 0
++  const h3_1 = compute(1, "h3") + offset(1); // step 1
++  const h3_2 = compute(2, "h3") + offset(2); // step 2
++  const h3_3 = compute(3, "h3") + offset(3); // step 3
++  const h3_4 = compute(4, "h3") + offset(4); // step 4
++  const h3_5 = compute(5, "h3") + offset(5); // step 5
++  const h3_6 = compute(6, "h3") + offset(6); // step 6
++  const h3_7 = compute(7, "h3") + offset(7); // step 7
++  const h3_8 = compute(8, "h3") + offset(8); // step 8
++  const h3_9 = compute(9, "h3") + offset(9); // step 9
++  const h3_10 = compute(10, "h3") + offset(10); // step 10
++  const h3_11 = compute(11, "h3") + offset(11); // step 11
+ // context line c
+@@ -41,3 +41,15 @@ function block4() {
+ // context line a
+ // context line b
++  const h4_0 = compute(0, "h4") + offset(0); // step 0
++  const h4_1 = compute(1, "h4") + offset(1); // step 1
++  const h4_2 = compute(2, "h4") + offset(2); // step 2
++  const h4_3 = compute(3, "h4") + offset(3); // step 3
++  const h4_4 = compute(4, "h4") + offset(4); // step 4
++  const h4_5 = compute(5, "h4") + offset(5); // step 5
++  const h4_6 = compute(6, "h4") + offset(6); // step 6
++  const h4_7 = compute(7, "h4") + offset(7); // step 7
++  const h4_8 = compute(8, "h4") + offset(8); // step 8
++  const h4_9 = compute(9, "h4") + offset(9); // step 9
++  const h4_10 = compute(10, "h4") + offset(10); // step 10
++  const h4_11 = compute(11, "h4") + offset(11); // step 11
+ // context line c
+@@ -51,3 +51,15 @@ function block5() {
+ // context line a
+ // context line b
++  const h5_0 = compute(0, "h5") + offset(0); // step 0
++  const h5_1 = compute(1, "h5") + offset(1); // step 1
++  const h5_2 = compute(2, "h5") + offset(2); // step 2
++  const h5_3 = compute(3, "h5") + offset(3); // step 3
++  const h5_4 = compute(4, "h5") + offset(4); // step 4
++  const h5_5 = compute(5, "h5") + offset(5); // step 5
++  const h5_6 = compute(6, "h5") + offset(6); // step 6
++  const h5_7 = compute(7, "h5") + offset(7); // step 7
++  const h5_8 = compute(8, "h5") + offset(8); // step 8
++  const h5_9 = compute(9, "h5") + offset(9); // step 9
++  const h5_10 = compute(10, "h5") + offset(10); // step 10
++  const h5_11 = compute(11, "h5") + offset(11); // step 11
+ // context line c
+@@ -61,3 +61,15 @@ function block6() {
+ // context line a
+ // context line b
++  const h6_0 = compute(0, "h6") + offset(0); // step 0
++  const h6_1 = compute(1, "h6") + offset(1); // step 1
++  const h6_2 = compute(2, "h6") + offset(2); // step 2
++  const h6_3 = compute(3, "h6") + offset(3); // step 3
++  const h6_4 = compute(4, "h6") + offset(4); // step 4
++  const h6_5 = compute(5, "h6") + offset(5); // step 5
++  const h6_6 = compute(6, "h6") + offset(6); // step 6
++  const h6_7 = compute(7, "h6") + offset(7); // step 7
++  const h6_8 = compute(8, "h6") + offset(8); // step 8
++  const h6_9 = compute(9, "h6") + offset(9); // step 9
++  const h6_10 = compute(10, "h6") + offset(10); // step 10
++  const h6_11 = compute(11, "h6") + offset(11); // step 11
+ // context line c
+@@ -71,3 +71,15 @@ function block7() {
+ // context line a
+ // context line b
++  const h7_0 = compute(0, "h7") + offset(0); // step 0
++  const h7_1 = compute(1, "h7") + offset(1); // step 1
++  const h7_2 = compute(2, "h7") + offset(2); // step 2
++  const h7_3 = compute(3, "h7") + offset(3); // step 3
++  const h7_4 = compute(4, "h7") + offset(4); // step 4
++  const h7_5 = compute(5, "h7") + offset(5); // step 5
++  const h7_6 = compute(6, "h7") + offset(6); // step 6
++  const h7_7 = compute(7, "h7") + offset(7); // step 7
++  const h7_8 = compute(8, "h7") + offset(8); // step 8
++  const h7_9 = compute(9, "h7") + offset(9); // step 9
++  const h7_10 = compute(10, "h7") + offset(10); // step 10
++  const h7_11 = compute(11, "h7") + offset(11); // step 11
+ // context line c
+@@ -81,3 +81,15 @@ function block8() {
+ // context line a
+ // context line b
++  const h8_0 = compute(0, "h8") + offset(0); // step 0
++  const h8_1 = compute(1, "h8") + offset(1); // step 1
++  const h8_2 = compute(2, "h8") + offset(2); // step 2
++  const h8_3 = compute(3, "h8") + offset(3); // step 3
++  const h8_4 = compute(4, "h8") + offset(4); // step 4
++  const h8_5 = compute(5, "h8") + offset(5); // step 5
++  const h8_6 = compute(6, "h8") + offset(6); // step 6
++  const h8_7 = compute(7, "h8") + offset(7); // step 7
++  const h8_8 = compute(8, "h8") + offset(8); // step 8
++  const h8_9 = compute(9, "h8") + offset(9); // step 9
++  const h8_10 = compute(10, "h8") + offset(10); // step 10
++  const h8_11 = compute(11, "h8") + offset(11); // step 11
+ // context line c
+@@ -91,3 +91,15 @@ function block9() {
+ // context line a
+ // context line b
++  const h9_0 = compute(0, "h9") + offset(0); // step 0
++  const h9_1 = compute(1, "h9") + offset(1); // step 1
++  const h9_2 = compute(2, "h9") + offset(2); // step 2
++  const h9_3 = compute(3, "h9") + offset(3); // step 3
++  const h9_4 = compute(4, "h9") + offset(4); // step 4
++  const h9_5 = compute(5, "h9") + offset(5); // step 5
++  const h9_6 = compute(6, "h9") + offset(6); // step 6
++  const h9_7 = compute(7, "h9") + offset(7); // step 7
++  const h9_8 = compute(8, "h9") + offset(8); // step 8
++  const h9_9 = compute(9, "h9") + offset(9); // step 9
++  const h9_10 = compute(10, "h9") + offset(10); // step 10
++  const h9_11 = compute(11, "h9") + offset(11); // step 11
+ // context line c
+@@ -101,3 +101,15 @@ function block10() {
+ // context line a
+ // context line b
++  const h10_0 = compute(0, "h10") + offset(0); // step 0
++  const h10_1 = compute(1, "h10") + offset(1); // step 1
++  const h10_2 = compute(2, "h10") + offset(2); // step 2
++  const h10_3 = compute(3, "h10") + offset(3); // step 3
++  const h10_4 = compute(4, "h10") + offset(4); // step 4
++  const h10_5 = compute(5, "h10") + offset(5); // step 5
++  const h10_6 = compute(6, "h10") + offset(6); // step 6
++  const h10_7 = compute(7, "h10") + offset(7); // step 7
++  const h10_8 = compute(8, "h10") + offset(8); // step 8
++  const h10_9 = compute(9, "h10") + offset(9); // step 9
++  const h10_10 = compute(10, "h10") + offset(10); // step 10
++  const h10_11 = compute(11, "h10") + offset(11); // step 11
+ // context line c
+@@ -111,3 +111,15 @@ function block11() {
+ // context line a
+ // context line b
++  const h11_0 = compute(0, "h11") + offset(0); // step 0
++  const h11_1 = compute(1, "h11") + offset(1); // step 1
++  const h11_2 = compute(2, "h11") + offset(2); // step 2
++  const h11_3 = compute(3, "h11") + offset(3); // step 3
++  const h11_4 = compute(4, "h11") + offset(4); // step 4
++  const h11_5 = compute(5, "h11") + offset(5); // step 5
++  const h11_6 = compute(6, "h11") + offset(6); // step 6
++  const h11_7 = compute(7, "h11") + offset(7); // step 7
++  const h11_8 = compute(8, "h11") + offset(8); // step 8
++  const h11_9 = compute(9, "h11") + offset(9); // step 9
++  const h11_10 = compute(10, "h11") + offset(10); // step 10
++  const h11_11 = compute(11, "h11") + offset(11); // step 11
+ // context line c
+
+

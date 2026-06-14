@@ -1,0 +1,496 @@
+## System
+
+
+You are a helpful assistant that generates concise, informative Git commit messages.
+
+Follow these strict rules:
+1. Use conventional commit format: type: description
+2. Types are: feat, fix, docs, style, refactor, test, chore
+3. NO scopes in parentheses - do not use feat(scope)
+4. Keep the entire message under 100 characters
+5. Use present tense (e.g., "add feature" not "added feature")
+6. Be brief but descriptive about WHAT changed
+7. Do not include detailed explanations
+
+Critical Rules:
+- Return a SINGLE LINE commit message only, with no additional explanations or paragraphs
+- Do NOT include a detailed message body section, just the commit title line
+- Do NOT use multiple lines, even for a single message
+
+Examples of Good Commit Messages:
+- feat: add user authentication system
+- fix: resolve crash when opening settings menu
+- refactor: simplify data processing pipeline
+- docs: update installation instructions in README
+- chore: update npm dependencies to latest versions
+- style: fix indentation in CSS files
+- test: add unit tests for payment processing
+- perf: optimize database queries for faster loading
+- build: update webpack configuration
+- ci: fix GitHub Actions workflow
+
+Examples of Bad Commit Messages:
+- added login screen                    ❌ (missing type prefix)
+- feat(auth): implement OAuth login     ❌ (using scope parentheses)
+- This is a really long commit message that exceeds the limit and contains too much information ❌ (too long)
+- feat: Adding user auth
+  
+  This implements the login page...     ❌ (contains multiple lines)
+- "fix: update styling"                 ❌ (includes quotes)
+
+
+Follow the conventional commit format (type(scope): message)
+
+
+
+## User
+
+
+Generate a single-line commit message for the following git diff:
+
+diff --git a/README.md b/README.md
+index 72b755b..5bf1c6c 100644
+--- a/README.md
++++ b/README.md
+@@ -15,6 +15,7 @@ Git Prompt Tool is a CLI tool that helps you write commit messages using AI thro
+ - Edit suggested messages before committing
+ - Works with various AI models via OpenRouter
+ - Support for local LLMs with OpenAI-compatible API
++- Support for Apple Foundation Models on-device (macOS 27+, no API key required)
+ - [Commitlint](https://commitlint.js.org/) support - read directly from your repository
+ 
+ ## Installation
+@@ -114,6 +115,12 @@ GitPT works with any local LLM that provides an OpenAI-compatible API endpoint,
+ - [LocalAI](https://localai.io/)
+ - Custom setups with tools like llama.cpp
+ 
++#### Using Apple Foundation Models
++
++On macOS 27 and later, GitPT can use Apple's on-device Foundation Models through the built-in `fm` CLI — no API key or network connection required. Select **Apple Foundation Models** when running `gitpt setup` or `gitpt model`.
++
++> Note: the on-device model has a small context window (~4096 tokens), so very large diffs may not fit.
++
+ ## GitHub Usage
+ 
+ If you have GitHub CLI (`gh`) installed, you can use GitPT to interact with GitHub (e.g. generate full pull requests).
+diff --git a/src/commands/middleware/setupMiddleware/index.ts b/src/commands/middleware/setupMiddleware/index.ts
+index d6f11a8..0b2cc2c 100644
+--- a/src/commands/middleware/setupMiddleware/index.ts
++++ b/src/commands/middleware/setupMiddleware/index.ts
+@@ -1,5 +1,9 @@
+ import inquirer from "inquirer";
+ import { getConfig, GitPTConfig, validateConfig } from "../../../config.js";
++import {
++  isAppleFoundationModelsSupported,
++  setupApple,
++} from "./setupApple.js";
+ import { setupLocalLLM } from "./setupLocalLLM.js";
+ import { setupOpenRouter } from "./setupOpenRouter.js";
+ 
+@@ -20,28 +24,45 @@ export const setupMiddleware = async (options?: {
+   }
+ 
+   // For initial setup or model command, start by selecting the provider
+-  const useLocalLLMAnswer = await inquirer.prompt([
++  const providerChoices: Array<{
++    name: string;
++    value: NonNullable<GitPTConfig["provider"]>;
++  }> = [
++    { name: "OpenRouter (remote)", value: "openrouter" },
++    ...(isAppleFoundationModelsSupported()
++      ? [
++          {
++            name: "Apple Foundation Models (macOS 27+)",
++            value: "apple" as const,
++          },
++        ]
++      : []),
++    { name: "Local LLM", value: "local" },
++  ];
++
++  const providerAnswer = await inquirer.prompt([
+     {
+       type: "list",
+-      name: "useLocalLLM",
++      name: "provider",
+       message: "Select LLM provider:",
+-      choices: [
+-        { name: "OpenRouter (remote)", value: false },
+-        { name: "Local LLM", value: true },
+-      ],
+-      default: existingConfig.provider === "local" ? 1 : 0,
++      choices: providerChoices,
++      default: Math.max(
++        providerChoices.findIndex((c) => c.value === existingConfig.provider),
++        0
++      ),
+     },
+   ]);
+ 
+   // Update config based on selected provider
+-  existingConfig.provider = useLocalLLMAnswer.useLocalLLM
+-    ? "local"
+-    : "openrouter";
++  existingConfig.provider = providerAnswer.provider;
+ 
+   // Proceed based on selected provider
+-  if (useLocalLLMAnswer.useLocalLLM) {
+-    return await setupLocalLLM(existingConfig);
+-  } else {
+-    return await setupOpenRouter(existingConfig);
++  switch (providerAnswer.provider) {
++    case "local":
++      return await setupLocalLLM(existingConfig);
++    case "apple":
++      return await setupApple(existingConfig);
++    default:
++      return await setupOpenRouter(existingConfig);
+   }
+ };
+diff --git a/src/commands/middleware/setupMiddleware/selectModel.ts b/src/commands/middleware/setupMiddleware/selectModel.ts
+index 08e1374..aedfd5e 100644
+--- a/src/commands/middleware/setupMiddleware/selectModel.ts
++++ b/src/commands/middleware/setupMiddleware/selectModel.ts
+@@ -1,3 +1,4 @@
++import chalk from "chalk";
+ import inquirer from "inquirer";
+ import { Model } from "./types.js";
+ 
+@@ -6,11 +7,14 @@ import { Model } from "./types.js";
+  */
+ export const selectModel = async (
+   models: Model[],
+-  existingModel?: string
++  existingModel?: string,
++  notes?: string[]
+ ): Promise<string> => {
+   const modelChoices = models.map((model) => ({
+     name: model.name
+-      ? `${model.name} (Context: ${model.context_length})`
++      ? model.context_length
++        ? `${model.name} (Context: ${model.context_length})`
++        : model.name
+       : model.id,
+     value: model.id,
+   }));
+@@ -20,12 +24,23 @@ export const selectModel = async (
+     value: "custom",
+   });
+ 
++  const choices: Array<
++    { name: string; value: string } | InstanceType<typeof inquirer.Separator>
++  > = [...modelChoices];
++
++  if (notes && notes.length > 0) {
++    choices.push(new inquirer.Separator(" "));
++    for (const note of notes) {
++      choices.push(new inquirer.Separator(chalk.gray(note)));
++    }
++  }
++
+   const answers = await inquirer.prompt([
+     {
+       type: "list",
+       name: "modelChoice",
+       message: "Select an AI model:",
+-      choices: modelChoices,
++      choices,
+       default: () => {
+         const currentIndex = modelChoices.findIndex(
+           (choice) => choice.value === existingModel
+diff --git a/src/commands/middleware/setupMiddleware/setupApple.ts b/src/commands/middleware/setupMiddleware/setupApple.ts
+new file mode 100644
+index 0000000..1638006
+--- /dev/null
++++ b/src/commands/middleware/setupMiddleware/setupApple.ts
+@@ -0,0 +1,103 @@
++import { spawnSync } from "child_process";
++import { platform } from "os";
++import chalk from "chalk";
++import { GitPTConfig, saveConfig } from "../../../config.js";
++import { selectModel } from "./selectModel.js";
++
++const MIN_MACOS_MAJOR = 27;
++
++export const isAppleFoundationModelsSupported = (): boolean => {
++  if (platform() !== "darwin") return false;
++
++  const result = spawnSync("sw_vers", ["-productVersion"], {
++    encoding: "utf-8",
++  });
++  if (result.error || !result.stdout) return false;
++
++  const major = parseInt(result.stdout.trim().split(".")[0], 10);
++  return Number.isFinite(major) && major >= MIN_MACOS_MAJOR;
++};
++
++const CANDIDATE_MODELS = [
++  {
++    id: "system",
++    name: "Apple On-Device Foundation Model",
++    context_length: 4096, // may change across OS versions; verify periodically
++  },
++  { id: "pcc", name: "Private Cloud Compute (PCC)" },
++];
++
++const isModelAvailable = (
++  modelId: string
++): { available: boolean; reason?: string } => {
++  const result = spawnSync("fm", ["available", "--model", modelId], {
++    encoding: "utf-8",
++  });
++
++  if (result.error) {
++    return { available: false, reason: "fm-missing" };
++  }
++
++  const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
++  const available = /available/i.test(output) && !/not available|error/i.test(output);
++
++  return { available, reason: output.trim() };
++};
++
++export const setupApple = async (
++  existingConfig: GitPTConfig
++): Promise<GitPTConfig> => {
++  console.log(chalk.blue("Apple Foundation Models Setup"));
++
++  const probes = CANDIDATE_MODELS.map((model) => ({
++    model,
++    ...isModelAvailable(model.id),
++  }));
++
++  if (probes.every((p) => p.reason === "fm-missing")) {
++    console.error(
++      chalk.red(
++        "The Apple Foundation Models CLI ('fm') was not found. It ships with macOS 27 and later."
++      )
++    );
++    process.exit(1);
++  }
++
++  const availableModels = probes
++    .filter((p) => p.available)
++    .map((p) => p.model);
++
++  if (availableModels.length === 0) {
++    console.error(
++      chalk.red(
++        "No Apple Foundation Models are available in this context. Make sure Apple Intelligence is enabled in System Settings."
++      )
++    );
++    process.exit(1);
++  }
++
++  const notes = probes
++    .filter((p) => !p.available)
++    .map(
++      (p) =>
++        `Note: Apple doesn't allow ${p.model.name} access from command-line tools.`
++    );
++
++  const selectedModel = await selectModel(
++    availableModels,
++    existingConfig.model,
++    notes
++  );
++
++  const updatedConfig: GitPTConfig = {
++    ...existingConfig,
++    provider: "apple",
++    model: selectedModel,
++  };
++
++  saveConfig(updatedConfig);
++
++  console.log(chalk.green(`✓ Model set to: ${chalk.yellow(selectedModel)}`));
++
++  return updatedConfig;
++};
+diff --git a/src/config.ts b/src/config.ts
+index 06bc970..18b3a0f 100644
+--- a/src/config.ts
++++ b/src/config.ts
+@@ -4,7 +4,7 @@ import Configstore from "configstore";
+ const config = new Configstore("gitpt");
+ 
+ export interface GitPTConfig {
+-  provider?: "openrouter" | "local";
++  provider?: "openrouter" | "local" | "apple";
+   customLLMEndpoint?: string;
+   model?: string;
+   apiKey?: string;
+diff --git a/src/llm/appleFoundationClient.ts b/src/llm/appleFoundationClient.ts
+new file mode 100644
+index 0000000..1353db1
+--- /dev/null
++++ b/src/llm/appleFoundationClient.ts
+@@ -0,0 +1,139 @@
++import { spawn } from "child_process";
++import type OpenAI from "openai";
++
++export const FM_BINARY = "fm";
++
++type ChatCompletionCreateParams =
++  OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming;
++
++type ChatCompletionMessageContent =
++  OpenAI.Chat.Completions.ChatCompletionMessageParam["content"];
++
++export interface LLMChatCompletion {
++  choices: Array<{ message: { content: string | null } }>;
++}
++
++export interface LLMModelsPage {
++  data: OpenAI.Models.Model[];
++  hasNextPage(): boolean;
++  getNextPage(): Promise<LLMModelsPage>;
++}
++
++export interface LLMClient {
++  chat: {
++    completions: {
++      create(body: ChatCompletionCreateParams): Promise<LLMChatCompletion>;
++    };
++  };
++  models: {
++    list(): Promise<LLMModelsPage>;
++  };
++}
++
++const clean = (text: string): string =>
++  text
++    .replace(/\x1b\[[0-9;]*m/g, "")
++    .replace(/[⠀-⣿]/g, "")
++    .trim();
++
++const messageText = (content: ChatCompletionMessageContent): string => {
++  if (typeof content === "string") return content;
++  if (Array.isArray(content)) {
++    return content
++      .map((part) => (part.type === "text" ? part.text : ""))
++      .join("");
++  }
++  return "";
++};
++
++const runFm = (args: string[], stdin: string): Promise<string> =>
++  new Promise((resolve, reject) => {
++    const child = spawn(FM_BINARY, args, {
++      stdio: ["pipe", "pipe", "pipe"],
++    });
++
++    let stdout = "";
++    let stderr = "";
++
++    child.stdout.on("data", (chunk) => {
++      stdout += chunk.toString();
++    });
++    child.stderr.on("data", (chunk) => {
++      stderr += chunk.toString();
++    });
++
++    child.on("error", (error) => {
++      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
++        reject(
++          new Error(
++            "The Apple Foundation Models CLI ('fm') was not found. It ships with macOS 27 and later."
++          )
++        );
++        return;
++      }
++      reject(error);
++    });
++
++    child.on("close", (code) => {
++      const out = stdout.trim();
++      const err = clean(stderr);
++
++      if (code !== 0 || !out) {
++        reject(
++          new Error(err || out || `'fm' exited with code ${code} and no output`)
++        );
++        return;
++      }
++
++      resolve(out);
++    });
++
++    child.stdin.on("error", () => {});
++    child.stdin.write(stdin);
++    child.stdin.end();
++  });
++
++export const getAppleFoundationClient = (): LLMClient => {
++  return {
++    chat: {
++      completions: {
++        create: async (params: ChatCompletionCreateParams) => {
++          const model = params.model || "system";
++
++          const instructions = params.messages
++            .filter((m) => m.role === "system")
++            .map((m) => messageText(m.content))
++            .join("\n\n")
++            .trim();
++
++          const prompt = params.messages
++            .filter((m) => m.role !== "system")
++            .map((m) => messageText(m.content))
++            .join("\n\n")
++            .trim();
++
++          const args = ["respond", "--no-stream", "--model", model];
++          if (instructions) {
++            args.push("--instructions", instructions);
++          }
++
++          const content = await runFm(args, prompt);
++
++          return { choices: [{ message: { content } }] };
++        },
++      },
++    },
++    models: {
++      list: async () => ({
++        data: [
++          { id: "system", created: 0, object: "model", owned_by: "apple" },
++          { id: "pcc", created: 0, object: "model", owned_by: "apple" },
++        ],
++        hasNextPage: () => false,
++        getNextPage: async () => {
++          throw new Error("No more pages");
++        },
++      }),
++    },
++  };
++};
+diff --git a/src/llm/index.ts b/src/llm/index.ts
+index 61c2657..bb852d7 100644
+--- a/src/llm/index.ts
++++ b/src/llm/index.ts
+@@ -1,16 +1,21 @@
+ import openai from "openai";
+ import { getConfig } from "../config.js";
+ import { formatBaseURL } from "../utils/formatBaseURL.js";
++import { getAppleFoundationClient, LLMClient } from "./appleFoundationClient.js";
+ 
+ export const OPENROUTER_API_URL = "https://openrouter.ai/api/v1";
+ 
+ export const getLLMClient = (options?: {
+   baseURLOverride?: string;
+-}): openai => {
++}): LLMClient => {
+   const { baseURLOverride } = options || {};
+ 
+   const { apiKey, customLLMEndpoint, provider } = getConfig();
+ 
++  if (provider === "apple" && !baseURLOverride) {
++    return getAppleFoundationClient();
++  }
++
+   const localLLMEndpoint = provider === "local" ? customLLMEndpoint : undefined;
+ 
+   const baseURL = formatBaseURL(
+
+

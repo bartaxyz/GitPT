@@ -1,5 +1,6 @@
-import { existsSync, readFileSync, readdirSync } from "fs";
-import { join } from "path";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import chalk from "chalk";
 import {
   distDir,
@@ -8,6 +9,12 @@ import {
   isSupported,
   withConfig,
 } from "./harness.mjs";
+
+const snapshotsDir = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "snapshots"
+);
 
 if (!isSupported()) {
   console.log(
@@ -27,26 +34,50 @@ if (!existsSync(join(distDir, "config.js"))) {
 
 const { prepareCommitContext } = await importDist("commands/commit/summarizeDiff.js");
 const { generateCommitMessage } = await importDist("commands/commit/generateCommitMessage.js");
+const { buildCommitPrompt } = await importDist("commands/commit/context/buildPrompt.js");
 
 const RUNS = Math.max(1, Number(process.env.BENCH_RUNS) || 3);
 const MAX_LEN = 72;
 const CONVENTIONAL = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\(.+\))?!?: .+/;
+const COLUMNS = ["format", "type", "mention"];
+const QUALITY = ["type", "mention"];
+const CONCURRENCY = Math.max(1, Number(process.env.BENCH_CONCURRENCY) || 6);
+
+const pool = async (items, limit, fn) => {
+  const out = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await fn(items[i], i);
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, worker)
+  );
+  return out;
+};
 
 const expectations = JSON.parse(
   readFileSync(join(fixturesDir, "expectations.json"), "utf-8")
 );
+const FILTER = process.env.BENCH_FILTER || "";
 const fixtures = readdirSync(fixturesDir)
-  .filter((f) => f.endsWith(".patch"))
+  .filter((f) => f.endsWith(".patch") && f.includes(FILTER))
   .sort();
 
 const scoreMessage = (message, expected) => {
   const checks = {
-    format: CONVENTIONAL.test(message),
-    singleLine: !message.includes("\n"),
-    length: message.length <= MAX_LEN,
+    format:
+      CONVENTIONAL.test(message) &&
+      !message.includes("\n") &&
+      message.length <= MAX_LEN,
   };
   const type = (message.match(/^(\w+)(\(.+\))?!?:/) || [])[1];
-  if (expected?.type) checks.type = type === expected.type;
+  if (expected?.type) {
+    const accepted = Array.isArray(expected.type) ? expected.type : [expected.type];
+    checks.type = accepted.includes(type);
+  }
   if (expected?.mentions) {
     const lower = message.toLowerCase();
     checks.mention = expected.mentions.some((m) => lower.includes(m));
@@ -56,10 +87,7 @@ const scoreMessage = (message, expected) => {
 
 const pct = (passed, total) =>
   total === 0 ? null : Math.round((100 * passed) / total);
-
-const cell = (value) =>
-  (value === null ? "-" : `${value}%`).padStart(7);
-
+const cell = (value) => (value === null ? "-" : `${value}%`).padStart(8);
 const tint = (text, value) => {
   if (value === null) return chalk.gray(text);
   if (value >= 80) return chalk.green(text);
@@ -67,25 +95,74 @@ const tint = (text, value) => {
   return chalk.red(text);
 };
 
+const fmtMs = (ms) => {
+  const s = Math.round(ms / 1000);
+  return s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`;
+};
+
+const renderPrompt = (diff) => {
+  const { system, user } = buildCommitPrompt(diff);
+  return `## System\n\n${system}\n\n## User\n\n${user}\n`;
+};
+
+const renderResults = (file, scores, messages) => {
+  const ref = expectations[file]?.reference;
+  const cols = [...COLUMNS, "quality"];
+  return [
+    `# ${file}`,
+    "",
+    "- model: apple/system",
+    `- runs: ${RUNS}`,
+    ...(ref ? [`- reference: \`${ref}\``] : []),
+    "",
+    `| ${cols.join(" | ")} |`,
+    `| ${cols.map(() => "---").join(" | ")} |`,
+    `| ${cols.map((k) => (scores[k] == null ? "-" : `${scores[k]}%`)).join(" | ")} |`,
+    "",
+    "## Samples",
+    "",
+    ...messages.map((m) => `- \`${m}\``),
+    "",
+  ].join("\n");
+};
+
 const passed = await withConfig({ provider: "apple", model: "system" }, async () => {
   console.log(chalk.bold("\nApple Foundation Models - commit message benchmark"));
-  console.log(chalk.gray(`model: system   runs per fixture: ${RUNS}\n`));
+  console.log(
+    chalk.gray(
+      `model: system   runs per fixture: ${RUNS}   concurrency: ${CONCURRENCY}\n`
+    )
+  );
 
-  const rows = [];
-  const samples = {};
+  const t0 = Date.now();
 
+  const contexts = [];
   for (const file of fixtures) {
-    const expected = expectations[file];
     const diff = readFileSync(join(fixturesDir, file), "utf-8");
-    process.stdout.write(chalk.gray(`  running ${file} ...`));
+    contexts.push({ file, diff, context: await prepareCommitContext(diff) });
+  }
+  const summarizeMs = Date.now() - t0;
 
-    const context = await prepareCommitContext(diff);
-    const messages = [];
-    for (let i = 0; i < RUNS; i++) {
-      messages.push((await generateCommitMessage(context)).trim());
-    }
-    samples[file] = messages;
+  const tasks = [];
+  contexts.forEach((_, fi) => {
+    for (let i = 0; i < RUNS; i++) tasks.push(fi);
+  });
+  let done = 0;
+  const genStart = Date.now();
+  const generated = await pool(tasks, CONCURRENCY, async (fi) => {
+    const message = (await generateCommitMessage(contexts[fi].context)).trim();
+    process.stdout.write(chalk.gray(`\r  generating ${++done}/${tasks.length}   `));
+    return { fi, message };
+  });
+  process.stdout.write("\n");
+  const generateMs = Date.now() - genStart;
 
+  const messagesByFixture = contexts.map(() => []);
+  for (const g of generated) messagesByFixture[g.fi].push(g.message);
+
+  const results = contexts.map(({ file, diff }, fi) => {
+    const expected = expectations[file];
+    const messages = messagesByFixture[fi];
     const agg = {};
     const total = {};
     for (const message of messages) {
@@ -94,72 +171,86 @@ const passed = await withConfig({ provider: "apple", model: "system" }, async ()
         total[key] = (total[key] || 0) + 1;
       }
     }
-    rows.push({ file, agg, total });
-    process.stdout.write(chalk.gray(" done\n"));
-  }
+    const scores = {};
+    for (const key of Object.keys(total)) scores[key] = pct(agg[key], total[key]);
+    let qp = 0;
+    let qt = 0;
+    for (const key of QUALITY) {
+      if (total[key]) {
+        qp += agg[key];
+        qt += total[key];
+      }
+    }
+    scores.quality = pct(qp, qt);
+    return { file, diff, messages, scores, agg, total };
+  });
 
-  const KEYS = ["type", "mention", "format", "length"];
-  const header =
-    "  " +
-    "fixture".padEnd(36) +
-    KEYS.map((k) => k.padStart(7)).join("") +
-    "score".padStart(8);
-  console.log("\n" + chalk.bold(header));
-  console.log(chalk.gray("  " + "-".repeat(36 + 7 * KEYS.length + 8)));
+  const width = 36 + 8 * COLUMNS.length + 9;
+  console.log(
+    "\n" +
+      chalk.bold(
+        "  " +
+          "fixture".padEnd(36) +
+          COLUMNS.map((k) => k.padStart(8)).join("") +
+          "quality".padStart(9)
+      )
+  );
+  console.log(chalk.gray("  " + "-".repeat(width)));
 
   const grand = {};
   const grandTotal = {};
-  for (const { file, agg, total } of rows) {
-    let scorePassed = 0;
-    let scoreTotal = 0;
+  for (const { file, scores, agg, total } of results) {
     for (const key of Object.keys(total)) {
       grand[key] = (grand[key] || 0) + agg[key];
       grandTotal[key] = (grandTotal[key] || 0) + total[key];
-      scorePassed += agg[key];
-      scoreTotal += total[key];
     }
-    const cols = KEYS.map((k) => {
-      const value = pct(agg[k] || 0, total[k] || 0);
-      return tint(cell(value), value);
-    }).join("");
-    const score = pct(scorePassed, scoreTotal);
-    console.log(
-      "  " + file.padEnd(36) + cols + tint(cell(score), score)
-    );
+    const cols = COLUMNS.map((k) => tint(cell(scores[k] ?? null), scores[k] ?? null)).join("");
+    console.log("  " + file.padEnd(36) + cols + tint(cell(scores.quality), scores.quality).padStart(9));
   }
 
-  console.log(chalk.gray("  " + "-".repeat(36 + 7 * KEYS.length + 8)));
-  let totalPassed = 0;
-  let totalChecks = 0;
-  for (const key of Object.keys(grandTotal)) {
-    totalPassed += grand[key];
-    totalChecks += grandTotal[key];
-  }
-  const overallCols = KEYS.map((k) => {
-    const value = pct(grand[k] || 0, grandTotal[k] || 0);
+  console.log(chalk.gray("  " + "-".repeat(width)));
+  const overallOf = (keys) => {
+    let p = 0;
+    let t = 0;
+    for (const k of keys) {
+      p += grand[k] || 0;
+      t += grandTotal[k] || 0;
+    }
+    return pct(p, t);
+  };
+  const overallCols = COLUMNS.map((k) => {
+    const value = overallOf([k]);
     return tint(cell(value), value);
   }).join("");
-  const overall = pct(totalPassed, totalChecks);
+  const overallQuality = overallOf(QUALITY);
   console.log(
-    "  " + chalk.bold("overall".padEnd(36)) + overallCols + tint(chalk.bold(cell(overall)), overall)
+    "  " +
+      chalk.bold("overall".padEnd(36)) +
+      overallCols +
+      tint(chalk.bold(cell(overallQuality)), overallQuality).padStart(9)
   );
-
-  console.log(chalk.bold("\nSample messages:"));
-  for (const file of fixtures) {
-    console.log("  " + chalk.underline(file));
-    if (expectations[file]?.reference) {
-      console.log(chalk.gray(`    reference: ${expectations[file].reference}`));
-    }
-    for (const message of samples[file]) {
-      console.log("    " + chalk.cyan(message));
-    }
-  }
-
   console.log(
     chalk.gray(
-      `\nQuality score: ${overall}% (mean of all checks across ${fixtures.length} fixtures x ${RUNS} runs).`
+      "\n  format = guardrail (should read 100%); quality = mean(type, mention)"
     )
   );
+
+  for (const { file, diff, messages, scores } of results) {
+    const dir = join(snapshotsDir, file.replace(/\.patch$/, ""));
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "prompt.md"), renderPrompt(diff));
+    writeFileSync(join(dir, "results.md"), renderResults(file, scores, messages));
+  }
+  console.log(
+    chalk.gray("\nSnapshots updated: tests/snapshots/<fixture>/prompt.md + results.md")
+  );
+  console.log(
+    chalk.gray(
+      `Runtime: ${fmtMs(Date.now() - t0)}  (summarize ${fmtMs(summarizeMs)} | ` +
+        `generate ${fmtMs(generateMs)} for ${tasks.length} gens @ concurrency ${CONCURRENCY})`
+    )
+  );
+
   return true;
 });
 

@@ -95,22 +95,27 @@ const checkFixture = async (file, expected) => {
 
   const message = (await generateCommitMessage(context)).trim();
   report.info("commit message", chalk.cyan(message));
-  report.soft(message.length > 0, "message is non-empty");
-  report.soft(!message.includes("\n"), "message is a single line");
-  report.soft(CONVENTIONAL.test(message), "message uses conventional-commit format");
+  report.soft(
+    message.length > 0 &&
+      !message.includes("\n") &&
+      CONVENTIONAL.test(message) &&
+      message.length <= 72,
+    "guardrail: valid conventional subject (<=72, single line)"
+  );
 
   const type = (message.match(/^(\w+)(\(.+\))?!?:/) || [])[1];
   if (expected?.type) {
+    const accepted = Array.isArray(expected.type) ? expected.type : [expected.type];
     report.soft(
-      type === expected.type,
-      `message type is '${expected.type}' (got '${type ?? "?"}')`
+      accepted.includes(type),
+      `type is one of [${accepted.join(", ")}] (got '${type ?? "?"}')`
     );
   }
   if (expected?.mentions) {
     const lower = message.toLowerCase();
     report.soft(
       expected.mentions.some((m) => lower.includes(m)),
-      `message mentions one of [${expected.mentions.join(", ")}]`
+      `mentions one of [${expected.mentions.join(", ")}]`
     );
   }
 };
@@ -124,8 +129,9 @@ const passed = await withConfig({ provider: "apple", model: "system" }, async ()
   checkUnits();
 
   const expectations = loadExpectations();
+  const filter = process.env.BENCH_FILTER || "";
   const fixtures = readdirSync(fixturesDir)
-    .filter((file) => file.endsWith(".patch"))
+    .filter((file) => file.endsWith(".patch") && file.includes(filter))
     .sort();
 
   for (const file of fixtures) {

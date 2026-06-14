@@ -1,0 +1,787 @@
+## System
+
+
+You are a helpful assistant that generates concise, informative Git commit messages.
+
+Follow these strict rules:
+1. Use conventional commit format: type: description
+2. Types are: feat, fix, docs, style, refactor, test, chore
+3. NO scopes in parentheses - do not use feat(scope)
+4. Keep the entire message under 100 characters
+5. Use present tense (e.g., "add feature" not "added feature")
+6. Be brief but descriptive about WHAT changed
+7. Do not include detailed explanations
+
+Critical Rules:
+- Return a SINGLE LINE commit message only, with no additional explanations or paragraphs
+- Do NOT include a detailed message body section, just the commit title line
+- Do NOT use multiple lines, even for a single message
+
+Examples of Good Commit Messages:
+- feat: add user authentication system
+- fix: resolve crash when opening settings menu
+- refactor: simplify data processing pipeline
+- docs: update installation instructions in README
+- chore: update npm dependencies to latest versions
+- style: fix indentation in CSS files
+- test: add unit tests for payment processing
+- perf: optimize database queries for faster loading
+- build: update webpack configuration
+- ci: fix GitHub Actions workflow
+
+Examples of Bad Commit Messages:
+- added login screen                    ❌ (missing type prefix)
+- feat(auth): implement OAuth login     ❌ (using scope parentheses)
+- This is a really long commit message that exceeds the limit and contains too much information ❌ (too long)
+- feat: Adding user auth
+  
+  This implements the login page...     ❌ (contains multiple lines)
+- "fix: update styling"                 ❌ (includes quotes)
+
+
+Follow the conventional commit format (type(scope): message)
+
+
+
+## User
+
+
+Generate a single-line commit message for the following git diff:
+
+diff --git a/package-lock.json b/package-lock.json
+index 1111111..2222222 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -100,0 +101,720 @@
++    "node_modules/dep-0": {
++      "version": "1.2.0",
++      "resolved": "https://registry.npmjs.org/dep-0/-/dep-0-1.2.0.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-1": {
++      "version": "1.2.1",
++      "resolved": "https://registry.npmjs.org/dep-1/-/dep-1-1.2.1.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-2": {
++      "version": "1.2.2",
++      "resolved": "https://registry.npmjs.org/dep-2/-/dep-2-1.2.2.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-3": {
++      "version": "1.2.3",
++      "resolved": "https://registry.npmjs.org/dep-3/-/dep-3-1.2.3.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-4": {
++      "version": "1.2.4",
++      "resolved": "https://registry.npmjs.org/dep-4/-/dep-4-1.2.4.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-5": {
++      "version": "1.2.5",
++      "resolved": "https://registry.npmjs.org/dep-5/-/dep-5-1.2.5.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa5==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-6": {
++      "version": "1.2.6",
++      "resolved": "https://registry.npmjs.org/dep-6/-/dep-6-1.2.6.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa6==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-7": {
++      "version": "1.2.7",
++      "resolved": "https://registry.npmjs.org/dep-7/-/dep-7-1.2.7.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa7==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-8": {
++      "version": "1.2.8",
++      "resolved": "https://registry.npmjs.org/dep-8/-/dep-8-1.2.8.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa8==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-9": {
++      "version": "1.2.9",
++      "resolved": "https://registry.npmjs.org/dep-9/-/dep-9-1.2.9.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-10": {
++      "version": "1.2.10",
++      "resolved": "https://registry.npmjs.org/dep-10/-/dep-10-1.2.10.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa10==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-11": {
++      "version": "1.2.11",
++      "resolved": "https://registry.npmjs.org/dep-11/-/dep-11-1.2.11.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa11==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-12": {
++      "version": "1.2.12",
++      "resolved": "https://registry.npmjs.org/dep-12/-/dep-12-1.2.12.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa12==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-13": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/dep-13/-/dep-13-1.2.13.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa13==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-14": {
++      "version": "1.2.14",
++      "resolved": "https://registry.npmjs.org/dep-14/-/dep-14-1.2.14.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa14==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-15": {
++      "version": "1.2.15",
++      "resolved": "https://registry.npmjs.org/dep-15/-/dep-15-1.2.15.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa15==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-16": {
++      "version": "1.2.16",
++      "resolved": "https://registry.npmjs.org/dep-16/-/dep-16-1.2.16.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa16==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-17": {
++      "version": "1.2.17",
++      "resolved": "https://registry.npmjs.org/dep-17/-/dep-17-1.2.17.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa17==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-18": {
++      "version": "1.2.18",
++      "resolved": "https://registry.npmjs.org/dep-18/-/dep-18-1.2.18.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa18==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-19": {
++      "version": "1.2.19",
++      "resolved": "https://registry.npmjs.org/dep-19/-/dep-19-1.2.19.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa19==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-20": {
++      "version": "1.2.20",
++      "resolved": "https://registry.npmjs.org/dep-20/-/dep-20-1.2.20.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa20==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-21": {
++      "version": "1.2.21",
++      "resolved": "https://registry.npmjs.org/dep-21/-/dep-21-1.2.21.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa21==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-22": {
++      "version": "1.2.22",
++      "resolved": "https://registry.npmjs.org/dep-22/-/dep-22-1.2.22.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa22==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-23": {
++      "version": "1.2.23",
++      "resolved": "https://registry.npmjs.org/dep-23/-/dep-23-1.2.23.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa23==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-24": {
++      "version": "1.2.24",
++      "resolved": "https://registry.npmjs.org/dep-24/-/dep-24-1.2.24.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa24==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-25": {
++      "version": "1.2.25",
++      "resolved": "https://registry.npmjs.org/dep-25/-/dep-25-1.2.25.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa25==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-26": {
++      "version": "1.2.26",
++      "resolved": "https://registry.npmjs.org/dep-26/-/dep-26-1.2.26.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa26==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-27": {
++      "version": "1.2.27",
++      "resolved": "https://registry.npmjs.org/dep-27/-/dep-27-1.2.27.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa27==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-28": {
++      "version": "1.2.28",
++      "resolved": "https://registry.npmjs.org/dep-28/-/dep-28-1.2.28.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa28==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-29": {
++      "version": "1.2.29",
++      "resolved": "https://registry.npmjs.org/dep-29/-/dep-29-1.2.29.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa29==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-30": {
++      "version": "1.2.30",
++      "resolved": "https://registry.npmjs.org/dep-30/-/dep-30-1.2.30.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa30==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-31": {
++      "version": "1.2.31",
++      "resolved": "https://registry.npmjs.org/dep-31/-/dep-31-1.2.31.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa31==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-32": {
++      "version": "1.2.32",
++      "resolved": "https://registry.npmjs.org/dep-32/-/dep-32-1.2.32.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa32==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-33": {
++      "version": "1.2.33",
++      "resolved": "https://registry.npmjs.org/dep-33/-/dep-33-1.2.33.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa33==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-34": {
++      "version": "1.2.34",
++      "resolved": "https://registry.npmjs.org/dep-34/-/dep-34-1.2.34.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa34==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-35": {
++      "version": "1.2.35",
++      "resolved": "https://registry.npmjs.org/dep-35/-/dep-35-1.2.35.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa35==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-36": {
++      "version": "1.2.36",
++      "resolved": "https://registry.npmjs.org/dep-36/-/dep-36-1.2.36.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa36==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-37": {
++      "version": "1.2.37",
++      "resolved": "https://registry.npmjs.org/dep-37/-/dep-37-1.2.37.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa37==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-38": {
++      "version": "1.2.38",
++      "resolved": "https://registry.npmjs.org/dep-38/-/dep-38-1.2.38.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa38==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-39": {
++      "version": "1.2.39",
++      "resolved": "https://registry.npmjs.org/dep-39/-/dep-39-1.2.39.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa39==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-40": {
++      "version": "1.2.40",
++      "resolved": "https://registry.npmjs.org/dep-40/-/dep-40-1.2.40.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa40==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-41": {
++      "version": "1.2.41",
++      "resolved": "https://registry.npmjs.org/dep-41/-/dep-41-1.2.41.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa41==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-42": {
++      "version": "1.2.42",
++      "resolved": "https://registry.npmjs.org/dep-42/-/dep-42-1.2.42.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa42==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-43": {
++      "version": "1.2.43",
++      "resolved": "https://registry.npmjs.org/dep-43/-/dep-43-1.2.43.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa43==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-44": {
++      "version": "1.2.44",
++      "resolved": "https://registry.npmjs.org/dep-44/-/dep-44-1.2.44.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa44==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-45": {
++      "version": "1.2.45",
++      "resolved": "https://registry.npmjs.org/dep-45/-/dep-45-1.2.45.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa45==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-46": {
++      "version": "1.2.46",
++      "resolved": "https://registry.npmjs.org/dep-46/-/dep-46-1.2.46.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa46==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-47": {
++      "version": "1.2.47",
++      "resolved": "https://registry.npmjs.org/dep-47/-/dep-47-1.2.47.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa47==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-48": {
++      "version": "1.2.48",
++      "resolved": "https://registry.npmjs.org/dep-48/-/dep-48-1.2.48.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa48==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-49": {
++      "version": "1.2.49",
++      "resolved": "https://registry.npmjs.org/dep-49/-/dep-49-1.2.49.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa49==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-50": {
++      "version": "1.2.50",
++      "resolved": "https://registry.npmjs.org/dep-50/-/dep-50-1.2.50.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa50==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-51": {
++      "version": "1.2.51",
++      "resolved": "https://registry.npmjs.org/dep-51/-/dep-51-1.2.51.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa51==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-52": {
++      "version": "1.2.52",
++      "resolved": "https://registry.npmjs.org/dep-52/-/dep-52-1.2.52.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa52==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-53": {
++      "version": "1.2.53",
++      "resolved": "https://registry.npmjs.org/dep-53/-/dep-53-1.2.53.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa53==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-54": {
++      "version": "1.2.54",
++      "resolved": "https://registry.npmjs.org/dep-54/-/dep-54-1.2.54.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa54==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-55": {
++      "version": "1.2.55",
++      "resolved": "https://registry.npmjs.org/dep-55/-/dep-55-1.2.55.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa55==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-56": {
++      "version": "1.2.56",
++      "resolved": "https://registry.npmjs.org/dep-56/-/dep-56-1.2.56.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa56==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-57": {
++      "version": "1.2.57",
++      "resolved": "https://registry.npmjs.org/dep-57/-/dep-57-1.2.57.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa57==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-58": {
++      "version": "1.2.58",
++      "resolved": "https://registry.npmjs.org/dep-58/-/dep-58-1.2.58.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa58==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-59": {
++      "version": "1.2.59",
++      "resolved": "https://registry.npmjs.org/dep-59/-/dep-59-1.2.59.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa59==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-60": {
++      "version": "1.2.60",
++      "resolved": "https://registry.npmjs.org/dep-60/-/dep-60-1.2.60.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa60==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-61": {
++      "version": "1.2.61",
++      "resolved": "https://registry.npmjs.org/dep-61/-/dep-61-1.2.61.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa61==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-62": {
++      "version": "1.2.62",
++      "resolved": "https://registry.npmjs.org/dep-62/-/dep-62-1.2.62.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa62==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-63": {
++      "version": "1.2.63",
++      "resolved": "https://registry.npmjs.org/dep-63/-/dep-63-1.2.63.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa63==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-64": {
++      "version": "1.2.64",
++      "resolved": "https://registry.npmjs.org/dep-64/-/dep-64-1.2.64.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa64==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-65": {
++      "version": "1.2.65",
++      "resolved": "https://registry.npmjs.org/dep-65/-/dep-65-1.2.65.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa65==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-66": {
++      "version": "1.2.66",
++      "resolved": "https://registry.npmjs.org/dep-66/-/dep-66-1.2.66.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa66==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-67": {
++      "version": "1.2.67",
++      "resolved": "https://registry.npmjs.org/dep-67/-/dep-67-1.2.67.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa67==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-68": {
++      "version": "1.2.68",
++      "resolved": "https://registry.npmjs.org/dep-68/-/dep-68-1.2.68.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa68==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-69": {
++      "version": "1.2.69",
++      "resolved": "https://registry.npmjs.org/dep-69/-/dep-69-1.2.69.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa69==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-70": {
++      "version": "1.2.70",
++      "resolved": "https://registry.npmjs.org/dep-70/-/dep-70-1.2.70.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa70==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-71": {
++      "version": "1.2.71",
++      "resolved": "https://registry.npmjs.org/dep-71/-/dep-71-1.2.71.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa71==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-72": {
++      "version": "1.2.72",
++      "resolved": "https://registry.npmjs.org/dep-72/-/dep-72-1.2.72.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa72==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-73": {
++      "version": "1.2.73",
++      "resolved": "https://registry.npmjs.org/dep-73/-/dep-73-1.2.73.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa73==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-74": {
++      "version": "1.2.74",
++      "resolved": "https://registry.npmjs.org/dep-74/-/dep-74-1.2.74.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa74==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-75": {
++      "version": "1.2.75",
++      "resolved": "https://registry.npmjs.org/dep-75/-/dep-75-1.2.75.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa75==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-76": {
++      "version": "1.2.76",
++      "resolved": "https://registry.npmjs.org/dep-76/-/dep-76-1.2.76.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa76==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-77": {
++      "version": "1.2.77",
++      "resolved": "https://registry.npmjs.org/dep-77/-/dep-77-1.2.77.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa77==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-78": {
++      "version": "1.2.78",
++      "resolved": "https://registry.npmjs.org/dep-78/-/dep-78-1.2.78.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa78==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-79": {
++      "version": "1.2.79",
++      "resolved": "https://registry.npmjs.org/dep-79/-/dep-79-1.2.79.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa79==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-80": {
++      "version": "1.2.80",
++      "resolved": "https://registry.npmjs.org/dep-80/-/dep-80-1.2.80.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa80==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-81": {
++      "version": "1.2.81",
++      "resolved": "https://registry.npmjs.org/dep-81/-/dep-81-1.2.81.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa81==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-82": {
++      "version": "1.2.82",
++      "resolved": "https://registry.npmjs.org/dep-82/-/dep-82-1.2.82.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa82==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-83": {
++      "version": "1.2.83",
++      "resolved": "https://registry.npmjs.org/dep-83/-/dep-83-1.2.83.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa83==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-84": {
++      "version": "1.2.84",
++      "resolved": "https://registry.npmjs.org/dep-84/-/dep-84-1.2.84.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa84==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-85": {
++      "version": "1.2.85",
++      "resolved": "https://registry.npmjs.org/dep-85/-/dep-85-1.2.85.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa85==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-86": {
++      "version": "1.2.86",
++      "resolved": "https://registry.npmjs.org/dep-86/-/dep-86-1.2.86.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa86==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-87": {
++      "version": "1.2.87",
++      "resolved": "https://registry.npmjs.org/dep-87/-/dep-87-1.2.87.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa87==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-88": {
++      "version": "1.2.88",
++      "resolved": "https://registry.npmjs.org/dep-88/-/dep-88-1.2.88.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa88==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-89": {
++      "version": "1.2.89",
++      "resolved": "https://registry.npmjs.org/dep-89/-/dep-89-1.2.89.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa89==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-90": {
++      "version": "1.2.90",
++      "resolved": "https://registry.npmjs.org/dep-90/-/dep-90-1.2.90.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa90==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-91": {
++      "version": "1.2.91",
++      "resolved": "https://registry.npmjs.org/dep-91/-/dep-91-1.2.91.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa91==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-92": {
++      "version": "1.2.92",
++      "resolved": "https://registry.npmjs.org/dep-92/-/dep-92-1.2.92.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa92==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-93": {
++      "version": "1.2.93",
++      "resolved": "https://registry.npmjs.org/dep-93/-/dep-93-1.2.93.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa93==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-94": {
++      "version": "1.2.94",
++      "resolved": "https://registry.npmjs.org/dep-94/-/dep-94-1.2.94.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa94==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-95": {
++      "version": "1.2.95",
++      "resolved": "https://registry.npmjs.org/dep-95/-/dep-95-1.2.95.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa95==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-96": {
++      "version": "1.2.96",
++      "resolved": "https://registry.npmjs.org/dep-96/-/dep-96-1.2.96.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa96==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-97": {
++      "version": "1.2.97",
++      "resolved": "https://registry.npmjs.org/dep-97/-/dep-97-1.2.97.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa97==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-98": {
++      "version": "1.2.98",
++      "resolved": "https://registry.npmjs.org/dep-98/-/dep-98-1.2.98.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa98==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-99": {
++      "version": "1.2.99",
++      "resolved": "https://registry.npmjs.org/dep-99/-/dep-99-1.2.99.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa99==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-100": {
++      "version": "1.2.100",
++      "resolved": "https://registry.npmjs.org/dep-100/-/dep-100-1.2.100.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa100==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-101": {
++      "version": "1.2.101",
++      "resolved": "https://registry.npmjs.org/dep-101/-/dep-101-1.2.101.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa101==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-102": {
++      "version": "1.2.102",
++      "resolved": "https://registry.npmjs.org/dep-102/-/dep-102-1.2.102.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa102==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-103": {
++      "version": "1.2.103",
++      "resolved": "https://registry.npmjs.org/dep-103/-/dep-103-1.2.103.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa103==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-104": {
++      "version": "1.2.104",
++      "resolved": "https://registry.npmjs.org/dep-104/-/dep-104-1.2.104.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa104==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-105": {
++      "version": "1.2.105",
++      "resolved": "https://registry.npmjs.org/dep-105/-/dep-105-1.2.105.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa105==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-106": {
++      "version": "1.2.106",
++      "resolved": "https://registry.npmjs.org/dep-106/-/dep-106-1.2.106.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa106==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-107": {
++      "version": "1.2.107",
++      "resolved": "https://registry.npmjs.org/dep-107/-/dep-107-1.2.107.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa107==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-108": {
++      "version": "1.2.108",
++      "resolved": "https://registry.npmjs.org/dep-108/-/dep-108-1.2.108.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa108==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-109": {
++      "version": "1.2.109",
++      "resolved": "https://registry.npmjs.org/dep-109/-/dep-109-1.2.109.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa109==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-110": {
++      "version": "1.2.110",
++      "resolved": "https://registry.npmjs.org/dep-110/-/dep-110-1.2.110.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa110==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-111": {
++      "version": "1.2.111",
++      "resolved": "https://registry.npmjs.org/dep-111/-/dep-111-1.2.111.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa111==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-112": {
++      "version": "1.2.112",
++      "resolved": "https://registry.npmjs.org/dep-112/-/dep-112-1.2.112.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa112==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-113": {
++      "version": "1.2.113",
++      "resolved": "https://registry.npmjs.org/dep-113/-/dep-113-1.2.113.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa113==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-114": {
++      "version": "1.2.114",
++      "resolved": "https://registry.npmjs.org/dep-114/-/dep-114-1.2.114.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa114==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-115": {
++      "version": "1.2.115",
++      "resolved": "https://registry.npmjs.org/dep-115/-/dep-115-1.2.115.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa115==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-116": {
++      "version": "1.2.116",
++      "resolved": "https://registry.npmjs.org/dep-116/-/dep-116-1.2.116.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa116==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-117": {
++      "version": "1.2.117",
++      "resolved": "https://registry.npmjs.org/dep-117/-/dep-117-1.2.117.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa117==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-118": {
++      "version": "1.2.118",
++      "resolved": "https://registry.npmjs.org/dep-118/-/dep-118-1.2.118.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa118==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
++    "node_modules/dep-119": {
++      "version": "1.2.119",
++      "resolved": "https://registry.npmjs.org/dep-119/-/dep-119-1.2.119.tgz",
++      "integrity": "sha512-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa119==",
++      "dependencies": { "left-pad": "^1.0.0" }
++    },
+
+diff --git a/src/config.ts b/src/config.ts
+index 1111111..2222222 100644
+--- a/src/config.ts
++++ b/src/config.ts
+@@ -1,3 +1,4 @@ function block0() {
+ // context line a
+ // context line b
++  retryLimit: 5,
+ // context line c
+
+
