@@ -1,4 +1,4 @@
-# 12-svelte-sources-set.patch
+# 07-svelte-sources-set.patch
 
 - model: apple/system
 - runs: 3

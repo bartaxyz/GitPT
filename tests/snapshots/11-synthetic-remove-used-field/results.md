@@ -1,4 +1,4 @@
-# 20-synthetic-remove-used-field.patch
+# 11-synthetic-remove-used-field.patch
 
 - model: apple/system
 - runs: 3

@@ -1,4 +1,4 @@
-# 06-synthetic-lockfile-heavy.patch
+# 04-synthetic-lockfile-heavy.patch
 
 - model: apple/system
 - runs: 3

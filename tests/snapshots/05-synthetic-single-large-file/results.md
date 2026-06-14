@@ -1,4 +1,4 @@
-# 07-synthetic-single-large-file.patch
+# 05-synthetic-single-large-file.patch
 
 - model: apple/system
 - runs: 3

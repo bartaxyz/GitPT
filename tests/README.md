@@ -89,17 +89,16 @@ itself stays local — only the prompt check runs in CI.
 
 `tests/fixtures/*.patch` are unified diffs, deliberately kept lean — each one
 either trips the model or exercises a mechanic. All-green, low-signal cases were
-pruned. The set is non-contiguous (gaps are pruned fixtures); numbers are stable
-so snapshots don't churn.
+pruned.
 
-- **Real diffs** from GitPT's own git history (`01`, `03`, `05`, `09`): a focused
+- **Real diffs** from GitPT's own git history (`01`, `02`, `03`, `06`): a focused
   bugfix, an over-budget multi-file feature (summarization path), a refactor, and
   a multi-file fix.
-- **Synthetic diffs** (`06`, `07`, `20`) for specific behaviours: an extreme
+- **Synthetic diffs** (`04`, `05`, `11`) for specific behaviours: an extreme
   lockfile churn (condensing), a single oversized file (hunk splitting), and a
   multi-file removal where the model mislabels dead-code cleanup as a `fix` and
   misses the feature actually removed.
-- **External MIT diffs** (`12`, `13`, `15`, `18`) — real commits from
+- **External MIT diffs** (`07`, `08`, `09`, `10`) — real commits from
   MIT-licensed repos (see `ATTRIBUTION.md`), each a type/subject the model tends
   to get wrong (perf-vs-refactor, test, post-unmount fix, dynamic prefix).
 

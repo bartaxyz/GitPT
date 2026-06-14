@@ -1,4 +1,4 @@
-# 13-react-viewtransition-tests.patch
+# 08-react-viewtransition-tests.patch
 
 - model: apple/system
 - runs: 3

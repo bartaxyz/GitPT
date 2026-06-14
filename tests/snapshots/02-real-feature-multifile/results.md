@@ -1,4 +1,4 @@
-# 03-real-feature-multifile.patch
+# 02-real-feature-multifile.patch
 
 - model: apple/system
 - runs: 3
