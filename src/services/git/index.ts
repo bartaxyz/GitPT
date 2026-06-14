@@ -4,6 +4,7 @@ import { getChangedFiles } from "./getChangedFiles.js";
 import { getCommitsSinceBaseBranch } from "./getCommitsSinceBaseBranch.js";
 import { getCurrentBranch } from "./getCurrentBranch.js";
 import { getDefaultBranch } from "./getDefaultBranch.js";
+import { getRepositoryRoot } from "./getRepositoryRoot.js";
 import { getStagedChanges } from "./getStagedChanges.js";
 import { getStagedFiles } from "./getStagedFiles.js";
 import { hasStagedChanges } from "./hasStagedChanges.js";
@@ -17,6 +18,7 @@ export const git = {
   getCommitsSinceBaseBranch,
   getCurrentBranch,
   getDefaultBranch,
+  getRepositoryRoot,
   hasStagedChanges,
   getStagedChanges,
   getStagedFiles,

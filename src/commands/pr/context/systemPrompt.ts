@@ -15,4 +15,8 @@ For the description:
 
 Format the description in Markdown with sections.
 Do not include "PR" or "Pull Request" in the title.
+
+If the user provides a pull request template, follow its structure for the
+description instead of the default sections above: keep its headings, ordering,
+and checklists, and fill them in from the changes.
 `;
