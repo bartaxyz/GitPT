@@ -1,0 +1,77 @@
+diff --git a/src/routes/article.loader.ts b/src/routes/article.loader.ts
+index a1b2c3d..e4f5a6b 100644
+--- a/src/routes/article.loader.ts
++++ b/src/routes/article.loader.ts
+@@ -14,7 +14,6 @@ export interface ArticleLoaderData {
+   article: Article | null;
+   author: Author | null;
+   dehydratedState?: DehydratedState;
+-  prefersDark?: boolean;
+   relatedSlugs?: string[];
+   tags?: string[];
+ }
+@@ -41,8 +40,8 @@ export const buildCanonical = (slug: string): string => {
+   return `https://example.com/articles/${slug}`;
+ };
+
+-export const meta: MetaFunction = ({ data: loaderData, location, matches, params }) => {
+-  const { article, author, prefersDark, tags } = (loaderData ?? {}) as ArticleLoaderData;
++export const meta: MetaFunction = ({ data: loaderData, location, params }) => {
++  const { article, author, tags } = (loaderData ?? {}) as ArticleLoaderData;
+   const title = article?.title ?? 'Articles';
+   const description = article?.excerpt ?? '';
+   const { slug } = params;
+@@ -58,17 +57,6 @@ export const meta: MetaFunction = ({ data: loaderData, location, matches, params
+     slug: slug ?? '',
+   });
+
+-  const rootData = matches.find((match) => match.id === 'root')?.data as { theme?: string } | undefined;
+-  const logoColor = rootData?.theme === 'dark' ? 'white' : 'black';
+-  const logoVariant = prefersDark ? 'inverted' : 'default';
+-  const logoPreload = {
+-    as: 'image',
+-    fetchPriority: 'high',
+-    href: `/images/logo/${logoColor}-${logoVariant}.png`,
+-    rel: 'preload',
+-    tagName: 'link' as const,
+-  };
+-
+   return [
+     { title },
+     { content: description, name: 'description' },
+@@ -76,7 +64,6 @@ export const meta: MetaFunction = ({ data: loaderData, location, matches, params
+     { content: title, property: 'og:title' },
+     { content: description, property: 'og:description' },
+     ...(canonical ? [{ href: canonical, rel: 'canonical', tagName: 'link' }] : []),
+-    logoPreload,
+     ...preloadLinks,
+   ];
+ };
+diff --git a/src/routes/article.server.ts b/src/routes/article.server.ts
+index 1122334..5566778 100644
+--- a/src/routes/article.server.ts
++++ b/src/routes/article.server.ts
+@@ -33,7 +33,6 @@ export async function loader({ params, request }: LoaderArgs) {
+   }
+
+   const cookie = request.headers.get('cookie');
+-  const prefersDark = /theme=dark/.test(cookie ?? '');
+   const requestInit = cookie ? { headers: { cookie } } : undefined;
+
+   try {
+@@ -52,7 +51,6 @@ export async function loader({ params, request }: LoaderArgs) {
+         article,
+         author,
+         dehydratedState: dehydrate(queryClient),
+-        prefersDark,
+         relatedSlugs,
+         tags,
+       });
+@@ -71,7 +69,6 @@ export async function loader({ params, request }: LoaderArgs) {
+       article,
+       author,
+       dehydratedState: dehydrate(queryClient),
+-      prefersDark,
+       relatedSlugs,
+       tags,
+     });

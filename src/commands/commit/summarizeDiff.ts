@@ -22,6 +22,8 @@ const LOW_SIGNAL_PATTERNS: Array<{ test: RegExp; note: string }> = [
   { test: /(^|\/)(dist|build|out|coverage)\//, note: "generated output updated" },
   { test: /\.min\.(js|css)$/, note: "minified asset updated" },
   { test: /\.(snap)$/, note: "test snapshot updated" },
+  { test: /(^|\/)snapshots?\//, note: "test snapshot updated" },
+  { test: /\.(patch|diff)$/, note: "patch file updated" },
 ];
 
 const lowSignalNote = (file: string): string | null =>
