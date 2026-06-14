@@ -29,19 +29,42 @@ These tests run the real on-device `fm` model, so:
 **Soft assertions** (non-deterministic model output — reported, never fail):
 
 - the generated commit message is non-empty, single-line, and uses
-  conventional-commit format.
+  conventional-commit format;
+- its type matches the fixture's expected `type` (when set);
+- it mentions at least one of the fixture's expected `mentions` keywords.
 
 The generated commit message is printed per fixture for manual review, since
 response quality can't be asserted deterministically.
+
+## Benchmark
+
+```bash
+npm run bench:apple            # 3 runs per fixture (default)
+BENCH_RUNS=5 npm run bench:apple
+```
+
+The benchmark measures **commit-message quality** rather than pass/fail. For each
+fixture it computes the context once, samples the final generation `BENCH_RUNS`
+times, and scores each message on:
+
+- **type** — matches the expected conventional type (`feat`/`fix`/`refactor`/…),
+- **mention** — contains an expected keyword,
+- **format** — valid conventional-commit format,
+- **length** — within 72 characters.
+
+It prints a per-fixture table, an aggregate **quality score**, and the sampled
+messages next to each fixture's reference, so prompt changes can be compared
+quantitatively. Use it to validate edits to `commit/context/systemPrompt.ts`.
 
 ## Fixtures
 
 `tests/fixtures/*.patch` are unified diffs covering the cases that matter:
 
-- **Real diffs** pulled from GitPT's own git history (`01`–`05`): a focused
-  bugfix, a small feature, a multi-file feature, a feature with a real
-  dependency/lockfile change, and a refactor. These exercise message quality on
-  real code.
+- **Real diffs** pulled from GitPT's own git history (`01`–`05`, `08`, `09`): a
+  focused bugfix, a small feature, an over-budget multi-file feature, a feature
+  with a real dependency/lockfile change, a refactor, and two *under-budget
+  multi-file* changes (a feature and a fix) that exercise synthesis without
+  summarization.
 - **Synthetic diffs** (`06`, `07`) for pure mechanics: an extreme lockfile churn
   and a single oversized file (hunk splitting).
 

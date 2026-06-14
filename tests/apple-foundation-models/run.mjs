@@ -98,6 +98,21 @@ const checkFixture = async (file, expected) => {
   report.soft(message.length > 0, "message is non-empty");
   report.soft(!message.includes("\n"), "message is a single line");
   report.soft(CONVENTIONAL.test(message), "message uses conventional-commit format");
+
+  const type = (message.match(/^(\w+)(\(.+\))?!?:/) || [])[1];
+  if (expected?.type) {
+    report.soft(
+      type === expected.type,
+      `message type is '${expected.type}' (got '${type ?? "?"}')`
+    );
+  }
+  if (expected?.mentions) {
+    const lower = message.toLowerCase();
+    report.soft(
+      expected.mentions.some((m) => lower.includes(m)),
+      `message mentions one of [${expected.mentions.join(", ")}]`
+    );
+  }
 };
 
 const loadExpectations = () => {

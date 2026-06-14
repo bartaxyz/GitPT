@@ -1,0 +1,83 @@
+diff --git a/src/commands/middleware/setupMiddleware/defaultModels.ts b/src/commands/middleware/setupMiddleware/defaultModels.ts
+new file mode 100644
+index 0000000..31caabb
+--- /dev/null
++++ b/src/commands/middleware/setupMiddleware/defaultModels.ts
+@@ -0,0 +1,25 @@
++import { GitPTConfig } from "../../../config.js";
++import {
++  isAppleFoundationModelsSupported,
++  isAppleModelAvailable,
++} from "./setupApple.js";
++
++export interface DefaultModel {
++  id: string;
++  label: string;
++  isAvailable: () => boolean;
++  config: GitPTConfig;
++}
++
++const DEFAULT_MODELS: DefaultModel[] = [
++  {
++    id: "apple-foundation-models",
++    label: "Apple Foundation Models (on-device)",
++    isAvailable: () =>
++      isAppleFoundationModelsSupported() && isAppleModelAvailable("system"),
++    config: { provider: "apple", model: "system" },
++  },
++];
++
++export const resolveDefaultModel = (): DefaultModel | undefined =>
++  DEFAULT_MODELS.find((model) => model.isAvailable());
+diff --git a/src/commands/middleware/setupMiddleware/index.ts b/src/commands/middleware/setupMiddleware/index.ts
+index 0b2cc2c..a42c75c 100644
+--- a/src/commands/middleware/setupMiddleware/index.ts
++++ b/src/commands/middleware/setupMiddleware/index.ts
+@@ -1,5 +1,12 @@
++import chalk from "chalk";
+ import inquirer from "inquirer";
+-import { getConfig, GitPTConfig, validateConfig } from "../../../config.js";
++import {
++  getConfig,
++  GitPTConfig,
++  saveConfig,
++  validateConfig,
++} from "../../../config.js";
++import { resolveDefaultModel } from "./defaultModels.js";
+ import {
+   isAppleFoundationModelsSupported,
+   setupApple,
+@@ -21,6 +28,19 @@ export const setupMiddleware = async (options?: {
+     if (isValidConfig.isValid) {
+       return getConfig();
+     }
++
++    if (!existingConfig.provider) {
++      const defaultModel = resolveDefaultModel();
++      if (defaultModel) {
++        saveConfig(defaultModel.config);
++        console.log(
++          chalk.gray(
++            `No model configured; using ${defaultModel.label} by default. Run 'gitpt model' to change.`
++          )
++        );
++        return getConfig();
++      }
++    }
+   }
+ 
+   // For initial setup or model command, start by selecting the provider
+diff --git a/src/commands/middleware/setupMiddleware/setupApple.ts b/src/commands/middleware/setupMiddleware/setupApple.ts
+index 1638006..0e316b2 100644
+--- a/src/commands/middleware/setupMiddleware/setupApple.ts
++++ b/src/commands/middleware/setupMiddleware/setupApple.ts
+@@ -44,6 +44,9 @@ const isModelAvailable = (
+   return { available, reason: output.trim() };
+ };
+ 
++export const isAppleModelAvailable = (modelId: string): boolean =>
++  isModelAvailable(modelId).available;
++
+ export const setupApple = async (
+   existingConfig: GitPTConfig
+ ): Promise<GitPTConfig> => {
