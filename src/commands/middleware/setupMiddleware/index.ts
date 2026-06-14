@@ -1,12 +1,15 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
 import {
+  clearAcceptedDefault,
+  getAcceptedDefault,
   getConfig,
   GitPTConfig,
   saveConfig,
+  setAcceptedDefault,
   validateConfig,
 } from "../../../config.js";
-import { resolveDefaultModel } from "./defaultModels.js";
+import { DefaultModel, resolveDefaultModel } from "./defaultModels.js";
 import {
   isAppleFoundationModelsSupported,
   setupApple,
@@ -22,26 +25,67 @@ export const setupMiddleware = async (options?: {
   // Always get the current config, even if it's empty
   const existingConfig = getConfig();
 
-  // If we're running a command, and the config is valid, continue with the command
+  const defaultModel = resolveDefaultModel();
+  const acceptedDefault = getAcceptedDefault();
+  const interactive = Boolean(process.stdin.isTTY);
+
+  const applyDefault = (model: DefaultModel): GitPTConfig => {
+    saveConfig(model.config);
+    setAcceptedDefault(model.id);
+    return getConfig();
+  };
+
+  const confirmDefault = async (message: string): Promise<boolean> => {
+    const { useDefault } = await inquirer.prompt([
+      { type: "confirm", name: "useDefault", message, default: true },
+    ]);
+    return useDefault;
+  };
+
   if (context === "command") {
-    const isValidConfig = validateConfig();
-    if (isValidConfig.isValid) {
+    if (validateConfig().isValid) {
+      if (!acceptedDefault) return getConfig();
+      if (!defaultModel || defaultModel.id === acceptedDefault) {
+        return getConfig();
+      }
+      if (
+        !interactive ||
+        (await confirmDefault(
+          `The recommended default changed to ${defaultModel.label}. Use it?`
+        ))
+      ) {
+        const result = applyDefault(defaultModel);
+        if (interactive) {
+          console.log(chalk.green(`✓ Now using ${defaultModel.label}.`));
+        }
+        return result;
+      }
       return getConfig();
     }
 
-    if (!existingConfig.provider) {
-      const defaultModel = resolveDefaultModel();
-      if (defaultModel) {
-        saveConfig(defaultModel.config);
+    if (!existingConfig.provider && defaultModel) {
+      if (!interactive) return applyDefault(defaultModel);
+      if (
+        await confirmDefault(
+          `No model configured. Use ${defaultModel.label} by default?`
+        )
+      ) {
+        const result = applyDefault(defaultModel);
         console.log(
-          chalk.gray(
-            `No model configured; using ${defaultModel.label} by default. Run 'gitpt model' to change.`
+          chalk.green(
+            `✓ Using ${defaultModel.label}. Run 'gitpt model' to change.`
           )
         );
-        return getConfig();
+        return result;
       }
+    } else if (!interactive) {
+      throw new Error(
+        "GitPT is not configured. Run 'gitpt setup' in an interactive terminal."
+      );
     }
   }
+
+  clearAcceptedDefault();
 
   // For initial setup or model command, start by selecting the provider
   const providerChoices: Array<{

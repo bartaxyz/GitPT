@@ -8,6 +8,7 @@ import { commitCommand } from "./commands/commit/index.js";
 import { configCommand } from "./commands/config.js";
 import { modelCommand } from "./commands/model.js";
 import { prCreateCommand } from "./commands/pr/index.js";
+import { resetCommand } from "./commands/reset.js";
 import { setupCommand } from "./commands/setup.js";
 
 const program = new Command();
@@ -34,6 +35,12 @@ program
   .command("model")
   .description("Change the AI model used for generating commit messages")
   .action(modelCommand);
+
+program
+  .command("reset")
+  .description("Reset GitPT configuration (clears provider, model, and API key)")
+  .option("-y, --yes", "Skip the confirmation prompt")
+  .action(resetCommand);
 
 // Enhanced git commands
 program

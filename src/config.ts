@@ -76,3 +76,21 @@ export const validateConfig = (): { isValid: boolean; errors?: string[] } => {
 export const clearConfig = (): void => {
   config.clear();
 };
+
+const ACCEPTED_DEFAULT_KEY = "acceptedDefault";
+
+export const getAcceptedDefault = (): string | undefined => {
+  try {
+    return config.get(ACCEPTED_DEFAULT_KEY);
+  } catch {
+    return undefined;
+  }
+};
+
+export const setAcceptedDefault = (id: string): void => {
+  config.set(ACCEPTED_DEFAULT_KEY, id);
+};
+
+export const clearAcceptedDefault = (): void => {
+  config.delete(ACCEPTED_DEFAULT_KEY);
+};
