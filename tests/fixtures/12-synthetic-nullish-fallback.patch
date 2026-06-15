@@ -1,0 +1,13 @@
+diff --git a/src/render/pixelRatio.ts b/src/render/pixelRatio.ts
+index 0043f58..9b4cb89 100644
+--- a/src/render/pixelRatio.ts
++++ b/src/render/pixelRatio.ts
+@@ -11,7 +11,7 @@ export const clampRatio = (value: number): number => {
+ export const resolvePixelRatio = (): number => {
+   if (typeof window === 'undefined') {
+     return 1;
+   }
+
+-  return window.devicePixelRatio ?? 1;
++  return window.devicePixelRatio || 1;
+ };

@@ -6,10 +6,10 @@
 
 | format | type | mention | quality |
 | --- | --- | --- | --- |
-| 100% | 67% | 0% | 33% |
+| 100% | 100% | 0% | 50% |
 
 ## Samples
 
-- `feat: add dynamic prefix and suffix text handling`
+- `fix: simplify prefix and suffix logic`
 - `fix: simplify prefix and suffix logic`
 - `fix: simplify prefix and suffix logic`

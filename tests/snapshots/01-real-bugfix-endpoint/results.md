@@ -6,10 +6,10 @@
 
 | format | type | mention | quality |
 | --- | --- | --- | --- |
-| 100% | 100% | 100% | 100% |
+| 100% | 33% | 100% | 67% |
 
 ## Samples
 
-- `fix: modify index.ts to include provider in getConfig`
-- `fix: update index.ts to add provider property`
-- `fix: update getConfig() to include provider field`
+- `feat: modify LLM client configuration to include provider`
+- `fix: update index.ts to include provider property`
+- `feat: modify index.ts to include provider property`

@@ -10,6 +10,6 @@
 
 ## Samples
 
-- `feat: add support for Apple Foundation Models`
-- `feat: add support for Apple Foundation Models`
-- `feat: add support for Apple Foundation Models`
+- `feat: add support for Apple Foundation Models on-device`
+- `feat: add support for Apple Foundation Models on-device`
+- `feat: add support for Apple Foundation Models on-device`

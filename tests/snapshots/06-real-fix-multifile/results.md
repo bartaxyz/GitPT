@@ -6,10 +6,10 @@
 
 | format | type | mention | quality |
 | --- | --- | --- | --- |
-| 100% | 100% | 100% | 100% |
+| 100% | 67% | 100% | 83% |
 
 ## Samples
 
 - `fix: update userPrompt function to accept context`
 - `fix: update userPrompt function to accept context`
-- `fix: update userPrompt function to accept context`
+- `feat: update userPrompt function to accept context`

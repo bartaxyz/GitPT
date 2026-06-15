@@ -10,6 +10,6 @@
 
 ## Samples
 
-- `refactor: update model interface and fetch logic`
-- `refactor: update model interface and fetch logic`
-- `refactor: update model interface and fetch logic`
+- `refactor: refactor model fetching and selection logic`
+- `refactor: refactor model fetching and selection logic`
+- `refactor: refactor model fetching and selection logic`

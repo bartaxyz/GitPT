@@ -133,5 +133,21 @@
       "logo",
       "theme"
     ]
+  },
+  "12-synthetic-nullish-fallback.patch": {
+    "origin": "synthetic",
+    "reference": "fix: fall back to 1 for falsy devicePixelRatio",
+    "shouldMention": "the ?? -> || fallback / falsy handling, not the unchanged return type",
+    "type": [
+      "fix",
+      "refactor"
+    ],
+    "mentions": [
+      "fallback",
+      "fall back",
+      "falsy",
+      "nullish",
+      "zero"
+    ]
   }
 }

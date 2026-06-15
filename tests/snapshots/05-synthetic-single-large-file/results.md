@@ -10,6 +10,6 @@
 
 ## Samples
 
-- `feat: add compute-based offsets and h8_0 to h11_11`
-- `feat: add compute-based offsets and h8_0 to h11_0 to schema.ts`
-- `feat: add compute-based offsets and h8_0 to h11_11`
+- `feat: add compute function with steps and offsets`
+- `feat: add compute function with steps and offsets`
+- `feat: add compute function with steps and offsets`

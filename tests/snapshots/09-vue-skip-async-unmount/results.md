@@ -10,6 +10,6 @@
 
 ## Samples
 
-- `test: add async tests for async component error handling`
-- `test: add async tests for async component error handling`
-- `feat: add async component error handling tests`
+- `feat: add async component error handling`
+- `test: add async tests for async component lifecycle`
+- `test: add async tests for async component unmount`

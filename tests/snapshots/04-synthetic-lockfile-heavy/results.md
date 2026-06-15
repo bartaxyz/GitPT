@@ -10,6 +10,6 @@
 
 ## Samples
 
-- `fix: update dependency lockfile and config retry limit`
-- `feat: update dependency lockfile and add retryLimit to config`
-- `fix: update dependency lockfile and add retry limit`
+- `feat: update dependency lockfile and add retryLimit in config`
+- `feat: update dependency lockfile and add retryLimit in config`
+- `feat: update dependency lockfile and add retryLimit in config`

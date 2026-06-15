@@ -6,10 +6,10 @@
 
 | format | type | mention | quality |
 | --- | --- | --- | --- |
-| 100% | 0% | 33% | 17% |
+| 100% | 0% | 67% | 33% |
 
 ## Samples
 
-- `fix: update reactivity source type`
-- `fix: update source type in reactivity and runtime`
 - `fix: update reactivity sources type`
+- `fix: simplify source type handling`
+- `fix: update source type from array to set`
