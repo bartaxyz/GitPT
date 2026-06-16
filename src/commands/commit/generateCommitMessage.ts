@@ -1,5 +1,5 @@
 import { getConfig } from "../../config.js";
-import { getLLMClient } from "../../llm/index.js";
+import { getProvider } from "../../llm/registry.js";
 import { buildCommitPrompt } from "./context/buildPrompt.js";
 
 export const generateCommitMessage = async (
@@ -15,22 +15,9 @@ export const generateCommitMessage = async (
     );
   }
 
-  const { model } = config;
-
   const { system, user } = buildCommitPrompt(diff, validationErrors);
 
-  const llmClient = getLLMClient();
-
-  const response = await llmClient.chat.completions.create({
-    model: model,
-    messages: [
-      { role: "system", content: system },
-      { role: "user", content: user },
-    ],
-    max_tokens: 300,
-  });
-
-  const message = response.choices[0].message.content;
+  const message = await getProvider().complete({ system, user, maxTokens: 300 });
 
   if (!message) {
     throw new Error("No message returned from LLM");

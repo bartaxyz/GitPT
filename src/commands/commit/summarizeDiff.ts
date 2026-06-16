@@ -1,6 +1,5 @@
 import ora from "ora";
-import { getConfig } from "../../config.js";
-import { getLLMClient } from "../../llm/index.js";
+import { getProvider } from "../../llm/registry.js";
 import {
   countTokens,
   getContextWindow,
@@ -131,19 +130,13 @@ const packChunks = (blocks: Block[], budget: number): Chunk[] => {
 };
 
 const summarizeChunk = async (content: string): Promise<string> => {
-  const { model } = getConfig();
-  const client = getLLMClient();
-
-  const response = await client.chat.completions.create({
-    model: model || "system",
-    messages: [
-      { role: "system", content: summarySystemPrompt },
-      { role: "user", content: summaryUserPrompt(content) },
-    ],
-    max_tokens: 400,
+  const message = await getProvider().complete({
+    system: summarySystemPrompt,
+    user: summaryUserPrompt(content),
+    maxTokens: 400,
   });
 
-  return response.choices[0].message.content?.trim() || "";
+  return message.trim();
 };
 
 export const prepareCommitContext = async (diff: string): Promise<string> => {
