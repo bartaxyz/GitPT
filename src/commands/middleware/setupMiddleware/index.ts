@@ -7,15 +7,13 @@ import {
   GitPTConfig,
   saveConfig,
   setAcceptedDefault,
-  validateConfig,
 } from "../../../config.js";
-import { DefaultModel, resolveDefaultModel } from "./defaultModels.js";
 import {
-  isAppleFoundationModelsSupported,
-  setupApple,
-} from "./setupApple.js";
-import { setupLocalLLM } from "./setupLocalLLM.js";
-import { setupOpenRouter } from "./setupOpenRouter.js";
+  getProviderClass,
+  PROVIDERS,
+  validateConfig,
+} from "../../../llm/registry.js";
+import { DefaultModel, resolveDefaultModel } from "./defaultModels.js";
 
 export const setupMiddleware = async (options?: {
   context?: "setup" | "model" | "command";
@@ -87,22 +85,10 @@ export const setupMiddleware = async (options?: {
 
   clearAcceptedDefault();
 
-  // For initial setup or model command, start by selecting the provider
-  const providerChoices: Array<{
-    name: string;
-    value: NonNullable<GitPTConfig["provider"]>;
-  }> = [
-    { name: "OpenRouter (remote)", value: "openrouter" },
-    ...(isAppleFoundationModelsSupported()
-      ? [
-          {
-            name: "Apple Foundation Models (macOS 27+)",
-            value: "apple" as const,
-          },
-        ]
-      : []),
-    { name: "Local LLM", value: "local" },
-  ];
+  const providerChoices = PROVIDERS.filter((p) => p.isAvailable()).map((p) => ({
+    name: p.label,
+    value: p.id,
+  }));
 
   const providerAnswer = await inquirer.prompt([
     {
@@ -117,16 +103,17 @@ export const setupMiddleware = async (options?: {
     },
   ]);
 
-  // Update config based on selected provider
-  existingConfig.provider = providerAnswer.provider;
+  existingConfig.provider = providerAnswer.provider as NonNullable<
+    GitPTConfig["provider"]
+  >;
 
-  // Proceed based on selected provider
-  switch (providerAnswer.provider) {
-    case "local":
-      return await setupLocalLLM(existingConfig);
-    case "apple":
-      return await setupApple(existingConfig);
-    default:
-      return await setupOpenRouter(existingConfig);
+  const spec = getProviderClass(existingConfig.provider);
+
+  if (!spec) {
+    throw new Error(
+      `Unknown provider: ${existingConfig.provider ?? "(none)"}.`
+    );
   }
+
+  return spec.setup(existingConfig);
 };

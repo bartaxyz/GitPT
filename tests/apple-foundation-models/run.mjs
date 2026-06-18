@@ -33,7 +33,7 @@ const { countTokens, getContextWindow, RESERVED_OUTPUT_TOKENS } = await importDi
 const { systemPrompt } = await importDist("commands/commit/context/systemPrompt.js");
 const { userPrompt } = await importDist("commands/commit/context/userPrompt.js");
 
-const CONTEXT_WINDOW = getContextWindow();
+const CONTEXT_WINDOW = await getContextWindow();
 const PROMPT_BUDGET = CONTEXT_WINDOW - RESERVED_OUTPUT_TOKENS;
 const CONVENTIONAL = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\(.+\))?!?: .+/;
 

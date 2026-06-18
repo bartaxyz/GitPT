@@ -1,11 +1,6 @@
 import ora from "ora";
-import { getConfig } from "../../config.js";
-import { getLLMClient } from "../../llm/index.js";
-import {
-  countTokens,
-  getContextWindow,
-  RESERVED_OUTPUT_TOKENS,
-} from "../../llm/tokenCount.js";
+import { getProvider } from "../../llm/registry.js";
+import { countTokens } from "../../llm/tokenCount.js";
 import { summarySystemPrompt, summaryUserPrompt } from "./context/summaryPrompt.js";
 import { systemPrompt } from "./context/systemPrompt.js";
 import { userPrompt } from "./context/userPrompt.js";
@@ -131,26 +126,22 @@ const packChunks = (blocks: Block[], budget: number): Chunk[] => {
 };
 
 const summarizeChunk = async (content: string): Promise<string> => {
-  const { model } = getConfig();
-  const client = getLLMClient();
-
-  const response = await client.chat.completions.create({
-    model: model || "system",
-    messages: [
-      { role: "system", content: summarySystemPrompt },
-      { role: "user", content: summaryUserPrompt(content) },
-    ],
-    max_tokens: 400,
+  const provider = getProvider();
+  const message = await provider.complete({
+    system: summarySystemPrompt,
+    user: summaryUserPrompt(content),
+    maxTokens: provider.maxOutputTokens,
   });
 
-  return response.choices[0].message.content?.trim() || "";
+  return message.trim();
 };
 
 export const prepareCommitContext = async (diff: string): Promise<string> => {
-  const window = getContextWindow();
+  const reserved = getProvider().maxOutputTokens;
+  const window = await getProvider().getContextWindow();
   if (!Number.isFinite(window)) return diff;
 
-  const fitBudget = Math.floor((window - RESERVED_OUTPUT_TOKENS) * MARGIN);
+  const fitBudget = Math.floor((window - reserved) * MARGIN);
   if (finalPromptTokens(diff) <= fitBudget) return diff;
 
   const spinner = ora({ text: "Analyzing diff size..." }).start();
@@ -175,7 +166,7 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
       `${summarySystemPrompt}\n\n${summaryUserPrompt("")}`
     );
     const chunkBudget = Math.floor(
-      (window - RESERVED_OUTPUT_TOKENS - summaryOverhead) * MARGIN
+      (window - reserved - summaryOverhead) * MARGIN
     );
 
     const chunks = packChunks(sourceBlocks, chunkBudget);

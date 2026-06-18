@@ -1,8 +1,6 @@
 import { GitPTConfig } from "../../../config.js";
-import {
-  isAppleFoundationModelsSupported,
-  isAppleModelAvailable,
-} from "./setupApple.js";
+import { AppleProvider } from "../../../llm/providers/apple/index.js";
+import { isAppleModelAvailable } from "../../../llm/providers/apple/models.js";
 
 export interface DefaultModel {
   id: string;
@@ -16,7 +14,7 @@ const DEFAULT_MODELS: DefaultModel[] = [
     id: "apple-foundation-models",
     label: "Apple Foundation Models (on-device)",
     isAvailable: () =>
-      isAppleFoundationModelsSupported() && isAppleModelAvailable("system"),
+      AppleProvider.isAvailable() && isAppleModelAvailable("system"),
     config: { provider: "apple", model: "system" },
   },
 ];
