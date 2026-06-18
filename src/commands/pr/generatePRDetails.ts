@@ -1,6 +1,5 @@
 import chalk from "chalk";
-import { getConfig } from "../../config.js";
-import { getLLMClient } from "../../llm/index.js";
+import { getProvider } from "../../llm/registry.js";
 import { systemPrompt } from "./context/systemPrompt.js";
 import { userPrompt } from "./context/userPrompt.js";
 import { getPRContext } from "./getPRContext.js";
@@ -9,24 +8,16 @@ export const generatePRDetails = async (): Promise<{
   title: string;
   body: string;
 }> => {
-  const { model } = getConfig();
-
   const context = getPRContext().join("\n\n");
-  const userPromptWithContext = userPrompt(context);
-
-  const llmClient = getLLMClient();
 
   try {
-    const response = await llmClient.chat.completions.create({
-      model: model!,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPromptWithContext },
-      ],
-      max_completion_tokens: 1000,
-    });
-
-    const result = response.choices[0].message?.content?.trim();
+    const result = (
+      await getProvider().complete({
+        system: systemPrompt,
+        user: userPrompt(context),
+        maxTokens: 1000,
+      })
+    ).trim();
 
     if (!result) {
       throw new Error("No response from LLM");

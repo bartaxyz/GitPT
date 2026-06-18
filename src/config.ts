@@ -4,10 +4,12 @@ import Configstore from "configstore";
 const config = new Configstore("gitpt");
 
 export interface GitPTConfig {
-  provider?: "openrouter" | "local" | "apple";
+  provider?: "openrouter" | "local" | "apple" | "openai" | "anthropic";
   customLLMEndpoint?: string;
   model?: string;
   apiKey?: string;
+  apiKeys?: Record<string, string>;
+  contextWindow?: number;
 }
 
 export const getConfig = (): GitPTConfig => {
@@ -16,12 +18,16 @@ export const getConfig = (): GitPTConfig => {
     const customLLMEndpoint = config.get("customLLMEndpoint");
     const model = config.get("model");
     const apiKey = config.get("apiKey");
+    const apiKeys = config.get("apiKeys");
+    const contextWindow = config.get("contextWindow");
 
     return {
       provider,
       customLLMEndpoint,
       model,
       apiKey,
+      apiKeys,
+      contextWindow,
     };
   } catch (error) {
     console.error(chalk.red("Error reading configuration:"), error);
@@ -45,32 +51,14 @@ export const saveConfig = (newConfig: GitPTConfig): void => {
   if (newConfig.apiKey !== undefined) {
     config.set("apiKey", newConfig.apiKey);
   }
-};
 
-export enum ConfigErrors {
-  CustomLLMEndpointRequired = "Custom LLM endpoint is required for local LLM provider.",
-  APIKeyRequired = "API key is required for OpenRouter provider.",
-  ModelRequired = "Model is required.",
-}
-
-export const validateConfig = (): { isValid: boolean; errors?: string[] } => {
-  const { provider, customLLMEndpoint, apiKey, model } = getConfig();
-
-  const errors: string[] = [];
-
-  if (provider === "local" && !customLLMEndpoint) {
-    errors.push(ConfigErrors.CustomLLMEndpointRequired);
+  if (newConfig.apiKeys !== undefined) {
+    config.set("apiKeys", newConfig.apiKeys);
   }
 
-  if (provider === "openrouter" && !apiKey) {
-    errors.push(ConfigErrors.APIKeyRequired);
+  if (newConfig.contextWindow !== undefined) {
+    config.set("contextWindow", newConfig.contextWindow);
   }
-
-  if (!model) {
-    errors.push(ConfigErrors.ModelRequired);
-  }
-
-  return { isValid: errors.length === 0, errors };
 };
 
 export const clearConfig = (): void => {

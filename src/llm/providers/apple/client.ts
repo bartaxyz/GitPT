@@ -1,34 +1,11 @@
 import { spawn } from "child_process";
 import type OpenAI from "openai";
+import type { ChatCompletionCreateParams, LLMClient } from "../../client.js";
 
 export const FM_BINARY = "fm";
 
-type ChatCompletionCreateParams =
-  OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming;
-
 type ChatCompletionMessageContent =
   OpenAI.Chat.Completions.ChatCompletionMessageParam["content"];
-
-export interface LLMChatCompletion {
-  choices: Array<{ message: { content: string | null } }>;
-}
-
-export interface LLMModelsPage {
-  data: OpenAI.Models.Model[];
-  hasNextPage(): boolean;
-  getNextPage(): Promise<LLMModelsPage>;
-}
-
-export interface LLMClient {
-  chat: {
-    completions: {
-      create(body: ChatCompletionCreateParams): Promise<LLMChatCompletion>;
-    };
-  };
-  models: {
-    list(): Promise<LLMModelsPage>;
-  };
-}
 
 const clean = (text: string): string =>
   text
