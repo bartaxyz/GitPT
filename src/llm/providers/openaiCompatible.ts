@@ -5,6 +5,7 @@ import type { LLMClient } from "../client.js";
 import { getLLMClient } from "../index.js";
 import { getAvailableModels } from "../setup/getAvailableModels.js";
 import { selectModel } from "../setup/selectModel.js";
+import { Model } from "../setup/types.js";
 import { getApiKey, promptApiKey, saveApiKey } from "./apiKey.js";
 import { Provider } from "./base.js";
 
@@ -27,9 +28,16 @@ export abstract class OpenAICompatibleProvider extends Provider {
 
 export const setupApiKeyProvider = async (
   existingConfig: GitPTConfig,
-  opts: { baseURL: string; label: string }
+  opts: {
+    baseURL: string;
+    label: string;
+    listModels?: (apiKey: string) => Promise<Model[]>;
+  }
 ): Promise<GitPTConfig> => {
   const { baseURL, label } = opts;
+  const listModels =
+    opts.listModels ??
+    ((key: string) => getAvailableModels({ baseURLOverride: baseURL, apiKey: key }));
   const providerId = existingConfig.provider ?? "";
 
   const existingKey =
@@ -51,10 +59,7 @@ export const setupApiKeyProvider = async (
   try {
     console.log(chalk.gray(`Fetching available models from ${label}...`));
 
-    const models = await getAvailableModels({
-      baseURLOverride: baseURL,
-      apiKey,
-    });
+    const models = await listModels(apiKey);
 
     if (models.length > 0) {
       console.log(

@@ -9,6 +9,8 @@ export class OpenAIProvider extends OpenAICompatibleProvider {
   static readonly label = "OpenAI";
   static readonly baseURL = "https://api.openai.com/v1";
 
+  protected override readonly usesCompletionTokensParam = true;
+
   static setup(existingConfig: GitPTConfig): Promise<GitPTConfig> {
     return setupApiKeyProvider(existingConfig, {
       baseURL: OpenAIProvider.baseURL,

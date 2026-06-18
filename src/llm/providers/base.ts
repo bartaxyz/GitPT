@@ -17,6 +17,9 @@ export abstract class Provider {
 
   readonly maxOutputTokens: number = 1024;
 
+  // Newer OpenAI models require `max_completion_tokens`; most others use `max_tokens`.
+  protected readonly usesCompletionTokensParam: boolean = false;
+
   constructor(public readonly model: string) {}
 
   async getContextWindow(): Promise<number> {
@@ -32,13 +35,17 @@ export abstract class Provider {
   protected abstract getClient(): LLMClient;
 
   async complete(req: CompletionRequest): Promise<string> {
+    const tokenLimit = this.usesCompletionTokensParam
+      ? { max_completion_tokens: req.maxTokens }
+      : { max_tokens: req.maxTokens };
+
     const response = await this.getClient().chat.completions.create({
       model: this.model,
       messages: [
         { role: "system", content: req.system },
         { role: "user", content: req.user },
       ],
-      max_tokens: req.maxTokens,
+      ...tokenLimit,
     });
 
     return response.choices[0].message.content ?? "";
