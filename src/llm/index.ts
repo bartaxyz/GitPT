@@ -1,29 +1,16 @@
 import openai from "openai";
-import { getConfig } from "../config.js";
 import { formatBaseURL } from "../utils/formatBaseURL.js";
-import { getAppleFoundationClient, LLMClient } from "./appleFoundationClient.js";
+import type { LLMClient } from "./client.js";
 
 export const OPENROUTER_API_URL = "https://openrouter.ai/api/v1";
 
 export const getLLMClient = (options?: {
   baseURLOverride?: string;
+  apiKey?: string;
 }): LLMClient => {
-  const { baseURLOverride } = options || {};
+  const baseURL = formatBaseURL(options?.baseURLOverride ?? OPENROUTER_API_URL);
+  // The OpenAI SDK requires a non-empty key even when the server ignores it.
+  const apiKey = options?.apiKey || "not-needed";
 
-  const { apiKey, customLLMEndpoint, provider } = getConfig();
-
-  if (provider === "apple" && !baseURLOverride) {
-    return getAppleFoundationClient();
-  }
-
-  const localLLMEndpoint = provider === "local" ? customLLMEndpoint : undefined;
-
-  const baseURL = formatBaseURL(
-    baseURLOverride ?? localLLMEndpoint ?? OPENROUTER_API_URL
-  );
-
-  return new openai.OpenAI({
-    apiKey,
-    baseURL,
-  });
+  return new openai.OpenAI({ apiKey, baseURL });
 };
