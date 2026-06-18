@@ -1,10 +1,6 @@
 import ora from "ora";
 import { getProvider } from "../../llm/registry.js";
-import {
-  countTokens,
-  getContextWindow,
-  RESERVED_OUTPUT_TOKENS,
-} from "../../llm/tokenCount.js";
+import { countTokens } from "../../llm/tokenCount.js";
 import { summarySystemPrompt, summaryUserPrompt } from "./context/summaryPrompt.js";
 import { systemPrompt } from "./context/systemPrompt.js";
 import { userPrompt } from "./context/userPrompt.js";
@@ -130,20 +126,22 @@ const packChunks = (blocks: Block[], budget: number): Chunk[] => {
 };
 
 const summarizeChunk = async (content: string): Promise<string> => {
-  const message = await getProvider().complete({
+  const provider = getProvider();
+  const message = await provider.complete({
     system: summarySystemPrompt,
     user: summaryUserPrompt(content),
-    maxTokens: 400,
+    maxTokens: provider.maxOutputTokens,
   });
 
   return message.trim();
 };
 
 export const prepareCommitContext = async (diff: string): Promise<string> => {
-  const window = getContextWindow();
+  const reserved = getProvider().maxOutputTokens;
+  const window = await getProvider().getContextWindow();
   if (!Number.isFinite(window)) return diff;
 
-  const fitBudget = Math.floor((window - RESERVED_OUTPUT_TOKENS) * MARGIN);
+  const fitBudget = Math.floor((window - reserved) * MARGIN);
   if (finalPromptTokens(diff) <= fitBudget) return diff;
 
   const spinner = ora({ text: "Analyzing diff size..." }).start();
@@ -168,7 +166,7 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
       `${summarySystemPrompt}\n\n${summaryUserPrompt("")}`
     );
     const chunkBudget = Math.floor(
-      (window - RESERVED_OUTPUT_TOKENS - summaryOverhead) * MARGIN
+      (window - reserved - summaryOverhead) * MARGIN
     );
 
     const chunks = packChunks(sourceBlocks, chunkBudget);

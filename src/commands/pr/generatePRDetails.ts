@@ -11,11 +11,12 @@ export const generatePRDetails = async (): Promise<{
   const context = getPRContext().join("\n\n");
 
   try {
+    const provider = getProvider();
     const result = (
-      await getProvider().complete({
+      await provider.complete({
         system: systemPrompt,
         user: userPrompt(context),
-        maxTokens: 1000,
+        maxTokens: provider.maxOutputTokens,
       })
     ).trim();
 

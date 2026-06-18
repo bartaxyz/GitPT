@@ -17,7 +17,12 @@ export const generateCommitMessage = async (
 
   const { system, user } = buildCommitPrompt(diff, validationErrors);
 
-  const message = await getProvider().complete({ system, user, maxTokens: 300 });
+  const provider = getProvider();
+  const message = await provider.complete({
+    system,
+    user,
+    maxTokens: provider.maxOutputTokens,
+  });
 
   if (!message) {
     throw new Error("No message returned from LLM");

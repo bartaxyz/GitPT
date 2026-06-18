@@ -85,7 +85,7 @@ export class AppleProvider extends Provider {
     super(model || "system");
   }
 
-  override getContextWindow(): number {
+  override async getContextWindow(): Promise<number> {
     // The Apple Foundation Model CLI does not provide a way to get the context window size.
     // `fm` only enables `system` model for programmatic use, the context window is always 4096 tokens.
     return 4096;

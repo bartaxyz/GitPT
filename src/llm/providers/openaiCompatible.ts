@@ -11,6 +11,10 @@ import { Provider } from "./base.js";
 export abstract class OpenAICompatibleProvider extends Provider {
   static readonly requiresApiKey: boolean = true;
 
+  // Headroom for reasoning models, which spend output tokens "thinking"
+  // before emitting the answer.
+  override readonly maxOutputTokens = 2048;
+
   protected abstract baseURL(): string;
 
   protected getClient(): LLMClient {

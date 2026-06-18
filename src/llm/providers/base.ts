@@ -15,14 +15,18 @@ export abstract class Provider {
     return true;
   }
 
+  readonly maxOutputTokens: number = 1024;
+
   constructor(public readonly model: string) {}
 
-  getContextWindow(): number {
+  async getContextWindow(): Promise<number> {
     return Number.POSITIVE_INFINITY;
   }
 
   countTokens(text: string): number {
-    return Math.ceil(text.length / 4);
+    // Conservative estimate (code tokenizes higher than the usual ~4 chars/token),
+    // so chunks stay under the real context window when no exact tokenizer exists.
+    return Math.ceil(text.length / 3);
   }
 
   protected abstract getClient(): LLMClient;
