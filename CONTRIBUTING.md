@@ -37,10 +37,15 @@ Thank you for your interest in contributing to GitPT! This document provides gui
 
 ## Local Testing
 
-1. **Running in development mode**:
+1. **Type-check, build, and the CI gate**:
    ```bash
-   npm run dev
+   npm test               # type-check (tsc --noEmit)
+   npm run build          # compile to dist/
+   npm run check:prompt   # verify commit-prompt snapshots (run in CI)
    ```
+
+   The Apple Foundation Models eval suite (`npm run test:apple` / `npm run bench:apple`)
+   runs the real on-device model and is macOS 27+ only; it's skipped elsewhere.
 
 2. **Testing the CLI**:
    After linking the package with `npm link`, you can test the CLI by running:
