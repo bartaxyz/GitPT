@@ -1,7 +1,7 @@
 #!/usr/bin/env node --experimental-specifier-resolution=node
 
 import chalk from "chalk";
-import { execSync } from "child_process";
+import { spawnSync } from "child_process";
 import { Command } from "commander";
 import packageJSON from "../package.json" with { type: "json" };
 import { commitCommand } from "./commands/commit/index.js";
@@ -70,16 +70,14 @@ program
 
 // Handle unknown commands by passing them to git
 program.on("command:*", () => {
-  try {
-    // Get all arguments passed to the original command
-    const args = process.argv.slice(2);
+  // Get all arguments passed to the original command
+  const args = process.argv.slice(2);
 
-    // Execute git with all arguments
-    execSync(`git ${args.join(" ")}`, { stdio: "inherit" });
-  } catch (error) {
-    // Git will handle its own error output through stdio: 'inherit'
-    process.exit(1);
-  }
+  // Pass them straight to git
+  const result = spawnSync("git", args, { stdio: "inherit" });
+
+  // Propagate git's exit code.
+  process.exit(result.status ?? 1);
 });
 
 // Main logic
