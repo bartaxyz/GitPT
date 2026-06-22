@@ -12,10 +12,11 @@ import { generateCommitMessage } from "./generateCommitMessage.js";
 import { prepareCommitContext } from "./summarizeDiff.js";
 
 interface CommitOptions {
-  message?: string;
-  edit?: boolean;
-  [key: string]: any;
-}
+    message?: string;
+    edit?: boolean;
+    dryRun?: boolean;
+    [key: string]: any;
+  }
 
 export const commitCommand = async (options: CommitOptions): Promise<void> => {
   capabilitiesMiddleware(["git"]);
@@ -172,6 +173,10 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
       );
       process.exit(1);
     }
+  }
+
+  if (options.dryRun) {
+    return;
   }
 
   // If edit is true or not specified, prompt user to edit the message
