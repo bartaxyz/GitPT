@@ -1,6 +1,6 @@
 {
   "name": "gitpt",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "CLI tool that helps you write commit messages & pull request descriptions using AI",
   "main": "dist/index.js",
   "type": "module",
@@ -20,6 +20,7 @@
     "bench:apple": "npm run build && node tests/apple-foundation-models/benchmark.mjs",
     "check:prompt": "npm run build && node tests/snapshots/check.mjs",
     "build:demo": "node scripts/build-demo.mjs",
+    "test:unit": "npm run build && node --test tests/unit/*.test.mjs",
     "prepublishOnly": "npm run build"
   },
   "repository": {
