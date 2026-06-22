@@ -72,7 +72,7 @@ program.on("command:*", () => {
   // Get all arguments passed to the original command
   const args = process.argv.slice(2);
 
-  // Pass them straight to git as an array — no shell, no re-splitting.
+  // Pass them straight to git
   const result = spawnSync("git", args, { stdio: "inherit" });
 
   // Propagate git's exit code.
