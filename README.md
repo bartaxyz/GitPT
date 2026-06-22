@@ -1,10 +1,12 @@
 # GitPT
 
-**AI commit messages, built for on-device models.** Free and private on Apple Foundation Models — or bring OpenAI, Anthropic, OpenRouter, or any local model (Ollama, LM Studio).
+GitPT (Git Prompt Tool) is a git command alias that writes your commit messages with an LLM, built for on-device models. Use it anywhere you use git: every command it doesn't change passes straight through, so you can replace git with it and lose nothing. The one command that changes is `commit`, which writes the message for you.
 
-![GitPT generating a commit message on-device](assets/demo.gif)
+Big remote models already write commits fine. The harder case is the small local model on your machine (Apple's Foundation Models, Ollama, LM Studio), which holds only a few thousand tokens. A real diff is much larger, so GitPT summarizes it file by file until it fits the model's context window, then writes the message from that summary. Remote APIs (OpenAI, Anthropic, OpenRouter) work too.
 
-<sub>Recorded with Apple Foundation Models running on-device — the diff is summarized to fit its small (~4k token) context window.</sub>
+![GitPT generating a commit message](assets/demo.gif)
+
+<sub>The diff is summarized to fit the model's context window before the message is written.</sub>
 
 ## Install
 
@@ -12,30 +14,51 @@
 npm install -g gitpt
 ```
 
-## Use
+## Setup
 
 ```bash
-gitpt setup     # pick a provider — Apple needs no API key
-gitpt add .
-gitpt commit    # AI commit message from your staged diff
+gitpt setup     # pick a model
 ```
 
-Review or edit, and it commits. `gitpt` wraps git, so every other command (`status`, `push`, `checkout`, …) passes straight through.
+Optional: alias git so GitPT runs everywhere you already type git.
+
+```bash
+alias git=gitpt
+```
+
+## Use
+
+With plain git, you write the message yourself:
+
+```bash
+git add .
+git commit -m "fix: handle empty staged diff"   # you write the message
+```
+
+With GitPT, you don't:
+
+```bash
+gitpt add .
+gitpt commit                                    # GitPT writes it from the diff
+```
+
+`gitpt commit` reads your staged diff, writes the message, and opens it in your editor. Save and close to commit.
+
+## Commands
+
+- `gitpt commit`: write a commit message from staged changes. Respects `-m` and your commitlint rules.
+- `gitpt model`: pick or switch the model. Each provider keeps its own key.
+- `gitpt setup` / `gitpt config` / `gitpt reset`: configure, show, or clear settings.
+- `gitpt pr create`: draft a pull request title and description with the `gh` CLI (experimental).
 
 ## Models
 
-Switch anytime with `gitpt model`:
+- **On-device**: Apple's Foundation Models on macOS 27 or later (no API key), or any OpenAI-compatible local server such as Ollama or LM Studio.
+- **Remote**: OpenAI, Anthropic, OpenRouter. Bring an API key.
 
-- **Apple Foundation Models** — on-device, no key, fully private (macOS 27+)
-- **OpenAI** · **Anthropic** · **OpenRouter** — bring an API key
-- **Local** — any OpenAI-compatible endpoint (Ollama, LM Studio, …)
+## Requests and bugs
 
-Big diffs are summarized to fit small context windows, and each provider keeps its own key.
-
-## More
-
-- `gitpt pr create` — AI pull-request title + description (needs the `gh` CLI)
-- Commitlint-aware — generated messages follow your repo's rules
+Want a feature or hit a bug? [Open an issue](https://github.com/bartaxyz/GitPT/issues).
 
 ## License
 

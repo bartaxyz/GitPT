@@ -1,6 +1,6 @@
-# Record a real end-to-end gitpt flow on Apple Foundation Models.
-#   vhs assets/demo.tape    (run from repo root; writes assets/demo.gif)
-# Needs macOS 27+ with `fm`, and gitpt set to Apple: gitpt model
+# Records a real end-to-end gitpt flow
+# `vhs assets/demo.tape` (run from repo root; writes assets/demo.gif)
+# Usually recorded on macOS 27+ with Apple Foundatio Models (`fm` CLI)
 
 Output assets/demo.gif
 
@@ -23,10 +23,15 @@ Type "git init -q && git config user.email demo@example.com && git config user.n
 Enter
 Type "git commit -q --allow-empty -m 'chore: init'"
 Enter
-Type "mkdir src"
+
+# Stage gitpt's own commit-message + diff-summarization source as the change.
+Type "mkdir -p src/commands/commit/context"
 Enter
-Type `cp "$REPO"/assets/demo-src/*.ts src/`
+Type `cp "$REPO"/src/commands/commit/summarizeDiff.ts "$REPO"/src/commands/commit/generateCommitMessage.ts src/commands/commit/`
 Enter
+Type `cp "$REPO"/src/commands/commit/context/summaryPrompt.ts "$REPO"/src/commands/commit/context/systemPrompt.ts "$REPO"/src/commands/commit/context/userPrompt.ts src/commands/commit/context/`
+Enter
+
 # Warm the model so the recording isn't a cold start.
 Type "echo hi | fm respond --no-stream --model system >/dev/null 2>&1"
 Enter

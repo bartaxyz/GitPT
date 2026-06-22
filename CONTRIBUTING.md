@@ -1,143 +1,63 @@
-# Contributing to GitPT
+# Contributing
 
-Thank you for your interest in contributing to GitPT! This document provides guidelines and instructions for contributing to this project.
+Thanks for working on GitPT. This page covers setup, the checks to run, and how to send a change.
 
-## Table of Contents
+## Setup
 
-- [Development Environment Setup](#development-environment-setup)
-- [Local Testing](#local-testing)
-- [Pull Request Process](#pull-request-process)
-- [Commit Message Guidelines](#commit-message-guidelines)
-- [Release Process](#release-process)
-- [Code Style](#code-style)
+```bash
+git clone https://github.com/bartaxyz/GitPT.git
+cd GitPT
+npm install
+npm run build
+npm link        # point the global `gitpt` at this checkout
+```
 
-## Development Environment Setup
+After `npm link`, the `gitpt` on your PATH runs your build. Rebuild after editing source with `npm run build`, or run `npx tsc --watch` while you work. Undo the link with `npm unlink -g gitpt`.
 
-1. **Fork and clone the repository**:
-   ```bash
-   git clone https://github.com/yourusername/GitPT.git
-   cd GitPT
-   ```
+## Checks
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+CI runs these three. Pass them before opening a pull request.
 
-3. **Build the project**:
-   ```bash
-   npm run build
-   ```
+```bash
+npm test             # type-check (tsc --noEmit)
+npm run build        # compile to dist/
+npm run check:prompt # verify the commit-prompt snapshots
+```
 
-4. **Link for local development**:
-   ```bash
-   npm link
-   ```
-   This makes the `gitpt` command available globally on your machine, pointing to your development version.
+The Apple Foundation Models evals run the real on-device model, so they need macOS 27 or later and are skipped in CI:
 
-## Local Testing
+```bash
+npm run test:apple   # correctness checks against fixture diffs
+npm run bench:apple  # message-quality benchmark
+```
 
-1. **Type-check, build, and the CI gate**:
-   ```bash
-   npm test               # type-check (tsc --noEmit)
-   npm run build          # compile to dist/
-   npm run check:prompt   # verify commit-prompt snapshots (run in CI)
-   ```
+## Project layout
 
-   The Apple Foundation Models eval suite (`npm run test:apple` / `npm run bench:apple`)
-   runs the real on-device model and is macOS 27+ only; it's skipped elsewhere.
+- `src/commands/`: the CLI commands (`commit`, `pr`, `setup`, `model`, `config`, `reset`).
+- `src/llm/providers/`: one folder per provider. A provider extends the base class in `providers/base.ts` and registers in `registry.ts`. Provider-specific logic lives here; nothing else in the codebase branches on the provider.
+- `src/commands/commit/summarizeDiff.ts`: the map/reduce that fits a large diff into a small context window.
+- `tests/`: the snapshot check and the Apple eval suite with its fixtures.
 
-2. **Testing the CLI**:
-   After linking the package with `npm link`, you can test the CLI by running:
-   ```bash
-   gitpt status
-   gitpt commit
-   gitpt pr create
-   ```
+To add a provider, copy a folder under `src/llm/providers/`, implement the class, and add it to the `PROVIDERS` array in `registry.ts`.
 
-3. **Unlink when finished**:
-   ```bash
-   npm unlink -g gitpt
-   ```
+## Commits and pull requests
 
-## Pull Request Process
+GitPT uses [Conventional Commits](https://www.conventionalcommits.org/). The type prefix drives the released version:
 
-1. **Create a feature branch**:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+```
+feat: detect the context window for local models
+fix: handle an empty staged diff
+docs: clarify local-endpoint setup
+```
 
-2. **Make your changes**:
-   Implement your feature or bug fix.
+Use `feat!:` or a `BREAKING CHANGE:` footer for a breaking change.
 
-3. **Test your changes**:
-   Make sure your changes work as expected and don't break existing functionality.
+You can write these with GitPT: `gitpt add .` then `gitpt commit`. For the pull request itself, `gitpt pr create` drafts a title and description from your commits.
 
-4. **Commit your changes**:
-   Follow the [Commit Message Guidelines](#commit-message-guidelines).
+## Releases
 
-5. **Push your branch and create a pull request using GitPT**:
-   ```bash
-   git push origin feature/your-feature-name
-   gitpt pr create
-   ```
-   Using `gitpt pr create` is recommended as it will automatically generate an appropriate PR title and description based on your changes, following the project's standards.
+Maintainers publish by drafting a GitHub Release with a new tag, for example `v1.7.0`. The publish workflow builds the package, pushes it to npm, and commits the bumped `package.json` back to the repo.
 
-6. **Code review**:
-   Wait for maintainers to review your PR. Make any requested changes.
+## Rebuilding the demo
 
-## Commit Message Guidelines
-
-GitPT uses conventional commits to automate versioning and release notes. Please follow these guidelines:
-
-- **Format**: `<type>: <description>`
-- **Types**:
-  - `feat`: A new feature
-  - `fix`: A bug fix
-  - `docs`: Documentation changes
-  - `style`: Code style changes (formatting, etc)
-  - `refactor`: Code changes that neither fix bugs nor add features
-  - `test`: Adding or updating tests
-  - `chore`: Changes to the build process or auxiliary tools
-
-- **Breaking Changes**:
-  - Use `!` after the type for breaking changes: `feat!: breaking change`
-
-- **Examples**:
-  ```
-  feat: add user authentication
-  fix: resolve null pointer in login
-  docs: update README with new commands
-  chore: update dependencies
-  ```
-
-## Release Process
-
-GitPT uses GitHub Releases to trigger the publishing workflow.
-
-### Release Process
-
-1. **Create a new GitHub Release**:
-   - Go to the repository on GitHub
-   - Navigate to "Releases" 
-   - Click "Draft a new release"
-   - Create a new tag (e.g., `v1.0.1`)
-   - Add a title and description for the release
-   - Click "Publish release"
-
-2. **GitHub Actions** will automatically:
-   - Update package.json with the release version
-   - Build the package
-   - Publish to npm
-   - Commit the updated package.json back to the repository
-
-The workflow is triggered when a GitHub Release is published. This ensures a clean, consistent release process that's easy to track through GitHub's UI.
-
-## Code Style
-
-- Use TypeScript for all new code
-- Follow existing code style patterns
-- Include appropriate error handling
-- Add comments for complex logic
-
-Thank you for contributing to GitPT!
+`npm run build:demo` re-records `assets/demo.gif`. It needs macOS 27 with the `fm` CLI and VHS (`brew install vhs`); the rest of the tooling is in devDependencies. The script records a real run, then speeds up only the on-device summarization wait.
