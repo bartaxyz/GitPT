@@ -15,11 +15,11 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "test": "npm run typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:apple": "npm run build && node tests/apple-foundation-models/run.mjs",
     "bench:apple": "npm run build && node tests/apple-foundation-models/benchmark.mjs",
     "check:prompt": "npm run build && node tests/snapshots/check.mjs",
-    "test:unit": "npm run build && node --test tests/unit/*.test.mjs",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -43,7 +43,8 @@
     "@types/node": "^22.14.1",
     "@types/node-fetch": "^2.6.12",
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.9"
   },
   "dependencies": {
     "@commitlint/cli": "^19.8.1",
