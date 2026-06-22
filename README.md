@@ -8,6 +8,8 @@ Big remote models already write commits fine. The harder case is the small local
 
 <sub>The diff is summarized to fit the model's context window before the message is written.</sub>
 
+> **New: Apple Foundation Models.** On macOS 27 and later, GitPT runs on Apple's built-in on-device model. No API key, no signup, nothing leaves your Mac. Run `gitpt setup` and choose Apple Foundation Models.
+
 ## Install
 
 ```bash
