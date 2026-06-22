@@ -19,6 +19,7 @@
     "test:apple": "npm run build && node tests/apple-foundation-models/run.mjs",
     "bench:apple": "npm run build && node tests/apple-foundation-models/benchmark.mjs",
     "check:prompt": "npm run build && node tests/snapshots/check.mjs",
+    "test:unit": "npm run build && node --test tests/unit/*.test.mjs",
     "prepublishOnly": "npm run build"
   },
   "repository": {
