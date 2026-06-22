@@ -2,6 +2,8 @@
 
 Git Prompt Tool is a CLI tool that helps you write commit messages using AI through [OpenRouter](https://openrouter.ai/) or a local LLM. It acts as a complete git wrapper, enhancing specific commands with AI while passing through all other git commands directly.
 
+> **New: Apple Foundation Models.** On macOS 27 and later, GitPT runs on Apple's built-in on-device model. No API key, no signup, nothing leaves your Mac. Run `gitpt setup` and choose Apple Foundation Models.
+
 ## Features
 
 - Acts as a complete git replacement - all git commands are supported
