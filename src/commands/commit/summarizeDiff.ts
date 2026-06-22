@@ -178,7 +178,7 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
     const summaries: string[] = [];
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
-      spinner.text = `Summarizing chunk ${i + 1}/${chunks.length}: ${chunk.files.join(", ")}`;
+      spinner.text = `Summarizing to fit the context window (~${window} tokens) — chunk ${i + 1}/${chunks.length}...`;
       summaries.push(await summarizeChunk(chunk.content));
     }
 
@@ -214,7 +214,7 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
     }
 
     spinner.succeed(
-      `Summarized ${blocks.length} file(s): ~${totalTokens} → ~${countTokens(framed())} tokens`
+      `Summarized ${blocks.length} file(s) to fit the context window: ~${totalTokens} → ~${countTokens(framed())} tokens`
     );
 
     return framed();
