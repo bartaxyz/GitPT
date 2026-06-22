@@ -9,6 +9,7 @@ type ChatCompletionMessageContent =
 
 const clean = (text: string): string =>
   text
+    // oxlint-disable-next-line no-control-regex -- intentional: strip ANSI escape codes
     .replace(/\x1b\[[0-9;]*m/g, "")
     .replace(/[⠀-⣿]/g, "")
     .trim();

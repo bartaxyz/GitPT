@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
     "build": "tsc",
     "test": "npm run typecheck",
     "test:apple": "npm run build && node tests/apple-foundation-models/run.mjs",
@@ -42,6 +43,7 @@
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.14.1",
     "@types/node-fetch": "^2.6.12",
+    "oxlint": "^1.71.0",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3"
   },

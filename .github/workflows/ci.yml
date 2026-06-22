@@ -22,6 +22,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Lint
+        run: npm run lint
+
       # The model benchmark itself is local-only (needs macOS 27 + the `fm` CLI).
       # CI only enforces that the prompt matches the last benchmarked snapshot,
       # so the prompt can't change without a fresh local benchmark run.
