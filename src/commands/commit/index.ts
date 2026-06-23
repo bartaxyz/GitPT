@@ -12,19 +12,37 @@ import { generateCommitMessage } from "./generateCommitMessage.js";
 import { prepareCommitContext } from "./summarizeDiff.js";
 
 interface CommitOptions {
-    message?: string;
-    edit?: boolean;
-    dryRun?: boolean;
+  message?: string;
+  edit?: boolean;
+  dryRun?: boolean;
+  [key: string]: any;
+}
+
+interface Command {
+  parent?: Command;
+  args?: {
+    allowEmpty: boolean;
     [key: string]: any;
-  }
+  };
+}
 
 export const commitCommand = async (
   options: CommitOptions,
-  command?: { args?: string[] },
+  command?: Command,
 ): Promise<void> => {
   capabilitiesMiddleware(["git"]);
   await setupMiddleware();
-  hasStagedChangesMiddleware();
+
+  // TODO: Please introduce a separate function, or dive deeper into documentation
+  // about how this works. This is just a quick attempt to make this work, it won't be final
+  const args =
+    (!command?.args || command.args.length === 0
+      ? command?.parent?.args
+      : command?.args) || [];
+
+  if (!args.includes("--allow-empty")) {
+    hasStagedChangesMiddleware();
+  }
 
   let commitMessage: string;
   let context: string | undefined;
@@ -48,15 +66,15 @@ export const commitCommand = async (
         if (hasCommitlint) {
           console.log(
             chalk.blue(
-              "Commitlint configuration detected. Generating message according to rules..."
-            )
+              "Commitlint configuration detected. Generating message according to rules...",
+            ),
           );
         }
       } catch (error) {
         console.warn(
           chalk.yellow(
-            "Warning: Error detecting commitlint config, proceeding without commitlint validation."
-          )
+            "Warning: Error detecting commitlint config, proceeding without commitlint validation.",
+          ),
         );
       }
 
@@ -67,7 +85,7 @@ export const commitCommand = async (
       if (hasCommitlint) {
         try {
           console.log(
-            chalk.blue("Validating commit message against commitlint rules...")
+            chalk.blue("Validating commit message against commitlint rules..."),
           );
 
           // Try up to 3 times to get a valid message
@@ -91,8 +109,8 @@ export const commitCommand = async (
                     attempts < MAX_ATTEMPTS
                       ? "Regenerating..."
                       : "Max attempts reached."
-                  }`
-                )
+                  }`,
+                ),
               );
 
               if (validation.errors) {
@@ -105,13 +123,13 @@ export const commitCommand = async (
                 try {
                   commitMessage = await generateCommitMessage(
                     context,
-                    validationErrors
+                    validationErrors,
                   );
                 } catch (error) {
                   console.warn(
                     chalk.yellow(
-                      "Error regenerating message, breaking validation loop."
-                    )
+                      "Error regenerating message, breaking validation loop.",
+                    ),
                   );
                   break;
                 }
@@ -136,14 +154,14 @@ export const commitCommand = async (
 
                 if (action === "abort") {
                   console.log(
-                    chalk.red("Commit aborted due to validation failures.")
+                    chalk.red("Commit aborted due to validation failures."),
                   );
                   process.exit(1);
                 } else if (action === "edit") {
                   options.edit = true; // Force editor to open
                 } else {
                   console.log(
-                    chalk.yellow("Proceeding with invalid message...")
+                    chalk.yellow("Proceeding with invalid message..."),
                   );
                 }
                 break;
@@ -154,13 +172,13 @@ export const commitCommand = async (
           // If there's an error with commitlint validation, continue without it
           console.warn(
             chalk.yellow(
-              "Warning: Error during commitlint validation, proceeding without validation."
-            )
+              "Warning: Error during commitlint validation, proceeding without validation.",
+            ),
           );
           console.warn(
             chalk.gray(
-              "This may be due to an ESM module cycle conflict or missing commitlint dependencies."
-            )
+              "This may be due to an ESM module cycle conflict or missing commitlint dependencies.",
+            ),
           );
         }
       }
@@ -173,7 +191,7 @@ export const commitCommand = async (
     } catch (error) {
       console.error(
         chalk.red("Error:"),
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       );
       process.exit(1);
     }
@@ -238,27 +256,31 @@ export const commitCommand = async (
         const validation = await validateCommitMessage(commitMessage);
         if (!validation.valid) {
           console.log(
-            chalk.yellow("Warning: the commit message has validation issues."),
+            chalk.yellow(
+              "Warning: Edited message still has validation issues.",
+            ),
           );
           if (validation.errors) console.log(chalk.gray(validation.errors));
         }
       }
-    } catch {
-      // Never block the commit on a validation hiccup.
+    } catch (error) {
+      // If validation fails, just warn and continue
+      console.warn(
+        chalk.yellow("Could not validate edited message, proceeding anyway."),
+      );
     }
   }
 
-  // Forward any unknown flags (e.g. --allow-empty, --amend) straight to git.
-  // Commander collects those in command.args, not in the typed `options`.
-  const passthroughArgs = command?.args ?? [];
-
   try {
-    git.commit(commitMessage, passthroughArgs);
+    // @ts-ignore
+    // TODO: Fix the args here. Because implicitly, the args also pass the initial command,
+    // so if they're passed altogether, git will get additional `commit`
+    git.commit(commitMessage, args);
     console.log(chalk.green("✓ Changes committed successfully"));
   } catch (error) {
     console.error(
       chalk.red("Error:"),
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
     process.exit(1);
   }

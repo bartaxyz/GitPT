@@ -22,7 +22,7 @@ program
 program
   .command("setup")
   .description(
-    "Configure GitPT with your OpenRouter API key and model selection"
+    "Configure GitPT with your OpenRouter API key and model selection",
   )
   .option("--provider <id>", "Provider id (local, openrouter, openai, anthropic, apple)")
   .option("--model <id>", "Model id")
@@ -32,7 +32,9 @@ program
 
 program
   .command("config")
-  .description("Configure GitPT with your OpenRouter API key and model selection")
+  .description(
+    "Configure GitPT with your OpenRouter API key and model selection",
+  )
   .action(configCommand);
 
 program
@@ -42,7 +44,9 @@ program
 
 program
   .command("reset")
-  .description("Reset GitPT configuration (clears provider, model, and API key)")
+  .description(
+    "Reset GitPT configuration (clears provider, model, and API key)",
+  )
   .option("-y, --yes", "Skip the confirmation prompt")
   .action(resetCommand);
 
@@ -52,11 +56,12 @@ program
   .description("Generate AI-powered commit message based on staged changes")
   .option(
     "-m, --message <message>",
-    "use provided message instead of generating one"
+    "use provided message instead of generating one",
   )
   .option("-e, --edit", "edit the message after generation")
   .option("--no-edit", "do not edit the message after generation")
   .option("--dry-run", "generate and print the message but do not commit")
+  .option("--allow-empty")
   .allowUnknownOption(true) // Pass through other git commit options
   .allowExcessArguments(true) // ...including bare flags like --allow-empty
   .action(commitCommand);
@@ -93,7 +98,7 @@ async function main() {
   } catch (error) {
     console.error(
       chalk.red("Error:"),
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
     process.exit(1);
   }
