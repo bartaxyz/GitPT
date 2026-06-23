@@ -6,6 +6,7 @@ import { Command } from "commander";
 import packageJSON from "../package.json" with { type: "json" };
 import { commitCommand } from "./commands/commit/index.js";
 import { configCommand } from "./commands/config.js";
+import { reviewCommand } from "./commands/review/index.js";
 import { modelCommand } from "./commands/model.js";
 import { prCreateCommand } from "./commands/pr/index.js";
 import { resetCommand } from "./commands/reset.js";
@@ -67,6 +68,11 @@ program
   .option("--no-edit", "Skip editing PR details")
   .allowUnknownOption(true)
   .action(prCreateCommand);
+
+program
+  .command("review")
+  .description("AI review of your staged changes (experimental)")
+  .action(reviewCommand);
 
 // Handle unknown commands by passing them to git
 program.on("command:*", () => {
