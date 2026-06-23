@@ -10,3 +10,11 @@ test("appends /v1 when it is missing", () => {
 test("leaves the URL unchanged when it already ends with /v1", () => {
   assert.strictEqual(formatBaseURL("https://host/v1"), "https://host/v1");
 });
+
+test("trims a trailing slash before appending /v1", () => {
+  assert.strictEqual(formatBaseURL("https://host/"), "https://host/v1");
+});
+
+test("trims a trailing slash when /v1 is already present", () => {
+  assert.strictEqual(formatBaseURL("https://host/v1/"), "https://host/v1");
+});

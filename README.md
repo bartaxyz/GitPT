@@ -1,207 +1,66 @@
 # GitPT
 
-Git Prompt Tool is a CLI tool that helps you write commit messages using AI through [OpenRouter](https://openrouter.ai/) or a local LLM. It acts as a complete git wrapper, enhancing specific commands with AI while passing through all other git commands directly.
+GitPT (Git Prompt Tool) is a git command alias that writes your commit messages with an LLM, built for on-device models. Use it anywhere you use git: every command it doesn't change passes straight through, so you can replace git with it and lose nothing. The one command that changes is `commit`, which writes the message for you.
 
-## Features
+Big remote models already write commits fine. The harder case is the small local model on your machine (Apple's Foundation Models, Ollama, LM Studio), which holds only a few thousand tokens. A real diff is much larger, so GitPT summarizes it file by file until it fits the model's context window, then writes the message from that summary. Remote APIs (OpenAI, Anthropic, OpenRouter) work too.
 
-- Acts as a complete git replacement - all git commands are supported
-- Generate commit messages with AI based on your code changes
+![GitPT generating a commit message](assets/demo.gif)
 
-  `gitpt commit`
-- Create pull requests with AI-generated titles and descriptions
+<sub>The diff is summarized to fit the model's context window before the message is written.</sub>
 
-  `gitpt pr create`
-- Compatible with all regular git options (flags, arguments, etc.)
-- Edit suggested messages before committing
-- Works with various AI models via OpenRouter
-- Support for local LLMs with OpenAI-compatible API
-- Support for Apple Foundation Models on-device (macOS 27+, no API key required)
-- [Commitlint](https://commitlint.js.org/) support - read directly from your repository
+> **New: Apple Foundation Models.** On macOS 27 and later, GitPT runs on Apple's built-in on-device model. No API key, no signup, nothing leaves your Mac. Run `gitpt setup` and choose Apple Foundation Models.
 
-## Installation
+## Install
 
 ```bash
-# Install globally
 npm install -g gitpt
-
-# Or use npx
-npx gitpt
 ```
 
-## Set up
-
-To configure GitPT with your OpenRouter API key and select a model:
+## Setup
 
 ```bash
-gitpt setup
+gitpt setup     # pick a model
 ```
 
-This will guide you through:
-1. Entering your OpenRouter API key
-2. Selecting an AI model from popular options or specifying a custom one
-
-_It's recommended using small models, such as `openai/gpt-4.1-mini` as your model choice. Mainly due to its large context window, fast response times & cost-effective pricing._
-
-
-You'll need an [OpenRouter](https://openrouter.ai/) account to get an API key.
-
-## Usage
-
-### Using GitPT as a Complete Git Replacement
-
-GitPT can be used as a direct replacement for git - any git command can be run through GitPT:
+Optional: alias git so GitPT runs everywhere you already type git.
 
 ```bash
-# Standard git commands work exactly the same
-gitpt status
-gitpt log
-gitpt branch
-gitpt checkout -b new-feature
-gitpt push origin main
-
-# GitPT passes all arguments and options to git
-gitpt log --oneline --graph
-gitpt merge --no-ff feature-branch
+alias git=gitpt
 ```
 
-### Adding Files
+## Use
 
-Add files to the staging area just like you would with git:
+With plain git, you write the message yourself:
 
 ```bash
-# Same as git add . (supports all the regular git add options)
+git add .
+git commit -m "fix: handle empty staged diff"   # you write the message
+```
+
+With GitPT, you don't:
+
+```bash
 gitpt add .
+gitpt commit                                    # GitPT writes it from the diff
 ```
 
-### Creating Commits
+`gitpt commit` reads your staged diff, writes the message, and opens it in your editor. Save and close to commit.
 
-Generate an AI-powered commit message based on your staged changes:
+## Commands
 
-```bash
-gitpt commit
+- `gitpt commit`: write a commit message from staged changes. Respects `-m` and your commitlint rules.
+- `gitpt model`: pick or switch the model. Each provider keeps its own key.
+- `gitpt setup` / `gitpt config` / `gitpt reset`: configure, show, or clear settings.
+- `gitpt pr create`: draft a pull request title and description with the `gh` CLI (experimental).
 
-# Or supply -m argument, if you want to avoid gitpt generating the message
-gitpt commit -m "feat: file hash validation"
+## Models
 
-# Pass any other git commit options
-gitpt commit --amend
-```
+- **On-device**: Apple's Foundation Models on macOS 27 or later (no API key), or any OpenAI-compatible local server such as Ollama or LM Studio.
+- **Remote**: OpenAI, Anthropic, OpenRouter. Bring an API key.
 
-The tool will:
-1. Analyze your staged changes
-2. Generate a commit message using the configured AI model
-3. Validate against commitlint rules (if configured)
-4. Regenerate the message if it fails validation
-5. Show you the suggested message
-6. Let you edit the message before committing
-7. Create the commit with your approved message
+## Requests and bugs
 
-### Changing Models
-
-You can change the AI model at any time:
-
-```bash
-# Select model interactively (either OpenRouter or a local LLM)
-gitpt model
-```
-
-_It's recommended using small models, such as `openai/gpt-4.1-mini` as your model choice. Mainly due to its large context window, fast response times & cost-effective pricing._
-
-#### Using a Local LLM
-
-GitPT works with any local LLM that provides an OpenAI-compatible API endpoint, such as:
-- [Ollama](https://ollama.ai/)
-- [LM Studio](https://lmstudio.ai/)
-- [LocalAI](https://localai.io/)
-- Custom setups with tools like llama.cpp
-
-#### Using Apple Foundation Models
-
-On macOS 27 and later, GitPT can use Apple's on-device Foundation Models through the built-in `fm` CLI — no API key or network connection required. Select **Apple Foundation Models** when running `gitpt setup` or `gitpt model`.
-
-> Note: the on-device model has a small context window (~4096 tokens), so very large diffs may not fit.
-
-## GitHub Usage
-
-If you have GitHub CLI (`gh`) installed, you can use GitPT to interact with GitHub (e.g. generate full pull requests).
-
-### Creating Pull Requests
-
-Generate AI-powered pull request titles and descriptions based on your changes:
-
-```bash
-gitpt pr create
-```
-
-The tool will:
-1. Analyze the commits and files changed since branching from the base branch
-2. Generate a suitable PR title and detailed description
-3. Show you the suggested content
-4. Let you edit the title and description before submission
-5. Create the pull request with your approved content
-
-#### Pull Request Options
-
-```bash
-# Create a draft PR
-gitpt pr create --draft
-
-# Specify a custom base branch
-gitpt pr create --base develop
-
-# Skip editing the PR details
-gitpt pr create --no-edit
-
-# Provide your own title instead of generating one
-gitpt pr create --title "Your PR title here"
-```
-
-## How It Works
-
-GitPT leverages AI to enhance your Git workflow while acting as a complete git wrapper:
-
-- **Command Handling:** GitPT intelligently routes commands - enhanced commands (commit, pr) use AI capabilities while all other git commands are passed directly to git.
-
-- **For commits:** Sends a diff of your staged changes to the AI, which generates a contextual commit message following best practices.
-
-- **Commitlint Integration:** Automatically detects commitlint configuration files and validates generated commit messages against your project's commit conventions. If validation fails, it regenerates a compliant message.
-
-- **For pull requests:** Analyzes the commits and file changes between your branch and the base branch, then generates a suitable title and detailed description for your PR.
-
-- **For other git commands:** Passes them through directly to git with all arguments and options preserved, ensuring complete compatibility with your existing git workflow.
-
-- **Local LLM Support:** Can use locally running LLM servers with OpenAI-compatible APIs instead of cloud-based services, providing privacy and offline capabilities.
-
-## Development
-
-```bash
-# Clone the repository
-git clone https://github.com/bartaxyz/GitPT.git
-cd GitPT
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-
-# Link for local development
-npm link
-```
-
-## Commitlint Integration
-
-GitPT automatically detects and integrates with [commitlint](https://commitlint.js.org/) if it's configured in your repository:
-
-- **Automatic Detection:** GitPT checks for common commitlint configuration files (commitlint.config.js, .commitlintrc.*, etc.)
-
-- **Rule-Aware Generation:** When commitlint is detected, GitPT instructs the AI to generate messages that follow your specific commit conventions
-
-- **Validation & Regeneration:** Generated messages are validated against your commitlint rules before committing. If validation fails, GitPT automatically regenerates a compliant message
-
-- **Error Feedback:** Validation errors are sent to the AI to help it understand how to fix the message
-
-This integration ensures that all AI-generated commit messages follow your team's established commit conventions without requiring manual corrections.
+Want a feature or hit a bug? [Open an issue](https://github.com/bartaxyz/GitPT/issues).
 
 ## License
 
