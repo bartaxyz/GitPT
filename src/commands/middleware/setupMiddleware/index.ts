@@ -7,6 +7,7 @@ import {
   GitPTConfig,
   saveConfig,
   setAcceptedDefault,
+  unsetConfigKey,
 } from "../../../config.js";
 import {
   getProviderClass,
@@ -106,6 +107,13 @@ export const setupMiddleware = async (options?: {
   existingConfig.provider = providerAnswer.provider as NonNullable<
     GitPTConfig["provider"]
   >;
+
+  // Only the local provider manages a context window. Clear any stale value
+  // carried over from a previous provider when switching to another one.
+  if (existingConfig.provider !== "local") {
+    delete existingConfig.contextWindow;
+    unsetConfigKey("contextWindow");
+  }
 
   const spec = getProviderClass(existingConfig.provider);
 
