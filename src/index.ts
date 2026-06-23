@@ -58,6 +58,7 @@ program
   .option("--no-edit", "do not edit the message after generation")
   .option("--dry-run", "generate and print the message but do not commit")
   .allowUnknownOption(true) // Pass through other git commit options
+  .allowExcessArguments(true) // ...including bare flags like --allow-empty
   .action(commitCommand);
 
 program
@@ -70,6 +71,7 @@ program
   .option("-e, --edit", "Edit PR details before submission", true)
   .option("--no-edit", "Skip editing PR details")
   .allowUnknownOption(true)
+  .allowExcessArguments(true)
   .action(prCreateCommand);
 
 // Handle unknown commands by passing them to git
