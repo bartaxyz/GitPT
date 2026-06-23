@@ -61,6 +61,10 @@ export const saveConfig = (newConfig: GitPTConfig): void => {
   }
 };
 
+export const unsetConfigKey = (key: keyof GitPTConfig): void => {
+  config.delete(key);
+};
+
 export const clearConfig = (): void => {
   config.clear();
 };
