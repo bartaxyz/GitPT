@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { getConfig } from "../config.js";
+import { getConfig, isDebug } from "../config.js";
 import { maskApiKey } from "../utils/maskApiKey.js";
 
 export const configCommand = async (): Promise<void> => {
@@ -12,10 +12,15 @@ export const configCommand = async (): Promise<void> => {
     ...config,
   };
 
+  // Diagnostic fields only show in debug mode.
+  const DEBUG_ONLY = new Set(["contextWindow", "debug"]);
+  const debug = isDebug();
+
   // Align values: pad every key to the width of the longest one.
   const labelWidth = Math.max(...Object.keys(entries).map((key) => key.length));
 
   for (const [key, value] of Object.entries(entries)) {
+    if (!debug && DEBUG_ONLY.has(key)) continue;
     let display: string;
     if (key === "apiKeys" && value && typeof value === "object") {
       // apiKeys is a Record<provider, key>: list each provider with a masked key.
