@@ -6,6 +6,11 @@ import { Command } from "commander";
 import packageJSON from "../package.json" with { type: "json" };
 import { commitCommand } from "./commands/commit/index.js";
 import { configCommand } from "./commands/config.js";
+import {
+  hookInstallCommand,
+  hookRunCommand,
+  hookUninstallCommand,
+} from "./commands/hook/index.js";
 import { modelCommand } from "./commands/model.js";
 import { prCreateCommand } from "./commands/pr/index.js";
 import { resetCommand } from "./commands/reset.js";
@@ -77,6 +82,26 @@ program
   .allowUnknownOption(true)
   .allowExcessArguments(true)
   .action(prCreateCommand);
+
+const hook = program
+  .command("hook")
+  .description("Manage the GitPT prepare-commit-msg git hook");
+
+hook
+  .command("install")
+  .description("Install the hook so `git commit` prefills an AI message")
+  .option("-f, --force", "Overwrite an existing prepare-commit-msg hook")
+  .action(hookInstallCommand);
+
+hook
+  .command("uninstall")
+  .description("Remove the GitPT prepare-commit-msg hook")
+  .action(hookUninstallCommand);
+
+hook
+  .command("run <msgFile> [source] [sha]")
+  .description("(internal) called by the installed hook")
+  .action(hookRunCommand);
 
 // Handle unknown commands by passing them to git
 program.on("command:*", () => {
