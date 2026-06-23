@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -44,6 +45,7 @@
     "@types/node": "^22.14.1",
     "@types/node-fetch": "^2.6.12",
     "ffmpeg-static": "^5.3.0",
+    "oxlint": "^1.71.0",
     "pngjs": "^7.0.0",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3",
