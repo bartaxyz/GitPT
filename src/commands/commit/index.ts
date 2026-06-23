@@ -10,6 +10,7 @@ import {
 import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware.js";
 import { generateCommitMessage } from "./generateCommitMessage.js";
 import { prepareCommitContext } from "./summarizeDiff.js";
+import { isAmend, skipsStagedGuard } from "./commitFlags.js";
 
 interface CommitOptions {
     message?: string;
@@ -24,7 +25,30 @@ export const commitCommand = async (
 ): Promise<void> => {
   capabilitiesMiddleware(["git"]);
   await setupMiddleware();
-  hasStagedChangesMiddleware();
+
+  const passthrough = command?.args ?? [];
+  const amend = isAmend(passthrough);
+  const noEdit = options.edit === false;
+
+  // --amend / --allow-empty are valid without staged changes; only guard otherwise.
+  if (!skipsStagedGuard(passthrough)) {
+    hasStagedChangesMiddleware();
+  }
+
+  // `--amend --no-edit` (and no -m): just amend, keep the existing message — no AI.
+  if (amend && noEdit && !options.message) {
+    try {
+      git.commit(null, [...passthrough, "--no-edit"]);
+      console.log(chalk.green("✓ Amended (kept the original message)."));
+    } catch (error) {
+      console.error(
+        chalk.red("Error:"),
+        error instanceof Error ? error.message : String(error),
+      );
+      process.exit(1);
+    }
+    return;
+  }
 
   let commitMessage: string;
 
@@ -33,8 +57,17 @@ export const commitCommand = async (
     commitMessage = options.message;
   } else {
     try {
-      // Get staged changes
-      const diff = git.getStagedChanges();
+      // For --amend, summarise the commit's content (HEAD~1 → index) so even a
+      // plain reword has something to describe; otherwise the staged diff.
+      const diff = amend ? git.getAmendChanges() : git.getStagedChanges();
+      if (!diff.trim()) {
+        console.error(
+          chalk.red(
+            'Error: nothing to summarise. Provide a message with -m "...".',
+          ),
+        );
+        process.exit(1);
+      }
 
       const context = await prepareCommitContext(diff);
 
@@ -235,12 +268,8 @@ export const commitCommand = async (
     }
   }
 
-  // Forward any unknown flags (e.g. --allow-empty, --amend) straight to git.
-  // Commander collects those in command.args, not in the typed `options`.
-  const passthroughArgs = command?.args ?? [];
-
   try {
-    git.commit(commitMessage, passthroughArgs);
+    git.commit(commitMessage, passthrough);
     console.log(chalk.green("✓ Changes committed successfully"));
   } catch (error) {
     console.error(
