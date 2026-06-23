@@ -24,6 +24,10 @@ program
   .description(
     "Configure GitPT with your OpenRouter API key and model selection"
   )
+  .option("--provider <id>", "Provider id (local, openrouter, openai, anthropic, apple)")
+  .option("--model <id>", "Model id")
+  .option("--endpoint <url>", "Custom LLM endpoint (for local)")
+  .option("--api-key <key>", "API key (for providers that need one)")
   .action(setupCommand);
 
 program
