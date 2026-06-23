@@ -18,7 +18,10 @@ interface CommitOptions {
     [key: string]: any;
   }
 
-export const commitCommand = async (options: CommitOptions): Promise<void> => {
+export const commitCommand = async (
+  options: CommitOptions,
+  command?: { args?: string[] },
+): Promise<void> => {
   capabilitiesMiddleware(["git"]);
   await setupMiddleware();
   hasStagedChangesMiddleware();
@@ -232,18 +235,12 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
     }
   }
 
-  // Extract other git options to pass through
-  const gitOptions = Object.keys(options)
-    .filter((key) => !["message", "edit"].includes(key))
-    .map((key) => {
-      if (typeof options[key] === "boolean") {
-        return options[key] ? `--${key}` : `--no-${key}`;
-      }
-      return `--${key}=${options[key]}`;
-    });
+  // Forward any unknown flags (e.g. --allow-empty, --amend) straight to git.
+  // Commander collects those in command.args, not in the typed `options`.
+  const passthroughArgs = command?.args ?? [];
 
   try {
-    git.commit(commitMessage, gitOptions);
+    git.commit(commitMessage, passthroughArgs);
     console.log(chalk.green("✓ Changes committed successfully"));
   } catch (error) {
     console.error(
