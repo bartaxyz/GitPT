@@ -8,3 +8,11 @@ test("appends /v1 when it is missing", () => {
 test("leaves the URL unchanged when it already ends with /v1", () => {
   expect(formatBaseURL("https://host/v1")).toBe("https://host/v1");
 });
+
+test("trims a trailing slash before appending /v1", () => {
+  expect(formatBaseURL("https://host/")).toBe("https://host/v1");
+});
+
+test("trims a trailing slash when /v1 is already present", () => {
+  expect(formatBaseURL("https://host/v1/")).toBe("https://host/v1");
+});
