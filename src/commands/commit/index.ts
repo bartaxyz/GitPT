@@ -24,6 +24,7 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
   hasStagedChangesMiddleware();
 
   let commitMessage: string;
+  let context: string | undefined;
 
   // If message is provided, use that
   if (options.message) {
@@ -33,7 +34,7 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
       // Get staged changes
       const diff = git.getStagedChanges();
 
-      const context = await prepareCommitContext(diff);
+      context = await prepareCommitContext(diff);
 
       console.log(chalk.blue("Generating commit message..."));
 
@@ -179,56 +180,68 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
     return;
   }
 
-  // If edit is true or not specified, prompt user to edit the message
-  if (options.edit !== false) {
-    const answer = await inquirer.prompt([
-      {
-        type: "editor",
-        name: "message",
-        message: "Edit commit message:",
-        default: commitMessage,
-      },
-    ]);
+  // Interactive: confirm the message, regenerate a different one, edit, or
+  // cancel — one menu, looping until the user settles. Skipped for --no-edit
+  // (take the generated message) and -m (the user's own message).
+  if (options.edit !== false && !options.message && context !== undefined) {
+    let confirmed = false;
+    while (!confirmed) {
+      const { action } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "action",
+          message: "Use this commit message?",
+          choices: [
+            { name: "Confirm and commit", value: "confirm" },
+            { name: "Generate another (different wording)", value: "another" },
+            { name: "Edit manually", value: "edit" },
+            { name: "Cancel", value: "cancel" },
+          ],
+        },
+      ]);
 
-    commitMessage = answer.message;
+      if (action === "confirm") {
+        confirmed = true;
+      } else if (action === "another") {
+        commitMessage = (
+          await generateCommitMessage(
+            `${context}\n\nWrite a noticeably different commit message — a fresh wording or angle, not the same as before.`,
+          )
+        ).trim();
+        console.log("");
+        console.log(chalk.cyan("Generated message:"));
+        console.log(commitMessage);
+        console.log("");
+      } else if (action === "edit") {
+        const answer = await inquirer.prompt([
+          {
+            type: "editor",
+            name: "message",
+            message: "Edit commit message:",
+            default: commitMessage,
+          },
+        ]);
+        commitMessage = answer.message;
+        confirmed = true;
+      } else {
+        console.log(chalk.gray("Commit cancelled."));
+        process.exit(0);
+      }
+    }
 
-    // Validate the edited message once
+    // Validate the final message; warn (never block) if it fails commitlint.
     try {
-      const hasCommitlint = hasCommitlintConfig();
-      if (hasCommitlint) {
-        console.log(chalk.blue("Validating edited commit message..."));
+      if (hasCommitlintConfig()) {
         const validation = await validateCommitMessage(commitMessage);
         if (!validation.valid) {
           console.log(
-            chalk.yellow("Warning: Edited message still has validation issues.")
+            chalk.yellow("Warning: the commit message has validation issues."),
           );
-          if (validation.errors) {
-            console.log(chalk.gray(validation.errors));
-          }
-
-          // Ask if user wants to proceed anyway
-          const { proceed } = await inquirer.prompt([
-            {
-              type: "confirm",
-              name: "proceed",
-              message: "Proceed with invalid commit message?",
-              default: false,
-            },
-          ]);
-
-          if (!proceed) {
-            console.log(chalk.red("Commit aborted by user."));
-            process.exit(1);
-          }
-        } else {
-          console.log(chalk.green("✓ Edited message passed validation"));
+          if (validation.errors) console.log(chalk.gray(validation.errors));
         }
       }
-    } catch (error) {
-      // If validation fails, just warn and continue
-      console.warn(
-        chalk.yellow("Could not validate edited message, proceeding anyway.")
-      );
+    } catch {
+      // Never block the commit on a validation hiccup.
     }
   }
 
