@@ -61,9 +61,8 @@ program
   .option("-e, --edit", "edit the message after generation")
   .option("--no-edit", "do not edit the message after generation")
   .option("--dry-run", "generate and print the message but do not commit")
-  .option("--allow-empty")
-  .allowUnknownOption(true) // Pass through other git commit options
-  .allowExcessArguments(true) // ...including bare flags like --allow-empty
+  .allowUnknownOption(true) // pass through git flags like --allow-empty, --amend
+  .allowExcessArguments(true) // ...so bare passthrough flags don't error
   .action(commitCommand);
 
 program
