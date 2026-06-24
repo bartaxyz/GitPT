@@ -24,7 +24,6 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
   hasStagedChangesMiddleware();
 
   let commitMessage: string;
-  // Kept around so "Generate another" can re-run generation with a variation.
   let context: string | undefined;
 
   // If message is provided, use that
