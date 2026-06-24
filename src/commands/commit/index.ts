@@ -10,6 +10,8 @@ import {
 import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware.js";
 import { generateCommitMessage } from "./generateCommitMessage.js";
 import { prepareCommitContext } from "./summarizeDiff.js";
+import type { Command } from "commander";
+import { passthroughArgs } from "../passthroughArgs.js";
 
 interface CommitOptions {
   message?: string;
@@ -18,28 +20,17 @@ interface CommitOptions {
   [key: string]: any;
 }
 
-interface Command {
-  parent?: Command;
-  args?: {
-    allowEmpty: boolean;
-    [key: string]: any;
-  };
-}
-
 export const commitCommand = async (
   options: CommitOptions,
-  command?: Command,
+  command: Command,
 ): Promise<void> => {
   capabilitiesMiddleware(["git"]);
   await setupMiddleware();
 
-  // TODO: Please introduce a separate function, or dive deeper into documentation
-  // about how this works. This is just a quick attempt to make this work, it won't be final
-  const args =
-    (!command?.args || command.args.length === 0
-      ? command?.parent?.args
-      : command?.args) || [];
+  // Git flags the user passed through (e.g. --allow-empty), forwarded to git.
+  const args = passthroughArgs(command);
 
+  // --allow-empty is valid even with nothing staged.
   if (!args.includes("--allow-empty")) {
     hasStagedChangesMiddleware();
   }
@@ -272,9 +263,6 @@ export const commitCommand = async (
   }
 
   try {
-    // @ts-ignore
-    // TODO: Fix the args here. Because implicitly, the args also pass the initial command,
-    // so if they're passed altogether, git will get additional `commit`
     git.commit(commitMessage, args);
     console.log(chalk.green("✓ Changes committed successfully"));
   } catch (error) {
