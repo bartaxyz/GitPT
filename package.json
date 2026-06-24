@@ -21,6 +21,7 @@
     "test:apple": "npm run build && node tests/apple-foundation-models/run.mjs",
     "bench:apple": "npm run build && node tests/apple-foundation-models/benchmark.mjs",
     "bench:local": "npm run build && node tests/local-model/run.mjs",
+    "bench:all": "npm run build && node tests/run-all.mjs",
     "check:prompt": "npm run build && node tests/snapshots/check.mjs",
     "build:demo": "node scripts/build-demo.mjs",
     "prepublishOnly": "npm run build"
