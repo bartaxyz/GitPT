@@ -127,7 +127,7 @@ export const runBenchmark = async ({ label, config }) => {
 
   return withConfig(config, async () => {
     const contextWindow = await getContextWindow();
-    const promptBudget = contextWindow - RESERVED_OUTPUT_TOKENS;
+    const promptBudget = Math.floor((contextWindow - RESERVED_OUTPUT_TOKENS) * 0.9);
     const promptTokens = (context) =>
       countTokens(`${systemPrompt}\n\n${userPrompt(context)}`);
 
