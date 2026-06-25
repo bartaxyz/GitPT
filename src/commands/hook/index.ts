@@ -9,9 +9,9 @@ import { prepareCommitContext } from "../commit/summarizeDiff.js";
 // Marker line so uninstall only ever removes a hook we installed.
 const HOOK_MARKER = "gitpt-hook";
 
-const HOOK_SCRIPT = `#!/bin/sh
+export const HOOK_SCRIPT = `#!/bin/sh
 # ${HOOK_MARKER} (prepare-commit-msg) — managed by GitPT. Remove: gitpt hook uninstall
-gitpt hook run "$1" "$2"
+command -v gitpt >/dev/null 2>&1 && gitpt hook run "$1" "$2" || true
 `;
 
 // Resolve the hooks dir via git so we honour core.hooksPath and worktrees,
