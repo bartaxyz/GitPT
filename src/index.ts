@@ -53,6 +53,7 @@ program
   .option("-e, --edit", "edit the message after generation")
   .option("--no-edit", "do not edit the message after generation")
   .option("--dry-run", "generate and print the message but do not commit")
+  .option("--debug", "show diagnostics (tokens, latency) for this run")
   .allowUnknownOption(true) // Pass through other git commit options
   .action(commitCommand);
 

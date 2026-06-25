@@ -68,10 +68,18 @@ export const saveConfig = (newConfig: GitPTConfig): void => {
   }
 };
 
+/** Env proměnná je "zapnuto" pro libovolnou non-empty hodnotu kromě
+ *  explicitně vypínajících ("0", "false", "no", "off"). */
+export const isTruthyEnv = (value: string | undefined): boolean => {
+  if (!value) return false;
+  const v = value.trim().toLowerCase();
+  return v !== "" && !["0", "false", "no", "off"].includes(v);
+};
+
 /** Debug mode: extra diagnostics (tokens, latency). Off by default; on via
- *  the `debug` config flag or the GITPT_DEBUG=1 env var. */
+ *  the `debug` config flag, the GITPT_DEBUG env var, or `--debug`. */
 export const isDebug = (): boolean =>
-  getConfig().debug === true || process.env.GITPT_DEBUG === "1";
+  getConfig().debug === true || isTruthyEnv(process.env.GITPT_DEBUG);
 
 export const unsetConfigKey = (key: keyof GitPTConfig): void => {
   config.delete(key);

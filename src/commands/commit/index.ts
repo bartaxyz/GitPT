@@ -16,10 +16,13 @@ interface CommitOptions {
     message?: string;
     edit?: boolean;
     dryRun?: boolean;
+    debug?: boolean;
     [key: string]: any;
   }
 
 export const commitCommand = async (options: CommitOptions): Promise<void> => {
+  // --debug zapne diagnostiku pro tento běh (isDebug() pak čte GITPT_DEBUG).
+  if (options.debug) process.env.GITPT_DEBUG = "1";
   capabilitiesMiddleware(["git"]);
   await setupMiddleware();
   hasStagedChangesMiddleware();
