@@ -1,15 +1,13 @@
-import { test } from "node:test";
-import assert from "node:assert";
-
-import { DEBUG_ONLY } from "../../dist/commands/config.js";
+import { test, expect } from "vitest";
+import { DEBUG_ONLY } from "../../src/commands/config.js";
 
 // `gitpt config` schovává v normálním režimu jen pole z DEBUG_ONLY.
 // Hlídáme, že tam contextWindow NENÍ (je to reálné uživatelské nastavení).
 
 test("contextWindow se zobrazuje i mimo debug (není v DEBUG_ONLY)", () => {
-  assert.ok(!DEBUG_ONLY.has("contextWindow"));
+  expect(DEBUG_ONLY.has("contextWindow")).toBe(false);
 });
 
 test("debug zůstává jen pro debug mód", () => {
-  assert.ok(DEBUG_ONLY.has("debug"));
+  expect(DEBUG_ONLY.has("debug")).toBe(true);
 });
