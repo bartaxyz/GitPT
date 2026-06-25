@@ -1,11 +1,11 @@
 import ora from "ora";
 import { getProvider } from "../../llm/registry.js";
 import { countTokens } from "../../llm/tokenCount.js";
+import { fitBudget } from "../../llm/budget.js";
 import { summarySystemPrompt, summaryUserPrompt } from "./context/summaryPrompt.js";
 import { systemPrompt } from "./context/systemPrompt.js";
 import { userPrompt } from "./context/userPrompt.js";
 
-const MARGIN = 0.9;
 const MAX_REDUCE_PASSES = 3;
 
 const LOW_SIGNAL_PATTERNS: Array<{ test: RegExp; note: string }> = [
@@ -141,8 +141,8 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
   const window = await getProvider().getContextWindow();
   if (!Number.isFinite(window)) return diff;
 
-  const fitBudget = Math.floor((window - reserved) * MARGIN);
-  if (finalPromptTokens(diff) <= fitBudget) return diff;
+  const promptBudget = fitBudget(window, reserved);
+  if (finalPromptTokens(diff) <= promptBudget) return diff;
 
   const spinner = ora({ text: "Analyzing diff size..." }).start();
 
@@ -165,9 +165,7 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
     const summaryOverhead = countTokens(
       `${summarySystemPrompt}\n\n${summaryUserPrompt("")}`
     );
-    const chunkBudget = Math.floor(
-      (window - reserved - summaryOverhead) * MARGIN
-    );
+    const chunkBudget = fitBudget(window, reserved + summaryOverhead);
 
     const chunks = packChunks(sourceBlocks, chunkBudget);
     const condensedNote = lowSignalLines.length
@@ -188,7 +186,7 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
     const framed = () => `${header}\n${combined}`;
 
     let pass = 0;
-    while (finalPromptTokens(framed()) > fitBudget && pass < MAX_REDUCE_PASSES) {
+    while (finalPromptTokens(framed()) > promptBudget && pass < MAX_REDUCE_PASSES) {
       pass++;
       const lineBlocks: Block[] = combined
         .split("\n")
@@ -208,9 +206,9 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
       combined = reduced.filter(Boolean).join("\n");
     }
 
-    if (finalPromptTokens(framed()) > fitBudget) {
+    if (finalPromptTokens(framed()) > promptBudget) {
       const headerTokens = countTokens(`${systemPrompt}\n\n${userPrompt(`${header}\n`)}`);
-      combined = truncateToBudget("summary", combined, fitBudget - headerTokens);
+      combined = truncateToBudget("summary", combined, promptBudget - headerTokens);
     }
 
     spinner.succeed(

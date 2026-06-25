@@ -114,8 +114,10 @@ export const runBenchmark = async ({ label, config }) => {
   const { generateCommitMessage } = await importDist(
     "commands/commit/generateCommitMessage.js",
   );
-  const { countTokens, getContextWindow, RESERVED_OUTPUT_TOKENS } =
+  const { countTokens, getContextWindow } =
     await importDist("llm/tokenCount.js");
+  const { fitBudget } = await importDist("llm/budget.js");
+  const { getProvider } = await importDist("llm/registry.js");
   const { systemPrompt } = await importDist(
     "commands/commit/context/systemPrompt.js",
   );
@@ -127,7 +129,7 @@ export const runBenchmark = async ({ label, config }) => {
 
   return withConfig(config, async () => {
     const contextWindow = await getContextWindow();
-    const promptBudget = Math.floor((contextWindow - RESERVED_OUTPUT_TOKENS) * 0.9);
+    const promptBudget = fitBudget(contextWindow, getProvider().maxOutputTokens);
     const promptTokens = (context) =>
       countTokens(`${systemPrompt}\n\n${userPrompt(context)}`);
 
