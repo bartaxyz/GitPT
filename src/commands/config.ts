@@ -2,6 +2,10 @@ import chalk from "chalk";
 import { getConfig, isDebug } from "../config.js";
 import { maskApiKey } from "../utils/maskApiKey.js";
 
+// Pole, která se ukazují jen v debug módu. `contextWindow` je reálné uživatelské
+// nastavení (lokální provider si ho sám ukládá), takže musí zůstat vidět normálně.
+export const DEBUG_ONLY = new Set(["debug"]);
+
 export const configCommand = async (): Promise<void> => {
   console.log(chalk.blue("GitPT Configuration"));
 
@@ -12,8 +16,6 @@ export const configCommand = async (): Promise<void> => {
     ...config,
   };
 
-  // Diagnostic fields only show in debug mode.
-  const DEBUG_ONLY = new Set(["contextWindow", "debug"]);
   const debug = isDebug();
 
   // Align values: pad every key to the width of the longest one.
