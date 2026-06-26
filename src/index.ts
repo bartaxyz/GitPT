@@ -23,13 +23,19 @@ program
 program
   .command("setup")
   .description(
-    "Configure GitPT with your OpenRouter API key and model selection"
+    "Configure GitPT with your OpenRouter API key and model selection",
   )
+  .option("--provider <id>", "Provider id (local, openrouter, openai, anthropic, apple)")
+  .option("--model <id>", "Model id")
+  .option("--endpoint <url>", "Custom LLM endpoint (for local)")
+  .option("--api-key <key>", "API key (for providers that need one)")
   .action(setupCommand);
 
 program
   .command("config")
-  .description("Configure GitPT with your OpenRouter API key and model selection")
+  .description(
+    "Configure GitPT with your OpenRouter API key and model selection",
+  )
   .action(configCommand);
 
 program
@@ -39,7 +45,9 @@ program
 
 program
   .command("reset")
-  .description("Reset GitPT configuration (clears provider, model, and API key)")
+  .description(
+    "Reset GitPT configuration (clears provider, model, and API key)",
+  )
   .option("-y, --yes", "Skip the confirmation prompt")
   .action(resetCommand);
 
@@ -49,12 +57,13 @@ program
   .description("Generate AI-powered commit message based on staged changes")
   .option(
     "-m, --message <message>",
-    "use provided message instead of generating one"
+    "use provided message instead of generating one",
   )
   .option("-e, --edit", "edit the message after generation")
   .option("--no-edit", "do not edit the message after generation")
   .option("--dry-run", "generate and print the message but do not commit")
-  .allowUnknownOption(true) // Pass through other git commit options
+  .allowUnknownOption(true) // pass through git flags like --allow-empty, --amend
+  .allowExcessArguments(true) // ...so bare passthrough flags don't error
   .action(commitCommand);
 
 program
@@ -67,6 +76,7 @@ program
   .option("-e, --edit", "Edit PR details before submission", true)
   .option("--no-edit", "Skip editing PR details")
   .allowUnknownOption(true)
+  .allowExcessArguments(true)
   .action(prCreateCommand);
 
 program
@@ -93,7 +103,7 @@ async function main() {
   } catch (error) {
     console.error(
       chalk.red("Error:"),
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
     process.exit(1);
   }
