@@ -1,6 +1,7 @@
 import { executeGitAdd } from "./executeGitAdd.js";
 import { executeGitCommit } from "./executeGitCommit.js";
 import { getChangedFiles } from "./getChangedFiles.js";
+import { getAmendChanges } from "./getAmendChanges.js";
 import { getCommitsSinceBaseBranch } from "./getCommitsSinceBaseBranch.js";
 import { getCurrentBranch } from "./getCurrentBranch.js";
 import { getDefaultBranch } from "./getDefaultBranch.js";
@@ -13,6 +14,7 @@ import { isGitRepository } from "./isGitRepository.js";
 export const git = {
   add: executeGitAdd,
   commit: executeGitCommit,
+  getAmendChanges,
   getChangedFiles,
   getCommitsSinceBaseBranch,
   getCurrentBranch,

@@ -11,6 +11,7 @@ import {
 import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware.js";
 import { generateCommitMessage } from "./generateCommitMessage.js";
 import { prepareCommitContext } from "./summarizeDiff.js";
+import { isAmend, skipsStagedGuard } from "./commitFlags.js";
 import type { Command } from "commander";
 import { passthroughArgs } from "../passthroughArgs.js";
 
@@ -31,12 +32,37 @@ export const commitCommand = async (
   capabilitiesMiddleware(["git"]);
   await setupMiddleware();
 
-  // Git flags the user passed through (e.g. --allow-empty), forwarded to git.
-  const args = passthroughArgs(command);
+  const passthrough = passthroughArgs(command);
+  const amend = isAmend(passthrough);
+  const noEdit = options.edit === false;
 
-  // --allow-empty is valid even with nothing staged.
-  if (!args.includes("--allow-empty")) {
+  // --amend / --allow-empty are valid without staged changes; only guard otherwise.
+  if (!skipsStagedGuard(passthrough)) {
     hasStagedChangesMiddleware();
+  }
+
+  // `--amend --no-edit` (and no -m): just amend, keep the existing message — no AI.
+  if (amend && noEdit && !options.message) {
+    // --dry-run must win before we actually amend (otherwise it amends anyway).
+    if (options.dryRun) {
+      console.log(
+        chalk.yellow(
+          "[dry-run] Would amend the last commit (keeping its message). Nothing changed.",
+        ),
+      );
+      return;
+    }
+    try {
+      git.commit(null, [...passthrough, "--no-edit"]);
+      console.log(chalk.green("✓ Amended (kept the original message)."));
+    } catch (error) {
+      console.error(
+        chalk.red("Error:"),
+        error instanceof Error ? error.message : String(error),
+      );
+      process.exit(1);
+    }
+    return;
   }
 
   let commitMessage: string;
@@ -47,8 +73,17 @@ export const commitCommand = async (
     commitMessage = options.message;
   } else {
     try {
-      // Get staged changes
-      const diff = git.getStagedChanges();
+      // For --amend, summarise the commit's content (HEAD~1 → index) so even a
+      // plain reword has something to describe; otherwise the staged diff.
+      const diff = amend ? git.getAmendChanges() : git.getStagedChanges();
+      if (!diff.trim()) {
+        console.error(
+          chalk.red(
+            'Error: nothing to summarise. Provide a message with -m "...".',
+          ),
+        );
+        process.exit(1);
+      }
 
       context = await prepareCommitContext(diff);
 
@@ -275,7 +310,7 @@ export const commitCommand = async (
   }
 
   try {
-    git.commit(commitMessage, args);
+    git.commit(commitMessage, passthrough);
     console.log(chalk.green("✓ Changes committed successfully"));
   } catch (error) {
     console.error(
