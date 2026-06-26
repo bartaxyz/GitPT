@@ -1,13 +1,13 @@
 import { test, expect } from "vitest";
 import { HOOK_SCRIPT } from "../../src/commands/hook/index.js";
 
-// Hook se spouští před KAŽDÝM commitem. Když by selhal, git commit zruší.
-// Tyhle testy hlídají, že nainstalovaný hook commit nikdy nezablokuje.
+// The hook runs before EVERY commit. If it fails, git aborts the commit.
+// These tests guard that the installed hook never blocks a commit.
 
-test("hook nikdy nezablokuje commit (končí na || true)", () => {
+test("hook never blocks a commit (ends with || true)", () => {
   expect(HOOK_SCRIPT).toContain("|| true");
 });
 
-test("gitpt se spustí jen když je v PATH (command -v gitpt)", () => {
+test("gitpt only runs when it's on PATH (command -v gitpt)", () => {
   expect(HOOK_SCRIPT).toContain("command -v gitpt");
 });
