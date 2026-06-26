@@ -6,6 +6,7 @@ import { Command } from "commander";
 import packageJSON from "../package.json" with { type: "json" };
 import { commitCommand } from "./commands/commit/index.js";
 import { configCommand } from "./commands/config.js";
+import { reviewCommand } from "./commands/review/index.js";
 import {
   hookInstallCommand,
   hookRunCommand,
@@ -29,7 +30,10 @@ program
   .description(
     "Configure GitPT with your OpenRouter API key and model selection",
   )
-  .option("--provider <id>", "Provider id (local, openrouter, openai, anthropic, apple)")
+  .option(
+    "--provider <id>",
+    "Provider id (local, openrouter, openai, anthropic, apple)",
+  )
   .option("--model <id>", "Model id")
   .option("--endpoint <url>", "Custom LLM endpoint (for local)")
   .option("--api-key <key>", "API key (for providers that need one)")
@@ -82,6 +86,11 @@ program
   .allowUnknownOption(true)
   .allowExcessArguments(true)
   .action(prCreateCommand);
+
+program
+  .command("review")
+  .description("AI review of your staged changes (experimental)")
+  .action(reviewCommand);
 
 const hook = program
   .command("hook")
