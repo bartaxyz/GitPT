@@ -7,6 +7,11 @@ import packageJSON from "../package.json" with { type: "json" };
 import { commitCommand } from "./commands/commit/index.js";
 import { configCommand } from "./commands/config.js";
 import { reviewCommand } from "./commands/review/index.js";
+import {
+  hookInstallCommand,
+  hookRunCommand,
+  hookUninstallCommand,
+} from "./commands/hook/index.js";
 import { modelCommand } from "./commands/model.js";
 import { prCreateCommand } from "./commands/pr/index.js";
 import { resetCommand } from "./commands/reset.js";
@@ -25,7 +30,10 @@ program
   .description(
     "Configure GitPT with your OpenRouter API key and model selection",
   )
-  .option("--provider <id>", "Provider id (local, openrouter, openai, anthropic, apple)")
+  .option(
+    "--provider <id>",
+    "Provider id (local, openrouter, openai, anthropic, apple)",
+  )
   .option("--model <id>", "Model id")
   .option("--endpoint <url>", "Custom LLM endpoint (for local)")
   .option("--api-key <key>", "API key (for providers that need one)")
@@ -83,6 +91,26 @@ program
   .command("review")
   .description("AI review of your staged changes (experimental)")
   .action(reviewCommand);
+
+const hook = program
+  .command("hook")
+  .description("Manage the GitPT prepare-commit-msg git hook");
+
+hook
+  .command("install")
+  .description("Install the hook so `git commit` prefills an AI message")
+  .option("-f, --force", "Overwrite an existing prepare-commit-msg hook")
+  .action(hookInstallCommand);
+
+hook
+  .command("uninstall")
+  .description("Remove the GitPT prepare-commit-msg hook")
+  .action(hookUninstallCommand);
+
+hook
+  .command("run <msgFile> [source] [sha]")
+  .description("(internal) called by the installed hook")
+  .action(hookRunCommand);
 
 // Handle unknown commands by passing them to git
 program.on("command:*", () => {

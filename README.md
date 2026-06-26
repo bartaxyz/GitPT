@@ -46,12 +46,20 @@ gitpt commit                                    # GitPT writes it from the diff
 
 `gitpt commit` reads your staged diff, writes the message, and opens it in your editor. Save and close to commit.
 
+### Through plain `git commit`
+
+Prefer typing `git commit`? Two ways:
+
+- **Shell alias** — add `alias git=gitpt` to your shell rc, then `git commit` runs GitPT.
+- **Git hook** — run `gitpt hook install` once. A normal `git commit` (without `-m`) then opens your editor prefilled with an AI-generated message. It steps aside for `-m`, merges, squashes, and amends, and never blocks a commit if generation fails. Remove it with `gitpt hook uninstall`.
+
 ## Commands
 
 - `gitpt commit`: write a commit message from staged changes. Respects `-m` and your commitlint rules.
 - `gitpt model`: pick or switch the model. Each provider keeps its own key.
 - `gitpt setup` / `gitpt config` / `gitpt reset`: configure, show, or clear settings.
 - `gitpt pr create`: draft a pull request title and description with the `gh` CLI (experimental).
+- `gitpt hook install` / `gitpt hook uninstall`: use GitPT through a plain `git commit` via a `prepare-commit-msg` hook.
 
 ## Models
 
