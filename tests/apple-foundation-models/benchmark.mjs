@@ -44,7 +44,7 @@ const QUALITY = ["type", "mention"];
 const CONCURRENCY = Math.max(1, Number(process.env.BENCH_CONCURRENCY) || 6);
 
 const pool = async (items, limit, fn) => {
-  const out = new Array(items.length);
+  const out = Array.from({ length: items.length });
   let next = 0;
   const worker = async () => {
     while (next < items.length) {
