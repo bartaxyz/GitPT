@@ -10,6 +10,7 @@ export interface GitPTConfig {
   apiKey?: string;
   apiKeys?: Record<string, string>;
   contextWindow?: number;
+  debug?: boolean;
 }
 
 export const getConfig = (): GitPTConfig => {
@@ -20,6 +21,7 @@ export const getConfig = (): GitPTConfig => {
     const apiKey = config.get("apiKey");
     const apiKeys = config.get("apiKeys");
     const contextWindow = config.get("contextWindow");
+    const debug = config.get("debug");
 
     return {
       provider,
@@ -28,6 +30,7 @@ export const getConfig = (): GitPTConfig => {
       apiKey,
       apiKeys,
       contextWindow,
+      debug,
     };
   } catch (error) {
     console.error(chalk.red("Error reading configuration:"), error);
@@ -59,7 +62,24 @@ export const saveConfig = (newConfig: GitPTConfig): void => {
   if (newConfig.contextWindow !== undefined) {
     config.set("contextWindow", newConfig.contextWindow);
   }
+
+  if (newConfig.debug !== undefined) {
+    config.set("debug", newConfig.debug);
+  }
 };
+
+/** Env proměnná je "zapnuto" pro libovolnou non-empty hodnotu kromě
+ *  explicitně vypínajících ("0", "false", "no", "off"). */
+export const isTruthyEnv = (value: string | undefined): boolean => {
+  if (!value) return false;
+  const v = value.trim().toLowerCase();
+  return v !== "" && !["0", "false", "no", "off"].includes(v);
+};
+
+/** Debug mode: extra diagnostics (tokens, latency). Off by default; on via
+ *  the `debug` config flag, the GITPT_DEBUG env var, or `--debug`. */
+export const isDebug = (): boolean =>
+  getConfig().debug === true || isTruthyEnv(process.env.GITPT_DEBUG);
 
 export const unsetConfigKey = (key: keyof GitPTConfig): void => {
   config.delete(key);

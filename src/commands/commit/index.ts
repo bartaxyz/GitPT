@@ -3,6 +3,7 @@ import inquirer from "inquirer";
 import { capabilitiesMiddleware } from "../middleware/capabilitiesMiddleware/index.js";
 import { setupMiddleware } from "../middleware/setupMiddleware/index.js";
 import { git } from "../../services/git/index.js";
+import { isDebug } from "../../config.js";
 import {
   hasCommitlintConfig,
   validateCommitMessage,
@@ -17,6 +18,7 @@ interface CommitOptions {
   message?: string;
   edit?: boolean;
   dryRun?: boolean;
+  debug?: boolean;
   [key: string]: any;
 }
 
@@ -24,6 +26,8 @@ export const commitCommand = async (
   options: CommitOptions,
   command: Command,
 ): Promise<void> => {
+  // --debug zapne diagnostiku pro tento běh (isDebug() pak čte GITPT_DEBUG).
+  if (options.debug) process.env.GITPT_DEBUG = "1";
   capabilitiesMiddleware(["git"]);
   await setupMiddleware();
 
@@ -69,8 +73,16 @@ export const commitCommand = async (
         );
       }
 
-      // Generate first commit message
+      // Generate first commit message (timed for the debug diagnostic).
+      const startedAt = Date.now();
       commitMessage = await generateCommitMessage(context);
+      if (isDebug()) {
+        console.log(
+          chalk.gray(
+            `⚙ debug · ~${Math.ceil(context.length / 3)} context tokens · generated in ${Date.now() - startedAt}ms`,
+          ),
+        );
+      }
 
       // If commitlint is configured, try to validate and regenerate up to 3 times
       if (hasCommitlint) {
