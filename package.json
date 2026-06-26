@@ -14,13 +14,16 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
     "build": "tsc",
-    "test": "npm run typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:apple": "npm run build && node tests/apple-foundation-models/run.mjs",
     "bench:apple": "npm run build && node tests/apple-foundation-models/benchmark.mjs",
+    "bench:local": "npm run build && node tests/local-model/run.mjs",
+    "bench:all": "npm run build && node tests/run-all.mjs",
     "check:prompt": "npm run build && node tests/snapshots/check.mjs",
     "build:demo": "node scripts/build-demo.mjs",
-    "test:unit": "npm run build && node --test tests/unit/*.test.mjs",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -44,9 +47,11 @@
     "@types/node": "^22.14.1",
     "@types/node-fetch": "^2.6.12",
     "ffmpeg-static": "^5.3.0",
+    "oxlint": "^1.71.0",
     "pngjs": "^7.0.0",
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.9"
   },
   "dependencies": {
     "@commitlint/cli": "^19.8.1",

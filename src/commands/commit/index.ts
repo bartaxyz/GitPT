@@ -11,23 +11,36 @@ import {
 import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware.js";
 import { generateCommitMessage } from "./generateCommitMessage.js";
 import { prepareCommitContext } from "./summarizeDiff.js";
+import type { Command } from "commander";
+import { passthroughArgs } from "../passthroughArgs.js";
 
 interface CommitOptions {
-    message?: string;
-    edit?: boolean;
-    dryRun?: boolean;
-    debug?: boolean;
-    [key: string]: any;
-  }
+  message?: string;
+  edit?: boolean;
+  dryRun?: boolean;
+  debug?: boolean;
+  [key: string]: any;
+}
 
-export const commitCommand = async (options: CommitOptions): Promise<void> => {
+export const commitCommand = async (
+  options: CommitOptions,
+  command: Command,
+): Promise<void> => {
   // --debug zapne diagnostiku pro tento běh (isDebug() pak čte GITPT_DEBUG).
   if (options.debug) process.env.GITPT_DEBUG = "1";
   capabilitiesMiddleware(["git"]);
   await setupMiddleware();
-  hasStagedChangesMiddleware();
+
+  // Git flags the user passed through (e.g. --allow-empty), forwarded to git.
+  const args = passthroughArgs(command);
+
+  // --allow-empty is valid even with nothing staged.
+  if (!args.includes("--allow-empty")) {
+    hasStagedChangesMiddleware();
+  }
 
   let commitMessage: string;
+  let context: string | undefined;
 
   // If message is provided, use that
   if (options.message) {
@@ -37,7 +50,7 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
       // Get staged changes
       const diff = git.getStagedChanges();
 
-      const context = await prepareCommitContext(diff);
+      context = await prepareCommitContext(diff);
 
       console.log(chalk.blue("Generating commit message..."));
 
@@ -48,15 +61,15 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
         if (hasCommitlint) {
           console.log(
             chalk.blue(
-              "Commitlint configuration detected. Generating message according to rules..."
-            )
+              "Commitlint configuration detected. Generating message according to rules...",
+            ),
           );
         }
       } catch (error) {
         console.warn(
           chalk.yellow(
-            "Warning: Error detecting commitlint config, proceeding without commitlint validation."
-          )
+            "Warning: Error detecting commitlint config, proceeding without commitlint validation.",
+          ),
         );
       }
 
@@ -75,7 +88,7 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
       if (hasCommitlint) {
         try {
           console.log(
-            chalk.blue("Validating commit message against commitlint rules...")
+            chalk.blue("Validating commit message against commitlint rules..."),
           );
 
           // Try up to 3 times to get a valid message
@@ -99,8 +112,8 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
                     attempts < MAX_ATTEMPTS
                       ? "Regenerating..."
                       : "Max attempts reached."
-                  }`
-                )
+                  }`,
+                ),
               );
 
               if (validation.errors) {
@@ -113,13 +126,13 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
                 try {
                   commitMessage = await generateCommitMessage(
                     context,
-                    validationErrors
+                    validationErrors,
                   );
                 } catch (error) {
                   console.warn(
                     chalk.yellow(
-                      "Error regenerating message, breaking validation loop."
-                    )
+                      "Error regenerating message, breaking validation loop.",
+                    ),
                   );
                   break;
                 }
@@ -144,14 +157,14 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
 
                 if (action === "abort") {
                   console.log(
-                    chalk.red("Commit aborted due to validation failures.")
+                    chalk.red("Commit aborted due to validation failures."),
                   );
                   process.exit(1);
                 } else if (action === "edit") {
                   options.edit = true; // Force editor to open
                 } else {
                   console.log(
-                    chalk.yellow("Proceeding with invalid message...")
+                    chalk.yellow("Proceeding with invalid message..."),
                   );
                 }
                 break;
@@ -162,13 +175,13 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
           // If there's an error with commitlint validation, continue without it
           console.warn(
             chalk.yellow(
-              "Warning: Error during commitlint validation, proceeding without validation."
-            )
+              "Warning: Error during commitlint validation, proceeding without validation.",
+            ),
           );
           console.warn(
             chalk.gray(
-              "This may be due to an ESM module cycle conflict or missing commitlint dependencies."
-            )
+              "This may be due to an ESM module cycle conflict or missing commitlint dependencies.",
+            ),
           );
         }
       }
@@ -181,7 +194,7 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
     } catch (error) {
       console.error(
         chalk.red("Error:"),
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? error.message : String(error),
       );
       process.exit(1);
     }
@@ -191,76 +204,83 @@ export const commitCommand = async (options: CommitOptions): Promise<void> => {
     return;
   }
 
-  // If edit is true or not specified, prompt user to edit the message
-  if (options.edit !== false) {
-    const answer = await inquirer.prompt([
-      {
-        type: "editor",
-        name: "message",
-        message: "Edit commit message:",
-        default: commitMessage,
-      },
-    ]);
+  // Interactive: confirm the message, regenerate a different one, edit, or
+  // cancel — one menu, looping until the user settles. Skipped for --no-edit
+  // (take the generated message) and -m (the user's own message).
+  if (options.edit !== false && !options.message && context !== undefined) {
+    let confirmed = false;
+    while (!confirmed) {
+      const { action } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "action",
+          message: "Use this commit message?",
+          choices: [
+            { name: "Confirm and commit", value: "confirm" },
+            { name: "Generate another (different wording)", value: "another" },
+            { name: "Edit manually", value: "edit" },
+            { name: "Cancel", value: "cancel" },
+          ],
+        },
+      ]);
 
-    commitMessage = answer.message;
+      if (action === "confirm") {
+        confirmed = true;
+      } else if (action === "another") {
+        commitMessage = (
+          await generateCommitMessage(
+            `${context}\n\nWrite a noticeably different commit message — a fresh wording or angle, not the same as before.`,
+          )
+        ).trim();
+        console.log("");
+        console.log(chalk.cyan("Generated message:"));
+        console.log(commitMessage);
+        console.log("");
+      } else if (action === "edit") {
+        const answer = await inquirer.prompt([
+          {
+            type: "editor",
+            name: "message",
+            message: "Edit commit message:",
+            default: commitMessage,
+          },
+        ]);
+        commitMessage = answer.message;
+        confirmed = true;
+      } else {
+        console.log(chalk.gray("Commit cancelled."));
+        process.exit(0);
+      }
+    }
 
-    // Validate the edited message once
+    // Validate the final message; warn (never block) if it fails commitlint.
     try {
-      const hasCommitlint = hasCommitlintConfig();
-      if (hasCommitlint) {
-        console.log(chalk.blue("Validating edited commit message..."));
+      if (hasCommitlintConfig()) {
         const validation = await validateCommitMessage(commitMessage);
         if (!validation.valid) {
           console.log(
-            chalk.yellow("Warning: Edited message still has validation issues.")
+            chalk.yellow(
+              "Warning: Edited message still has validation issues.",
+            ),
           );
-          if (validation.errors) {
-            console.log(chalk.gray(validation.errors));
-          }
-
-          // Ask if user wants to proceed anyway
-          const { proceed } = await inquirer.prompt([
-            {
-              type: "confirm",
-              name: "proceed",
-              message: "Proceed with invalid commit message?",
-              default: false,
-            },
-          ]);
-
-          if (!proceed) {
-            console.log(chalk.red("Commit aborted by user."));
-            process.exit(1);
-          }
-        } else {
-          console.log(chalk.green("✓ Edited message passed validation"));
+          if (validation.errors) console.log(chalk.gray(validation.errors));
         }
       }
     } catch (error) {
       // If validation fails, just warn and continue
       console.warn(
-        chalk.yellow("Could not validate edited message, proceeding anyway.")
+        chalk.yellow("Could not validate edited message, proceeding anyway."),
       );
     }
   }
 
-  // Extract other git options to pass through
-  const gitOptions = Object.keys(options)
-    .filter((key) => !["message", "edit"].includes(key))
-    .map((key) => {
-      if (typeof options[key] === "boolean") {
-        return options[key] ? `--${key}` : `--no-${key}`;
-      }
-      return `--${key}=${options[key]}`;
-    });
-
   try {
-    git.commit(commitMessage, gitOptions);
+    git.commit(commitMessage, args);
     console.log(chalk.green("✓ Changes committed successfully"));
   } catch (error) {
     console.error(
       chalk.red("Error:"),
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
     process.exit(1);
   }
