@@ -15,7 +15,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
-    "build": "tsc",
+    "build": "vite build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:apple": "npm run build && node tests/apple-foundation-models/run.mjs",
@@ -51,6 +51,7 @@
     "pngjs": "^7.0.0",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3",
+    "vite": "^8.1.0",
     "vitest": "^4.1.9"
   },
   "dependencies": {
