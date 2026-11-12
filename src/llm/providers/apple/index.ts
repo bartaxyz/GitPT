@@ -53,6 +53,11 @@ export class AppleProvider extends Provider {
           "No Apple Foundation Models are available in this context. Make sure Apple Intelligence is enabled in System Settings."
         )
       );
+      for (const { model, reason } of probes) {
+        if (reason) {
+          console.error(chalk.red(`${model.name}: ${reason}`));
+        }
+      }
       process.exit(1);
     }
 
