@@ -11,7 +11,12 @@ export interface GitPTConfig {
   apiKeys?: Record<string, string>;
   contextWindow?: number;
   debug?: boolean;
+  summarySystemPromptPath?: string;
+  summaryUserPromptPath?: string;
+  skipFinalSummarization?: boolean;
 }
+
+export const getConfigPath = (): string => config.path;
 
 export const getConfig = (): GitPTConfig => {
   try {
@@ -22,6 +27,9 @@ export const getConfig = (): GitPTConfig => {
     const apiKeys = config.get("apiKeys");
     const contextWindow = config.get("contextWindow");
     const debug = config.get("debug");
+    const summarySystemPromptPath = config.get("summarySystemPromptPath");
+    const summaryUserPromptPath = config.get("summaryUserPromptPath");
+    const skipFinalSummarization = config.get("skipFinalSummarization");
 
     return {
       provider,
@@ -31,6 +39,9 @@ export const getConfig = (): GitPTConfig => {
       apiKeys,
       contextWindow,
       debug,
+      summarySystemPromptPath,
+      summaryUserPromptPath,
+      skipFinalSummarization,
     };
   } catch (error) {
     console.error(chalk.red("Error reading configuration:"), error);
@@ -65,6 +76,18 @@ export const saveConfig = (newConfig: GitPTConfig): void => {
 
   if (newConfig.debug !== undefined) {
     config.set("debug", newConfig.debug);
+  }
+
+  if (newConfig.summarySystemPromptPath !== undefined) {
+    config.set("summarySystemPromptPath", newConfig.summarySystemPromptPath);
+  }
+
+  if (newConfig.summaryUserPromptPath !== undefined) {
+    config.set("summaryUserPromptPath", newConfig.summaryUserPromptPath);
+  }
+
+  if (newConfig.skipFinalSummarization !== undefined) {
+    config.set("skipFinalSummarization", newConfig.skipFinalSummarization);
   }
 };
 

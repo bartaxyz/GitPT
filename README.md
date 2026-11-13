@@ -28,6 +28,113 @@ Optional: alias git so GitPT runs everywhere you already type git.
 alias git=gitpt
 ```
 
+## Config file location
+
+Created when running `gitpt setup`. For individual keys that are not covered by `gitpt setup` (such as the advanced summarization options below), edit `gitpt.json` directly
+
+macOS / Linux `~/.config/configstore/gitpt.json`
+
+Windows	`%USERPROFILE%\.config\configstore\gitpt.json`
+
+## Available keys
+
+| Key | Type | Description |
+| --- | --- | --- |
+| provider | `"openrouter"` \| `"local"` \| `"apple"` \| `"openai"` \| `"anthropic"` | LLM provider. |
+| customLLMEndpoint | `string` | Custom base URL for an OpenAI-compatible endpoint (used with "local" or custom servers). |
+| model | `string` | Model ID, e.g. "openai/gpt-4.1-mini" or a local model name. |
+| apiKey | `string` | API key for the selected remote provider. |
+| apiKeys | `Record<string, string>` | Per-provider API keys, keyed by provider name. |
+| contextWindow | `number` | Manual override for the model's context-window size, in tokens. |
+| debug | `boolean` | Enable verbose logging. |
+| summarySystemPromptPath | `string` | Path to a file whose contents replace the system prompt used when summarizing each diff chunk. Supports `~/` and relative paths. |
+| summaryUserPromptPath | `string` | Path to a file whose contents are used as the user-prompt template for each chunk. Use `{{diff}}` (or `{{chunk}}`) as a placeholder; if omitted, the chunk is appended. |
+| skipFinalSummarization | `boolean` | When true, GitPT stops after the per-file summarization step and emits the change list directly instead of asking the LLM for a single commit message. |
+
+## Examples
+
+### Minimal remote setup
+
+```json
+{
+  "provider": "openrouter",
+  "model": "openai/gpt-4.1-mini",
+  "apiKey": "sk-or-..."
+}
+```
+
+### On-device Apple model (no API key)
+
+```json
+{
+  "provider": "apple",
+  "model": "system"
+}
+```
+
+### Custom OpenAI-compatible endpoint
+
+```json
+{
+  "provider": "local",
+  "customLLMEndpoint": "http://localhost:11434/v1",
+  "model": "llama3.1"
+}
+```
+
+### Custom summarization prompts from files
+
+```json
+{
+  "summarySystemPromptPath": "~/.config/configstore/gitpt-summary-system.md",
+  "summaryUserPromptPath": "~/.config/configstore/gitpt-summary-user.md"
+}
+```
+
+`~/.config/configstore/gitpt-summary-system.md`:
+
+```text
+You are condensing a git diff fragment.
+Output one line per file: <filename>: <summary>
+```
+
+`~/.config/configstore/gitpt-summary-user.md`:
+```text
+Summarize the changes in this diff fragment:
+
+{{diff}}
+```
+
+### Change-list mode (skip final summarization)
+
+```json
+{
+  "skipFinalSummarization": true
+}
+```
+
+With this enabled, gitpt commit produces output like:
+
+```text
+README.md: update install steps;
+src/main.py: handle null userId;
+package.json: bump lodash to 4.17.21
+```
+
+instead of a single commit-message paragraph.
+
+### Multiline prompts
+
+If you prefer to keep prompts inline in `gitpt.json` rather than in separate files, represent line breaks with `\n`:
+
+```json
+{
+  "summarySystemPrompt": "You are condensing a git diff fragment.\nOutput one line per file: <filename>: <summary>"
+}
+```
+
+Using `summarySystemPromptPath` / `summaryUserPromptPath` is usually more convenient because you can edit a normal multi-line file without escaping.
+
 ## Use
 
 With plain git, you write the message yourself:
