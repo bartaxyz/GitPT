@@ -10,10 +10,11 @@ import {
 } from "../../utils/commitlint.js";
 import { hasStagedChangesMiddleware } from "../middleware/hasStagedChangesMiddleware.js";
 import { generateCommitMessage } from "./generateCommitMessage.js";
-import { prepareCommitContext } from "./summarizeDiff.js";
+import { CommitContext, prepareCommitContext } from "./summarizeDiff.js";
 import { isAmend, skipsStagedGuard } from "./commitFlags.js";
 import type { Command } from "commander";
 import { passthroughArgs } from "../passthroughArgs.js";
+import { getConfig } from "../../config.js";
 
 interface CommitOptions {
   message?: string;
@@ -66,7 +67,7 @@ export const commitCommand = async (
   }
 
   let commitMessage: string;
-  let context: string | undefined;
+  let context: CommitContext | undefined;
 
   // If message is provided, use that
   if (options.message) {
@@ -87,137 +88,146 @@ export const commitCommand = async (
 
       context = await prepareCommitContext(diff);
 
-      console.log(chalk.blue("Generating commit message..."));
+      if (getConfig().skipFinalSummarization) {
+        if (context.entries.length === 0) {
+          throw new Error(
+            "GitPT: cannot skip final summarization — no per-file summaries " +
+            "were produced (context window unavailable or empty diff)."
+          );
+        }
+        commitMessage = formatAsChangeList(context.entries);
+      } else {
+        console.log(chalk.blue("Generating commit message..."));
 
-      // Check if commitlint is configured
-      let hasCommitlint = false;
-      try {
-        hasCommitlint = hasCommitlintConfig();
-        if (hasCommitlint) {
-          console.log(
-            chalk.blue(
-              "Commitlint configuration detected. Generating message according to rules...",
+        // Check if commitlint is configured
+        let hasCommitlint = false;
+        try {
+          hasCommitlint = hasCommitlintConfig();
+          if (hasCommitlint) {
+            console.log(
+              chalk.blue(
+                "Commitlint configuration detected. Generating message according to rules...",
+              ),
+            );
+          }
+        } catch (error) {
+          console.warn(
+            chalk.yellow(
+              "Warning: Error detecting commitlint config, proceeding without commitlint validation.",
             ),
           );
         }
-      } catch (error) {
-        console.warn(
-          chalk.yellow(
-            "Warning: Error detecting commitlint config, proceeding without commitlint validation.",
-          ),
-        );
-      }
 
-      // Generate first commit message (timed for the debug diagnostic).
-      const startedAt = Date.now();
-      commitMessage = await generateCommitMessage(context);
-      if (isDebug()) {
-        console.log(
-          chalk.gray(
-            `⚙ debug · ~${Math.ceil(context.length / 3)} context tokens · generated in ${Date.now() - startedAt}ms`,
-          ),
-        );
-      }
-
-      // If commitlint is configured, try to validate and regenerate up to 3 times
-      if (hasCommitlint) {
-        try {
+        // Generate first commit message (timed for the debug diagnostic).
+        const startedAt = Date.now();
+        commitMessage = await generateCommitMessage(context.framed);
+        if (isDebug()) {
           console.log(
-            chalk.blue("Validating commit message against commitlint rules..."),
+            chalk.gray(
+              `⚙ debug · ~${Math.ceil(context.framed.length / 3)} context tokens · generated in ${Date.now() - startedAt}ms`,
+            ),
           );
+        }
 
-          // Try up to 3 times to get a valid message
-          let validMessage = false;
-          let attempts = 0;
-          const MAX_ATTEMPTS = 3;
-          let validationErrors: string | undefined;
+        // If commitlint is configured, try to validate and regenerate up to 3 times
+        if (hasCommitlint) {
+          try {
+            console.log(
+              chalk.blue("Validating commit message against commitlint rules..."),
+            );
 
-          while (!validMessage && attempts < MAX_ATTEMPTS) {
-            const validation = await validateCommitMessage(commitMessage);
+            // Try up to 3 times to get a valid message
+            let validMessage = false;
+            let attempts = 0;
+            const MAX_ATTEMPTS = 3;
+            let validationErrors: string | undefined;
 
-            if (validation.valid) {
-              console.log(chalk.green("✓ Commit message passed validation"));
-              validMessage = true;
-              break;
-            } else {
-              attempts++;
-              console.log(
-                chalk.yellow(
-                  `Commit message failed validation. ${
-                    attempts < MAX_ATTEMPTS
+            while (!validMessage && attempts < MAX_ATTEMPTS) {
+              const validation = await validateCommitMessage(commitMessage);
+
+              if (validation.valid) {
+                console.log(chalk.green("✓ Commit message passed validation"));
+                validMessage = true;
+                break;
+              } else {
+                attempts++;
+                console.log(
+                  chalk.yellow(
+                    `Commit message failed validation. ${attempts < MAX_ATTEMPTS
                       ? "Regenerating..."
                       : "Max attempts reached."
-                  }`,
-                ),
-              );
+                    }`,
+                  ),
+                );
 
-              if (validation.errors) {
-                console.log(chalk.gray(validation.errors));
-                validationErrors = validation.errors;
-              }
+                if (validation.errors) {
+                  console.log(chalk.gray(validation.errors));
+                  validationErrors = validation.errors;
+                }
 
-              if (attempts < MAX_ATTEMPTS) {
-                // Try regenerating with validation errors
-                try {
-                  commitMessage = await generateCommitMessage(
-                    context,
-                    validationErrors,
-                  );
-                } catch (error) {
-                  console.warn(
-                    chalk.yellow(
-                      "Error regenerating message, breaking validation loop.",
-                    ),
-                  );
+                if (attempts < MAX_ATTEMPTS) {
+                  // Try regenerating with validation errors
+                  try {
+                    commitMessage = await generateCommitMessage(
+                      context.framed,
+                      validationErrors,
+                    );
+                  } catch (error) {
+                    console.warn(
+                      chalk.yellow(
+                        "Error regenerating message, breaking validation loop.",
+                      ),
+                    );
+                    break;
+                  }
+                } else {
+                  // Ask user what to do after max attempts
+                  const { action } = await inquirer.prompt([
+                    {
+                      type: "list",
+                      name: "action",
+                      message:
+                        "Failed to generate a valid commit message after 3 attempts. What would you like to do?",
+                      choices: [
+                        {
+                          name: "Proceed with invalid message",
+                          value: "proceed",
+                        },
+                        { name: "Edit message manually", value: "edit" },
+                        { name: "Abort commit", value: "abort" },
+                      ],
+                    },
+                  ]);
+
+                  if (action === "abort") {
+                    console.log(
+                      chalk.red("Commit aborted due to validation failures."),
+                    );
+                    process.exit(1);
+                  } else if (action === "edit") {
+                    options.edit = true; // Force editor to open
+                  } else {
+                    console.log(
+                      chalk.yellow("Proceeding with invalid message..."),
+                    );
+                  }
                   break;
                 }
-              } else {
-                // Ask user what to do after max attempts
-                const { action } = await inquirer.prompt([
-                  {
-                    type: "list",
-                    name: "action",
-                    message:
-                      "Failed to generate a valid commit message after 3 attempts. What would you like to do?",
-                    choices: [
-                      {
-                        name: "Proceed with invalid message",
-                        value: "proceed",
-                      },
-                      { name: "Edit message manually", value: "edit" },
-                      { name: "Abort commit", value: "abort" },
-                    ],
-                  },
-                ]);
-
-                if (action === "abort") {
-                  console.log(
-                    chalk.red("Commit aborted due to validation failures."),
-                  );
-                  process.exit(1);
-                } else if (action === "edit") {
-                  options.edit = true; // Force editor to open
-                } else {
-                  console.log(
-                    chalk.yellow("Proceeding with invalid message..."),
-                  );
-                }
-                break;
               }
             }
+          } catch (error) {
+            // If there's an error with commitlint validation, continue without it
+            console.warn(
+              chalk.yellow(
+                "Warning: Error during commitlint validation, proceeding without validation.",
+              ),
+            );
+            console.warn(
+              chalk.gray(
+                "This may be due to an ESM module cycle conflict or missing commitlint dependencies.",
+              ),
+            );
           }
-        } catch (error) {
-          // If there's an error with commitlint validation, continue without it
-          console.warn(
-            chalk.yellow(
-              "Warning: Error during commitlint validation, proceeding without validation.",
-            ),
-          );
-          console.warn(
-            chalk.gray(
-              "This may be due to an ESM module cycle conflict or missing commitlint dependencies.",
-            ),
-          );
         }
       }
 
@@ -319,4 +329,12 @@ export const commitCommand = async (
     );
     process.exit(1);
   }
+};
+
+export const formatAsChangeList = (entries: string[]): string => {
+  const lines = entries.map(l => l.trim()).filter(l => l.length > 0);
+  if (lines.length === 0) return "";
+  return lines
+    .map((line, i) => (i < lines.length - 1 ? `${line};` : line))
+    .join("\n");
 };

@@ -1,8 +1,15 @@
 import ora from "ora";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { homedir } from "node:os";
+import { getConfig } from "../../config.js";
 import { getProvider } from "../../llm/registry.js";
 import { countTokens } from "../../llm/tokenCount.js";
 import { fitBudget } from "../../llm/budget.js";
-import { summarySystemPrompt, summaryUserPrompt } from "./context/summaryPrompt.js";
+import {
+  summarySystemPrompt as defaultSystemPrompt,
+  summaryUserPrompt   as defaultUserPrompt,
+} from "./context/summaryPrompt.js";
 import { systemPrompt } from "./context/systemPrompt.js";
 import { userPrompt } from "./context/userPrompt.js";
 
@@ -34,6 +41,64 @@ interface Chunk {
   files: string[];
   content: string;
 }
+
+export interface CommitContext {
+  /** Framed context for the final commit-message LLM call (with header). */
+  framed: string;
+  /** Raw per-file summary lines + low-signal notes, header-free. */
+  entries: string[];
+}
+
+/** 
+ * Expand `~/` and resolve relative paths against the CWD. 
+ */
+const resolvePromptPath = (p: string): string => {
+  if (p === "~" || p.startsWith("~/")) {
+    return resolve(homedir(), p.slice(2));
+  }
+  return resolve(p);
+};
+
+const readPromptFile = (path: string): string => {
+  const full = resolvePromptPath(path);
+  try {
+    return readFileSync(full, "utf-8").trim();
+  } catch (err) {
+    throw new Error(
+      `GitPT: could not read prompt file "${path}" (resolved to "${full}"): ${
+        (err as Error).message
+      }`,
+    );
+  }
+};
+
+/**
+ * Load the effective system prompt and user‑prompt template once per run.
+ * Returns `{ system, userTemplate }` where `userTemplate` is `null` when the
+ * default (function) prompt should be used.
+ */
+const loadPrompts = (): { system: string; userTemplate: string | null } => {
+  const cfg = getConfig();
+  const system = cfg.summarySystemPromptPath
+    ? readPromptFile(cfg.summarySystemPromptPath)
+    : defaultSystemPrompt;
+  const userTemplate = cfg.summaryUserPromptPath
+    ? readPromptFile(cfg.summaryUserPromptPath)
+    : null;
+  return { system, userTemplate };
+};
+
+const buildUserPrompt = (template: string | null, content: string): string => {
+  if (template === null) return defaultUserPrompt(content);
+  // Support an optional {{diff}} (or {{chunk}}) placeholder.
+  if (template.includes("{{diff}}") || template.includes("{{chunk}}")) {
+    return template
+      .replaceAll("{{diff}}", content)
+      .replaceAll("{{chunk}}", content);
+  }
+  // No placeholder → append the diff so the file is still self‑contained.
+  return `${template}\n\n${content}`;
+};
 
 const finalPromptTokens = (context: string): number =>
   countTokens(`${systemPrompt}\n\n${userPrompt(context)}`);
@@ -125,24 +190,32 @@ const packChunks = (blocks: Block[], budget: number): Chunk[] => {
   return chunks;
 };
 
-const summarizeChunk = async (content: string): Promise<string> => {
+const summarizeChunk = async (
+  content: string,
+  prompts: { system: string; userTemplate: string | null },
+): Promise<string> => {
   const provider = getProvider();
   const message = await provider.complete({
-    system: summarySystemPrompt,
-    user: summaryUserPrompt(content),
+    system: prompts.system,
+    user: buildUserPrompt(prompts.userTemplate, content),
     maxTokens: provider.maxOutputTokens,
   });
-
   return message.trim();
 };
 
-export const prepareCommitContext = async (diff: string): Promise<string> => {
+export const prepareCommitContext = async (diff: string): Promise<CommitContext> => {
   const reserved = getProvider().maxOutputTokens;
   const window = await getProvider().getContextWindow();
-  if (!Number.isFinite(window)) return diff;
+  if (!Number.isFinite(window)) return { framed: diff, entries: [] };
 
   const promptBudget = fitBudget(window, reserved);
-  if (finalPromptTokens(diff) <= promptBudget) return diff;
+  const skipFinal = getConfig().skipFinalSummarization === true;
+
+  // Only short-circuit when the final LLM call will actually run — otherwise
+  // we still need per-file summaries to emit as a change list.
+  if (!skipFinal && finalPromptTokens(diff) <= promptBudget) {
+    return { framed: diff, entries: [] };
+  }
 
   const spinner = ora({ text: "Analyzing diff size..." }).start();
 
@@ -162,8 +235,11 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
       })
       .filter((line): line is string => line !== null);
 
+    // Load prompts once; use the *actual* prompts (custom or default)
+    // for the summarisation-call overhead calculation.
+    const prompts = loadPrompts();
     const summaryOverhead = countTokens(
-      `${summarySystemPrompt}\n\n${summaryUserPrompt("")}`
+      `${prompts.system}\n\n${prompts.userTemplate ?? defaultUserPrompt("")}`
     );
     const chunkBudget = fitBudget(window, reserved + summaryOverhead);
 
@@ -177,7 +253,7 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       spinner.text = `Summarizing to fit the context window (~${window} tokens) — chunk ${i + 1}/${chunks.length}...`;
-      summaries.push(await summarizeChunk(chunk.content));
+      summaries.push(await summarizeChunk(chunk.content, prompts));
     }
 
     const header = `The lines below are per-file summaries of a single commit. Treat them as one related change and write a commit message describing the overall change (not just one file):`;
@@ -201,13 +277,17 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
       const reduced: string[] = [];
       for (let i = 0; i < reduceChunks.length; i++) {
         spinner.text = `Condensing summary (pass ${pass}, ${i + 1}/${reduceChunks.length})...`;
-        reduced.push(await summarizeChunk(reduceChunks[i].content));
+        reduced.push(await summarizeChunk(reduceChunks[i].content, prompts));
       }
       combined = reduced.filter(Boolean).join("\n");
     }
 
     if (finalPromptTokens(framed()) > promptBudget) {
-      const headerTokens = countTokens(`${systemPrompt}\n\n${userPrompt(`${header}\n`)}`);
+      // Budget against the *final commit-message* prompts, not the
+      // summarisation prompts: systemPrompt + userPrompt + header.
+      const headerTokens = countTokens(
+        `${systemPrompt}\n\n${userPrompt(`${header}\n`)}`
+      );
       combined = truncateToBudget("summary", combined, promptBudget - headerTokens);
     }
 
@@ -215,7 +295,12 @@ export const prepareCommitContext = async (diff: string): Promise<string> => {
       `Summarized ${blocks.length} file(s) to fit the context window: ~${totalTokens} → ~${countTokens(framed())} tokens`
     );
 
-    return framed();
+    const entries = combined
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    return { framed: framed(), entries };
   } catch (error) {
     spinner.fail("Failed to summarize diff");
     throw error;
