@@ -5,9 +5,9 @@ on:
   release:
     types: [published]
 
-# Grant write permissions to the repository contents so we can push version updates
 permissions:
-  contents: write
+  contents: write # Push version updates
+  id-token: write # Authenticate to npm with OIDC
 
 jobs:
   publish:
@@ -26,6 +26,10 @@ jobs:
         with:
           node-version: '22.x'
           registry-url: 'https://registry.npmjs.org'
+
+      # Trusted publishing requires npm 11.5.1 or newer.
+      - name: Update npm
+        run: npm install --global npm@11
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -57,5 +61,3 @@ jobs:
       # Step 7: Publish the new version to npm
       - name: Publish to npm
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
