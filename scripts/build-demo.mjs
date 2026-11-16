@@ -18,6 +18,7 @@ import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import ffmpegPath from "ffmpeg-static";
 import { PNG } from "pngjs";
+import { drawPlaybackSpeed } from "./demo-playback.mjs";
 
 const TAPE = "assets/demo.tape";
 const RAW = "assets/demo.gif";
@@ -88,18 +89,23 @@ try {
     const { wait, top } = isWait(png, prevTop);
     prevTop = top;
     if (wait) {
-      if (waitRun % SPEEDUP === 0) keep.push(frames[i]);
+      if (waitRun % SPEEDUP === 0) keep.push({ frame: frames[i], speed: SPEEDUP });
       waitRun++;
     } else {
       waitRun = 0;
-      keep.push(frames[i]);
+      keep.push({ frame: frames[i], speed: 1 });
     }
   }
   console.log(`Keeping ${keep.length}/${frames.length} frames.`);
 
-  keep.forEach((f, i) =>
-    cpSync(join(framesDir, f), join(cutDir, `f${String(i).padStart(5, "0")}.png`))
-  );
+  keep.forEach(({ frame, speed }, i) => {
+    const png = PNG.sync.read(readFileSync(join(framesDir, frame)));
+    drawPlaybackSpeed(png, speed);
+    writeFileSync(
+      join(cutDir, `f${String(i).padStart(5, "0")}.png`),
+      PNG.sync.write(png)
+    );
+  });
 
   console.log("Encoding final gif...");
   ffmpeg([
