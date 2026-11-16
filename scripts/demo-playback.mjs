@@ -24,6 +24,7 @@ export function renderPlaybackLabels(tape, work, speeds) {
       'Show',
       'Sleep 500ms',
       `Screenshot "${path}.png"`,
+      'Sleep 500ms',
       '',
     ].join("\n"));
     execFileSync("vhs", [`${path}.tape`], { stdio: "inherit" });

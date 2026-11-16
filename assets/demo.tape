@@ -14,8 +14,6 @@ Set TypingSpeed 55ms
 Set Theme "UltraDark"
 
 Hide
-Type "export EDITOR=vim VISUAL=vim"
-Enter
 Type `REPO="$PWD"`
 Enter
 Type `rm -rf /tmp/gitpt-demo && mkdir -p /tmp/gitpt-demo && cd /tmp/gitpt-demo || exit 1`
@@ -47,12 +45,10 @@ Sleep 1.5s
 Type "gitpt commit"
 Enter
 
-# Summarization (build-demo.mjs speeds up only this wait).
+# Generation (build-demo.mjs speeds up only this phase).
 Sleep 24s
 
 Sleep 2s
-Enter
-Sleep 4s
-Type ":wq"
+# Confirm the generated message and commit.
 Enter
 Sleep 4s
