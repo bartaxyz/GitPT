@@ -18,7 +18,7 @@ import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import ffmpegPath from "ffmpeg-static";
 import { PNG } from "pngjs";
-import { drawPlaybackSpeed } from "./demo-playback.mjs";
+import { drawPlaybackSpeed, renderPlaybackLabels } from "./demo-playback.mjs";
 
 const TAPE = "assets/demo.tape";
 const RAW = "assets/demo.gif";
@@ -74,6 +74,8 @@ try {
   console.log("Recording with VHS...");
   withAppleConfig(() => execFileSync("vhs", [TAPE], { stdio: "inherit" }));
 
+  const labels = renderPlaybackLabels(readFileSync(TAPE, "utf8"), work, [1, SPEEDUP]);
+
   console.log("Extracting frames...");
   cpSync(RAW, join(work, "raw.gif"));
   execFileSync("mkdir", ["-p", framesDir, cutDir]);
@@ -100,7 +102,7 @@ try {
 
   keep.forEach(({ frame, speed }, i) => {
     const png = PNG.sync.read(readFileSync(join(framesDir, frame)));
-    drawPlaybackSpeed(png, speed);
+    drawPlaybackSpeed(png, speed, labels);
     writeFileSync(
       join(cutDir, `f${String(i).padStart(5, "0")}.png`),
       PNG.sync.write(png)
