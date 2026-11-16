@@ -22,6 +22,8 @@ npm install -g gitpt
 gitpt setup     # pick a model
 ```
 
+> **Apple Foundation Models:** Enable Apple Intelligence in System Settings and run `sudo fm license` to accept the CLI terms before setup. Acceptance applies to every user on the Mac.
+
 Optional: alias git so GitPT runs everywhere you already type git.
 
 ```bash
