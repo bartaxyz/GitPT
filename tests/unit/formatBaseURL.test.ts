@@ -1,6 +1,11 @@
 import { test, expect } from "vitest";
 import { formatBaseURL } from "../../src/utils/formatBaseURL.js";
 
+test("trims surrounding whitespace before formatting", () => {
+  expect(formatBaseURL(" \thttps://host/\n")).toBe("https://host/v1");
+  expect(formatBaseURL(" https://host/v1/ ")).toBe("https://host/v1");
+});
+
 test("appends /v1 when it is missing", () => {
   expect(formatBaseURL("https://host")).toBe("https://host/v1");
 });
