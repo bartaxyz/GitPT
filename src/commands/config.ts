@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { getConfig, isDebug } from "../config.js";
+import { getConfigPath, getConfig, isDebug } from "../config.js";
 import { maskApiKey } from "../utils/maskApiKey.js";
 
 // Pole, která se ukazují jen v debug módu. `contextWindow` je reálné uživatelské
@@ -8,6 +8,7 @@ export const DEBUG_ONLY = new Set(["debug"]);
 
 export const configCommand = async (): Promise<void> => {
   console.log(chalk.blue("GitPT Configuration"));
+  console.log(`Configuration file: ${getConfigPath()}`);
 
   const { apiKey, ...config } = getConfig();
 

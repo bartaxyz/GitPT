@@ -88,7 +88,7 @@ export const hookRunCommand = async (
     const diff = git.getStagedChanges();
     if (!diff || !diff.trim()) return;
 
-    const message = (await generateCommitMessage(await prepareCommitContext(diff))).trim();
+    const message = (await generateCommitMessage((await prepareCommitContext(diff)).framed)).trim();
     if (!message) return;
 
     // Keep git's template/comments below the generated message.
